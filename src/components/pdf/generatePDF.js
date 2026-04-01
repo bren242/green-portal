@@ -681,9 +681,10 @@ export async function generatePDF(formData, user) {
   const safeName = (clientName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]
   const fileName = `KYC_${dateStr}_${safeName}.pdf`
-  const blob = doc.output('blob')
+  const pdfBytes = doc.output('arraybuffer')
+  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
-  return { url, fileName, blob }
+  return { url, fileName, blob: pdfBytes }
 }
 
 function translateMarital(status) {
