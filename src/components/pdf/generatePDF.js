@@ -1,246 +1,538 @@
 import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+import { assistantRegular, assistantBold } from '../../assets/fonts/assistantFonts'
 import { RISK_LEVELS } from '../../data/formSchema'
 
-// Hebrew text helper - jsPDF doesn't support RTL natively
-// We'll use a simple approach: reverse text for display
-function hebrewText(text) {
-  return text
+// Hebrew RTL helper - reverse text for jsPDF display
+function rtl(text) {
+  if (!text) return ''
+  // Split into segments: Hebrew vs non-Hebrew (numbers, English, symbols)
+  const segments = text.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+|[^\u0590-\u05FF\uFB1D-\uFB4F]+/g) || []
+  // Reverse order of segments and reverse Hebrew segments internally
+  return segments
+    .reverse()
+    .map((seg) => {
+      if (/[\u0590-\u05FF]/.test(seg)) {
+        return seg.split('').reverse().join('')
+      }
+      return seg
+    })
+    .join('')
+}
+
+// Colors from DESIGN.md
+const COLORS = {
+  primary: [27, 58, 47],       // #1B3A2F
+  secondary: [62, 122, 92],    // #3E7A5C
+  gold: [184, 151, 90],        // #B8975A
+  goldLight: [212, 180, 131],  // #D4B483
+  offWhite: [244, 243, 239],   // #F4F3EF
+  cream: [248, 245, 238],      // #F8F5EE
+  surfaceLight: [246, 245, 241],// #F6F5F1
+  border: [221, 213, 191],     // #DDD5BF
+  textPrimary: [26, 26, 26],   // #1A1A1A
+  textMuted: [90, 90, 90],     // #5A5A5A
+  negative: [192, 57, 43],     // #C0392B
+  white: [255, 255, 255],
 }
 
 export async function generatePDF(formData, user) {
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-  })
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+  // Register fonts
+  doc.addFileToVFS('Assistant-Regular.ttf', assistantRegular)
+  doc.addFont('Assistant-Regular.ttf', 'Assistant', 'normal')
+  doc.addFileToVFS('Assistant-Bold.ttf', assistantBold)
+  doc.addFont('Assistant-Bold.ttf', 'Assistant', 'bold')
 
   const pageWidth = 210
+  const pageHeight = 297
   const margin = 20
+  const rightX = pageWidth - margin
   const contentWidth = pageWidth - margin * 2
-  let y = 20
+  let y = 0
 
-  // Helper functions
-  const addLine = (text, fontSize = 12, fontStyle = 'normal', align = 'right') => {
-    doc.setFontSize(fontSize)
-    doc.setFont('helvetica', fontStyle)
-    if (align === 'right') {
-      doc.text(text, pageWidth - margin, y, { align: 'right' })
-    } else if (align === 'center') {
-      doc.text(text, pageWidth / 2, y, { align: 'center' })
-    }
-    y += fontSize * 0.5
+  // ==================== HELPERS ====================
+  const setColor = (color) => doc.setTextColor(...color)
+  const setFill = (color) => doc.setFillColor(...color)
+  const setDraw = (color) => doc.setDrawColor(...color)
+
+  const text = (str, x, yPos, options = {}) => {
+    doc.text(rtl(str), x, yPos, { align: 'right', ...options })
   }
 
-  const addSpacer = (size = 5) => { y += size }
+  const textLeft = (str, x, yPos) => {
+    doc.text(str, x, yPos, { align: 'left' })
+  }
 
-  const checkPageBreak = (needed = 30) => {
-    if (y + needed > 270) {
+  const checkPage = (needed = 25) => {
+    if (y + needed > pageHeight - 25) {
       doc.addPage()
-      y = 20
+      y = 25
+      addPageHeader()
     }
   }
 
-  // === COVER ===
-  addLine('GREEN Wealth Management', 22, 'bold', 'center')
-  addSpacer(8)
-  addLine('Needs Assessment / Client KYC', 16, 'normal', 'center')
-  addSpacer(4)
-  addLine(`Date: ${new Date().toLocaleDateString('he-IL')}`, 11, 'normal', 'center')
-  addLine(`Advisor: ${user.name}`, 11, 'normal', 'center')
-  addSpacer(10)
+  const addPageHeader = () => {
+    // Thin header bar
+    setFill(COLORS.primary)
+    doc.rect(0, 0, pageWidth, 12, 'F')
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(8)
+    setColor(COLORS.goldLight)
+    text('GREEN Wealth Management', rightX - 5, 8)
+    setColor(COLORS.white)
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(7)
+    textLeft(rtl('איפיון צרכים'), margin + 5, 8)
+    y = 20
+  }
 
-  doc.setDrawColor(27, 58, 47)
-  doc.setLineWidth(0.5)
-  doc.line(margin, y, pageWidth - margin, y)
-  addSpacer(8)
+  const sectionTitle = (title) => {
+    checkPage(20)
+    setFill(COLORS.primary)
+    doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F')
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(12)
+    setColor(COLORS.white)
+    text(title, rightX - 5, y + 7)
+    y += 16
+    setColor(COLORS.textPrimary)
+    doc.setFont('Assistant', 'normal')
+  }
 
-  // === SECTION 1: Personal Details ===
-  addLine('Section 1: Personal Details', 14, 'bold')
-  addSpacer(3)
+  const labelValue = (label, value) => {
+    checkPage(8)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(9)
+    setColor(COLORS.textMuted)
+    text(label, rightX, y)
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(10)
+    setColor(COLORS.textPrimary)
+    text(value || '---', rightX - 50, y)
+    y += 6
+  }
 
-  const clientFields = [
-    ['Full Name', 'fullName'],
-    ['ID Number', 'idNumber'],
-    ['Date of Birth', 'birthDate'],
-    ['Marital Status', 'maritalStatus'],
-    ['Dependents', 'dependents'],
-    ['Phone', 'phone'],
-    ['Email', 'email'],
-    ['Occupation', 'occupation'],
-  ]
+  const spacer = (s = 4) => { y += s }
+
+  // ==================== COVER PAGE ====================
+  // Green background bar
+  setFill(COLORS.primary)
+  doc.rect(0, 0, pageWidth, 85, 'F')
+
+  // Gold accent line
+  setFill(COLORS.gold)
+  doc.rect(0, 85, pageWidth, 3, 'F')
+
+  // Logo placeholder - text version
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(32)
+  setColor(COLORS.white)
+  doc.text('GREEN', pageWidth / 2, 35, { align: 'center' })
+  doc.setFontSize(11)
+  setColor(COLORS.goldLight)
+  doc.text('WEALTH MANAGEMENT', pageWidth / 2, 45, { align: 'center' })
+
+  // Title
+  doc.setFontSize(22)
+  setColor(COLORS.white)
+  text('איפיון צרכים והתאמת מדיניות השקעה', pageWidth / 2, 65, { align: 'center' })
+
+  // Info box below cover
+  y = 100
+  setFill(COLORS.cream)
+  setDraw(COLORS.border)
+  doc.roundedRect(margin + 20, y, contentWidth - 40, 40, 3, 3, 'FD')
+
+  doc.setFont('Assistant', 'normal')
+  doc.setFontSize(11)
+  setColor(COLORS.textPrimary)
+
+  const date = new Date().toLocaleDateString('he-IL')
+  const clientName = formData.clientA.fullName || '---'
+
+  text(`תאריך: ${date}`, pageWidth / 2 + 30, y + 12)
+  text(`לקוח: ${clientName}`, pageWidth / 2 + 30, y + 22)
+  text(`בעל הרישיון: ${user.name}`, pageWidth / 2 + 30, y + 32)
+
+  // Footer disclaimer
+  y = 260
+  doc.setFontSize(8)
+  setColor(COLORS.textMuted)
+  text('מסמך זה הופק באמצעות מערכת איפיון צרכים דיגיטלית של GREEN Wealth Management', pageWidth / 2, y, { align: 'center' })
+  text('כל הנתונים נמסרו על ידי הלקוח ובאחריותו', pageWidth / 2, y + 5, { align: 'center' })
+
+  // ==================== PAGE 2: PERSONAL DETAILS ====================
+  doc.addPage()
+  addPageHeader()
+
+  sectionTitle('פרטים מזהים')
 
   const printClient = (client, title) => {
-    addLine(title, 12, 'bold')
-    addSpacer(2)
-    clientFields.forEach(([label, key]) => {
-      const val = client[key] || '---'
-      addLine(`${label}: ${val}`, 10)
-    })
-    addSpacer(3)
+    checkPage(50)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(11)
+    setColor(COLORS.secondary)
+    text(title, rightX, y)
+    y += 8
+    doc.setFont('Assistant', 'normal')
+
+    labelValue('שם מלא', client.fullName)
+    labelValue('תעודת זהות', client.idNumber)
+    labelValue('תאריך לידה', client.birthDate)
+    labelValue('מצב משפחתי', translateMarital(client.maritalStatus))
+    labelValue('נפשות תלויות', client.dependents)
+    labelValue('טלפון', client.phone)
+    labelValue('דוא״ל', client.email)
+    labelValue('עיסוק', client.occupation)
+    spacer(6)
   }
 
-  printClient(formData.clientA, formData.signerType === 'couple' ? 'Client A' : 'Client')
+  printClient(formData.clientA, formData.signerType === 'couple' ? 'לקוח א׳' : 'פרטי הלקוח')
   if (formData.signerType === 'couple') {
-    printClient(formData.clientB, 'Client B')
+    printClient(formData.clientB, 'לקוח ב׳')
   }
 
-  // === SECTION 2: Financial Balance ===
-  checkPageBreak(60)
-  doc.setDrawColor(27, 58, 47)
-  doc.line(margin, y, pageWidth - margin, y)
-  addSpacer(5)
-  addLine('Section 2: Financial Balance (Household)', 14, 'bold')
-  addSpacer(3)
+  // ==================== FINANCIAL BALANCE ====================
+  sectionTitle('תמונה כלכלית — התא המשפחתי')
 
   // Income
-  addLine('Income:', 11, 'bold')
-  if (formData.income.salary.has) addLine(`  Salary: ${formData.income.salary.amount}`, 10)
-  if (formData.income.pension.has) addLine(`  Pension: ${formData.income.pension.amount}`, 10)
-  if (formData.income.realEstate.has) addLine(`  Real Estate Income: ${formData.income.realEstate.amount}`, 10)
-  if (formData.income.other.has) addLine(`  Other: ${formData.income.other.amount}`, 10)
-  addSpacer(3)
+  checkPage(30)
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(10)
+  setColor(COLORS.primary)
+  text('הכנסות (חודשי)', rightX, y)
+  y += 7
 
-  // Assets summary
-  addLine('Assets:', 11, 'bold')
-  const assetLabels = {
-    cash: 'Cash', deposits: 'Deposits', moneyMarket: 'Money Market',
-    managedPortfolio: 'Managed Portfolio', stocks: 'Stocks/Bonds', etf: 'ETF', foreignBroker: 'Foreign Broker',
-    hishtalmut: 'Keren Hishtalmut', gemel: 'Kupat Gemel', gemelInvestment: 'Gemel LeHashkaa', savingsPolicy: 'Savings Policy',
-    pensionFund: 'Pension Fund', bituachMenahalim: 'Bituach Menahalim',
-    investmentRealEstate: 'Investment Real Estate', residenceRealEstate: 'Residence',
-    business: 'Business', other: 'Other',
+  const incomeRows = []
+  if (formData.income.salary.has) incomeRows.push(['שכר נטו חודשי', formData.income.salary.amount])
+  if (formData.income.pension.has) incomeRows.push(['פנסיה / קצבה', formData.income.pension.amount])
+  if (formData.income.realEstate.has) incomeRows.push(['הכנסות מנדל״ן', formData.income.realEstate.amount])
+  if (formData.income.other.has) incomeRows.push(['אחר', formData.income.other.amount])
+
+  if (incomeRows.length > 0) {
+    addTable(doc, incomeRows, y)
+    y += incomeRows.length * 8 + 10
+  }
+  if (formData.incomeNotes) {
+    addNote(doc, formData.incomeNotes)
   }
 
-  Object.entries(formData.assets).forEach(([key, asset]) => {
-    if (asset.has) {
-      let line = `  ${assetLabels[key] || key}: ${asset.amount}`
-      if (asset.guaranteedYield) line += ' (Guaranteed Yield)'
-      addLine(line, 10)
+  // Assets
+  const assetSections = [
+    { title: 'עו״ש, מזומן ופקדונות', items: [
+      ['עו״ש / מזומן', formData.assets.cash],
+      ['פקדונות בנקאיים', formData.assets.deposits],
+      ['קרנות כספיות', formData.assets.moneyMarket],
+    ], notes: formData.cashNotes },
+    { title: 'ני״ע בארץ ובחו״ל', items: [
+      ['תיק מנוהל', formData.assets.managedPortfolio],
+      ['מניות / אג״ח', formData.assets.stocks],
+      ['ETF', formData.assets.etf],
+      ['ברוקר זר / חו״ל', formData.assets.foreignBroker],
+    ], notes: formData.securitiesNotes },
+    { title: 'חיסכון, גמל והשתלמות', items: [
+      ['קרן השתלמות', formData.assets.hishtalmut],
+      ['קופת גמל', formData.assets.gemel],
+      ['גמל להשקעה', formData.assets.gemelInvestment],
+      ['פוליסת חיסכון', formData.assets.savingsPolicy],
+    ], notes: formData.savingsNotes },
+    { title: 'פנסיה', items: [
+      ['קרן פנסיה', formData.assets.pensionFund],
+      ['ביטוח מנהלים' + (formData.assets.bituachMenahalim.guaranteedYield ? ' (תשואה מובטחת)' : ''), formData.assets.bituachMenahalim],
+    ], notes: formData.pensionNotes },
+    { title: 'נדל״ן', items: [
+      ['נדל״ן להשקעה', formData.assets.investmentRealEstate],
+      ['נדל״ן מגורים', formData.assets.residenceRealEstate],
+    ], notes: formData.realEstateNotes },
+    { title: 'אחר', items: [
+      ['עסק / שותפות', formData.assets.business],
+      ['אחר', formData.assets.other],
+    ], notes: formData.otherAssetsNotes },
+  ]
+
+  for (const section of assetSections) {
+    const rows = section.items.filter(([, asset]) => asset.has).map(([label, asset]) => [label, asset.amount || '---'])
+    if (rows.length > 0) {
+      checkPage(rows.length * 8 + 18)
+      doc.setFont('Assistant', 'bold')
+      doc.setFontSize(10)
+      setColor(COLORS.primary)
+      text(section.title, rightX, y)
+      y += 7
+      addTable(doc, rows, y)
+      y += rows.length * 8 + 8
+      if (section.notes) addNote(doc, section.notes)
     }
-  })
-  addSpacer(3)
+  }
 
   // Liabilities
-  addLine('Liabilities:', 11, 'bold')
-  if (formData.liabilities.mortgage.has) addLine(`  Mortgage: Monthly ${formData.liabilities.mortgage.monthly}, Total ${formData.liabilities.mortgage.total}`, 10)
-  if (formData.liabilities.loans.has) addLine(`  Loans: Monthly ${formData.liabilities.loans.monthly}, Total ${formData.liabilities.loans.total}`, 10)
-  if (formData.liabilities.monthlyExpenses) addLine(`  Monthly Expenses: ${formData.liabilities.monthlyExpenses}`, 10)
-  addSpacer(3)
+  checkPage(30)
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(10)
+  setColor(COLORS.primary)
+  text('התחייבויות', rightX, y)
+  y += 7
 
+  const liabRows = []
+  if (formData.liabilities.mortgage.has) liabRows.push(['משכנתא', `חודשי: ${formData.liabilities.mortgage.monthly || '---'} | יתרה: ${formData.liabilities.mortgage.total || '---'}`])
+  if (formData.liabilities.loans.has) liabRows.push(['הלוואות', `חודשי: ${formData.liabilities.loans.monthly || '---'} | יתרה: ${formData.liabilities.loans.total || '---'}`])
+  if (formData.liabilities.monthlyExpenses) liabRows.push(['הוצאות שוטפות', formData.liabilities.monthlyExpenses])
+
+  if (liabRows.length > 0) {
+    addTable(doc, liabRows, y)
+    y += liabRows.length * 8 + 8
+  }
+  if (formData.liabilitiesNotes) addNote(doc, formData.liabilitiesNotes)
+
+  // Managed portion
   if (formData.managedPortion) {
-    const portionLabels = { up_to_35: 'Up to 35%', '35_to_70': '35%-70%', over_70: 'Over 70%' }
-    addLine(`Managed Portion: ${portionLabels[formData.managedPortion]}`, 10)
+    spacer(4)
+    const portionLabels = { up_to_35: 'עד 35%', '35_to_70': '35%-70%', over_70: 'מעל 70%' }
+    labelValue('שיעור נכסים מנוהל', portionLabels[formData.managedPortion])
   }
 
-  // === SECTION 3: Goals ===
-  checkPageBreak(40)
-  doc.line(margin, y, pageWidth - margin, y)
-  addSpacer(5)
-  addLine('Section 3: Investment Goals & Horizon', 14, 'bold')
-  addSpacer(3)
+  // ==================== GOALS & HORIZON ====================
+  sectionTitle('מטרות השקעה ואופק')
 
   const goalLabels = {
-    preserve: 'Preserve Value', income: 'Regular Income', growth: 'Long-term Growth',
-    pension: 'Pension', education: 'Children Education', intergenerational: 'Intergenerational Transfer', other: 'Other',
+    preserve: 'שמירת ערך', income: 'הכנסה שוטפת', growth: 'צמיחה לטווח ארוך',
+    pension: 'חיסכון לפנסיה', education: 'חינוך ילדים', intergenerational: 'העברה בין-דורית', other: 'אחר',
   }
-  addLine(`Goal: ${goalLabels[formData.investmentGoal] || '---'}`, 10)
-  if (formData.investmentGoalOther) addLine(`  Details: ${formData.investmentGoalOther}`, 10)
+  const goals = (formData.investmentGoals || []).map((g) => goalLabels[g] || g).join(', ')
+  labelValue('מטרות ההשקעה', goals || '---')
+  if (formData.investmentGoalOther) labelValue('פירוט', formData.investmentGoalOther)
 
-  const horizonLabels = { up_to_2: 'Up to 2 years', '2_to_5': '2-5 years', '5_to_10': '5-10 years', over_10: 'Over 10 years' }
-  addLine(`Horizon: ${horizonLabels[formData.investmentHorizon] || '---'}`, 10)
+  const horizonLabels = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', '5_to_10': '5-10 שנים', over_10: 'מעל 10 שנים' }
+  labelValue('אופק השקעה', horizonLabels[formData.investmentHorizon] || '---')
 
-  // === SECTION 4: Liquidity ===
-  addSpacer(3)
-  const timelineLabels = { up_to_2: 'Up to 2 years', '2_to_5': '2-5 years', over_5: 'Over 5 years' }
-  const next3Labels = { '0': '0%', up_to_30: 'Up to 30%', up_to_50: 'Up to 50%', over_50: 'Over 50%' }
-  addLine(`Liquidity Timeline: ${timelineLabels[formData.liquidityTimeline] || '---'}`, 10)
-  addLine(`Next 3 Years Need: ${next3Labels[formData.liquidityNext3Years] || '---'}`, 10)
+  // ==================== LIQUIDITY ====================
+  sectionTitle('צרכי נזילות')
 
-  // === SECTION 5: Risk ===
-  checkPageBreak(50)
-  doc.line(margin, y, pageWidth - margin, y)
-  addSpacer(5)
-  addLine('Section 5: Risk Assessment', 14, 'bold')
-  addSpacer(3)
+  const timelineLabels = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
+  const next3Labels = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
 
-  const riskAnswerLabels = {
-    riskQ1: { a: 'A - Conservative', b: 'B - Moderate', c: 'C - Balanced', d: 'D - Aggressive' },
-    riskQ2: { a: 'A - Safety first', b: 'B - Accept volatility', c: 'C - Long-term investor' },
-    riskQ3: { a: 'A - Exit', b: 'B - Reduce risk', c: 'C - Hold', d: 'D - Add more' },
-    riskQ4: { a: 'A - No loss', b: 'B - Beat inflation', c: 'C - Long-term growth' },
+  labelValue('צורך בכל הכסף', timelineLabels[formData.liquidityTimeline] || '---')
+  labelValue('צורך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---')
+
+  // ==================== RISK ASSESSMENT ====================
+  sectionTitle('הערכת סיכון')
+
+  // Risk questions answers
+  const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
+  const q2Labels = { a: 'מעדיף לישון בשקט', b: 'מוכן לתנודות לטובת תשואה', c: 'משקיע לטווח ארוך, תנודות לא מדאיגות' }
+  const q3Labels = { a: 'רוצה לצאת', b: 'שוקל לצמצם סיכון', c: 'מחזיק ומחכה', d: 'רואה הזדמנות להוסיף' }
+  const q4Labels = { a: 'לא להפסיד', b: 'לשמור מעל אינפלציה', c: 'צמיחה לטווח ארוך' }
+
+  labelValue('שאלה 1 — אסימטריה', q1Labels[formData.riskQ1] || '---')
+  labelValue('שאלה 2 — תחושה', q2Labels[formData.riskQ2] || '---')
+  labelValue('שאלה 3 — תרחיש', q3Labels[formData.riskQ3] || '---')
+  labelValue('שאלה 4 — עדיפות', q4Labels[formData.riskQ4] || '---')
+
+  spacer(4)
+
+  // Prior experience
+  if (formData.priorExperience) {
+    labelValue('ניסיון קודם', formData.priorExperience === 'yes' ? 'כן' : 'לא')
+    if (formData.priorExperienceDetails) labelValue('פירוט', formData.priorExperienceDetails)
   }
 
-  for (let i = 1; i <= 4; i++) {
-    const key = `riskQ${i}`
-    const answer = formData[key]
-    addLine(`Q${i}: ${answer ? riskAnswerLabels[key][answer] : '---'}`, 10)
-  }
-  addSpacer(2)
+  // ==================== ADVISOR SUMMARY & POLICY ====================
+  sectionTitle('סיכום והמלצת בעל הרישיון')
 
+  if (formData.advisorSummary) {
+    checkPage(20)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(9)
+    setColor(COLORS.textMuted)
+    text('סיכום וניתוח', rightX, y)
+    y += 6
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(9)
+    setColor(COLORS.textPrimary)
+    const lines = doc.splitTextToSize(rtl(formData.advisorSummary), contentWidth)
+    doc.text(lines, rightX, y, { align: 'right' })
+    y += lines.length * 4.5 + 4
+  }
+
+  if (formData.clientPreferences) {
+    checkPage(20)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(9)
+    setColor(COLORS.textMuted)
+    text('העדפות / הגבלות לקוח', rightX, y)
+    y += 6
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(9)
+    setColor(COLORS.textPrimary)
+    const lines = doc.splitTextToSize(rtl(formData.clientPreferences), contentWidth)
+    doc.text(lines, rightX, y, { align: 'right' })
+    y += lines.length * 4.5 + 4
+  }
+
+  // Risk level box
   if (formData.finalRiskLevel > 0) {
+    checkPage(35)
     const rl = RISK_LEVELS[formData.finalRiskLevel - 1]
-    addLine(`Final Risk Level: ${formData.finalRiskLevel} (${rl.name})`, 12, 'bold')
-    addLine(`Max Loss: ${rl.maxLoss} | Max Stocks: ${rl.maxStocks} | Corp Bonds: ${rl.corpBonds}`, 10)
+
+    // Risk level highlight box
+    setFill(COLORS.cream)
+    setDraw(COLORS.gold)
+    doc.setLineWidth(0.8)
+    doc.roundedRect(margin, y, contentWidth, 25, 3, 3, 'FD')
+
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(14)
+    setColor(COLORS.primary)
+    text(`דרגת סיכון סופית: ${formData.finalRiskLevel}`, rightX - 5, y + 10)
+
+    doc.setFontSize(11)
+    setColor(COLORS.secondary)
+    text(`${rl.name} | הפסד מקסימלי: ${rl.maxLoss} | מניות: ${rl.maxStocks} | אג״ח קונצרני: ${rl.corpBonds}`, rightX - 5, y + 19)
+
+    y += 32
   }
 
   if (formData.finalRiskJustification) {
-    addSpacer(2)
-    addLine(`Justification: ${formData.finalRiskJustification}`, 10)
+    checkPage(15)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(9)
+    setColor(COLORS.textMuted)
+    text('נימוק מקצועי', rightX, y)
+    y += 6
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(9)
+    setColor(COLORS.textPrimary)
+    const lines = doc.splitTextToSize(rtl(formData.finalRiskJustification), contentWidth)
+    doc.text(lines, rightX, y, { align: 'right' })
+    y += lines.length * 4.5 + 4
   }
 
-  addSpacer(3)
-  addLine(`Forex: ${formData.forex ? 'Yes' : 'No'} | Low-rated Bonds: ${formData.lowRatedBonds ? 'Yes' : 'No'} | Corp Bonds: ${formData.corporateBondsPct || '---'}%`, 10)
-  if (formData.equityPct) addLine(`Max Equity: ${formData.equityPct}%`, 10)
+  // Policy parameters
+  spacer(3)
+  if (formData.equityPct) labelValue('אחוז מניות מקסימלי', formData.equityPct + '%')
+  if (formData.corporateBondsPct) labelValue('אג״ח קונצרני', formData.corporateBondsPct === '50' ? 'עד 50%' : 'עד 100%')
+  labelValue('מט״ח', formData.forex ? 'כן' : 'לא')
+  labelValue('אג״ח בדירוג נמוך', formData.lowRatedBonds ? 'כן' : 'לא')
 
-  // === REFUSALS ===
+  // ==================== REFUSALS ====================
   if (formData.refusals.length > 0) {
-    checkPageBreak(30)
-    doc.line(margin, y, pageWidth - margin, y)
-    addSpacer(5)
-    addLine('Refused Questions:', 12, 'bold')
-    addSpacer(2)
+    checkPage(20 + formData.refusals.length * 6)
+    spacer(6)
+    setFill(COLORS.offWhite)
+    setDraw(COLORS.negative)
+    doc.setLineWidth(0.3)
+    const refHeight = 15 + formData.refusals.length * 6
+    doc.roundedRect(margin, y, contentWidth, refHeight, 2, 2, 'FD')
+
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(10)
+    setColor(COLORS.negative)
+    text('שאלות שהלקוח סירב להשיב:', rightX - 5, y + 8)
+    y += 14
+
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(9)
     formData.refusals.forEach((r) => {
-      addLine(`  - ${r.label}`, 10)
+      text(`• ${r.label}`, rightX - 8, y)
+      y += 6
     })
-    addSpacer(3)
-    addLine('The client refused to answer the above questions.', 10)
-    addLine('It was explained that this may affect the quality of the recommendation.', 10)
+
+    y += 4
+    doc.setFontSize(8)
+    setColor(COLORS.textMuted)
+    text('הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.', rightX, y)
+    y += 10
   }
 
-  // === SIGNATURES ===
-  checkPageBreak(50)
-  addSpacer(10)
+  // ==================== SIGNATURES ====================
+  checkPage(60)
+  spacer(10)
+  setDraw(COLORS.primary)
+  doc.setLineWidth(0.5)
   doc.line(margin, y, pageWidth - margin, y)
-  addSpacer(8)
-  addLine('Signatures', 14, 'bold', 'center')
-  addSpacer(8)
+  y += 10
 
-  // Client A signature
-  const sigY = y
-  doc.line(margin, sigY + 15, margin + 60, sigY + 15)
-  addLine(`${formData.clientA.fullName || 'Client'}`, 10)
-  y = sigY + 20
-  addLine('Date: ____________', 9)
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(13)
+  setColor(COLORS.primary)
+  text('חתימות', pageWidth / 2, y, { align: 'center' })
+  y += 12
 
-  if (formData.signerType === 'couple') {
-    addSpacer(5)
-    const sigY2 = y
-    doc.line(margin, sigY2 + 15, margin + 60, sigY2 + 15)
-    addLine(`${formData.clientB.fullName || 'Client B'}`, 10)
-    y = sigY2 + 20
-    addLine('Date: ____________', 9)
+  // Signature helper
+  const addSignature = (name, role) => {
+    checkPage(25)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(10)
+    setColor(COLORS.primary)
+    text(role, rightX, y)
+    y += 8
+
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(9)
+    setColor(COLORS.textPrimary)
+    text(name || '_______________', rightX, y)
+    y += 5
+
+    setDraw(COLORS.border)
+    doc.setLineWidth(0.3)
+    doc.line(rightX - 60, y, rightX, y)
+    y += 5
+    doc.setFontSize(8)
+    setColor(COLORS.textMuted)
+    text('חתימה                                   תאריך', rightX, y)
+    y += 10
   }
 
-  // Advisor signature
-  addSpacer(5)
-  const sigYAdvisor = y
-  doc.line(margin, sigYAdvisor + 15, margin + 60, sigYAdvisor + 15)
-  addLine(`${user.name} - Licensed Investment Marketer`, 10)
-  y = sigYAdvisor + 20
-  addLine('Date: ____________', 9)
+  addSignature(formData.clientA.fullName, formData.signerType === 'couple' ? 'לקוח א׳' : 'הלקוח')
+  if (formData.signerType === 'couple') {
+    addSignature(formData.clientB.fullName, 'לקוח ב׳')
+  }
+  addSignature(user.name, 'בעל הרישיון')
 
-  // Save
-  const clientName = formData.clientA.fullName || 'client'
-  const date = new Date().toISOString().split('T')[0]
-  doc.save(`KYC_${date}_${clientName}.pdf`)
+  // ==================== SAVE ====================
+  const safeName = (formData.clientA.fullName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
+  const dateStr = new Date().toISOString().split('T')[0]
+  doc.save(`KYC_${dateStr}_${safeName}.pdf`)
+
+  // ==================== HELPER FUNCTIONS ====================
+  function addTable(d, rows, startY) {
+    autoTable(d, {
+      body: rows.map(([label, value]) => [rtl(value || '---'), rtl(label)]),
+      startY,
+      margin: { right: margin, left: margin },
+      styles: {
+        font: 'Assistant',
+        fontStyle: 'normal',
+        fontSize: 9,
+        halign: 'right',
+        cellPadding: 2,
+        lineColor: COLORS.border,
+        lineWidth: 0.2,
+      },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: contentWidth - 50, fontStyle: 'bold' },
+      },
+      alternateRowStyles: { fillColor: COLORS.surfaceLight },
+      didDrawPage: () => { y = d.lastAutoTable.finalY + 4 },
+    })
+    y = d.lastAutoTable.finalY + 4
+  }
+
+  function addNote(d, noteText) {
+    if (!noteText) return
+    checkPage(12)
+    d.setFont('Assistant', 'normal')
+    d.setFontSize(8)
+    setColor(COLORS.textMuted)
+    text(`הערות: ${noteText}`, rightX, y)
+    y += 6
+  }
+}
+
+function translateMarital(status) {
+  const map = { single: 'רווק/ה', married: 'נשוי/אה', divorced: 'גרוש/ה', widowed: 'אלמן/ה' }
+  return map[status] || status || '---'
 }

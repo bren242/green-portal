@@ -14,6 +14,7 @@ export default function LiquidityStep({ formData, updateForm, isRefused, toggleR
               { value: 'up_to_2', label: 'עד שנתיים' },
               { value: '2_to_5', label: '2-5 שנים' },
               { value: 'over_5', label: 'מעל 5 שנים' },
+              { value: 'unknown', label: 'לא ידוע' },
             ]}
           />
         </div>
@@ -32,6 +33,7 @@ export default function LiquidityStep({ formData, updateForm, isRefused, toggleR
               { value: 'up_to_30', label: 'עד 30%' },
               { value: 'up_to_50', label: 'עד 50%' },
               { value: 'over_50', label: 'מעל 50%' },
+              { value: 'unknown', label: 'לא ידוע' },
             ]}
           />
         </div>

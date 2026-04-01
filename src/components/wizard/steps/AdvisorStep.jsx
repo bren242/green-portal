@@ -21,8 +21,7 @@ export default function AdvisorStep({ formData, updateForm, user }) {
   return (
     <div className="space-y-6">
       <div className="bg-surface-cream border border-gold/30 rounded-card p-4 text-sm">
-        <span className="font-bold text-green-primary">חלק זה מיועד לבעל הרישיון בלבד</span>
-        <span className="text-text-muted"> — לא מוצג ללקוח ב-PDF</span>
+        <span className="font-bold text-green-primary">סיכום והמלצת בעל הרישיון</span>
       </div>
 
       <TextArea

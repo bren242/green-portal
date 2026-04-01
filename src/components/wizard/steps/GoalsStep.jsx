@@ -1,30 +1,57 @@
 import { RadioGroup, TextInput, RefuseButton } from '../ui/FormField'
 
+const GOAL_OPTIONS = [
+  { value: 'preserve', label: 'שמירת ערך' },
+  { value: 'income', label: 'הכנסה שוטפת' },
+  { value: 'growth', label: 'צמיחה לטווח ארוך' },
+  { value: 'pension', label: 'חיסכון לפנסיה' },
+  { value: 'education', label: 'חינוך ילדים' },
+  { value: 'intergenerational', label: 'העברה בין-דורית' },
+  { value: 'other', label: 'אחר' },
+]
+
 export default function GoalsStep({ formData, updateForm, isRefused, toggleRefusal }) {
+  const goals = formData.investmentGoals || []
+
+  const toggleGoal = (value) => {
+    const updated = goals.includes(value)
+      ? goals.filter((g) => g !== value)
+      : [...goals, value]
+    updateForm({ investmentGoals: updated })
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-2">
         <div className="flex-1">
-          <RadioGroup
-            label="מטרת ההשקעה הראשית"
-            name="investmentGoal"
-            value={formData.investmentGoal}
-            onChange={(v) => updateForm({ investmentGoal: v })}
-            options={[
-              { value: 'preserve', label: 'שמירת ערך' },
-              { value: 'income', label: 'הכנסה שוטפת' },
-              { value: 'growth', label: 'צמיחה לטווח ארוך' },
-              { value: 'pension', label: 'חיסכון לפנסיה' },
-              { value: 'education', label: 'חינוך ילדים' },
-              { value: 'intergenerational', label: 'העברה בין-דורית' },
-              { value: 'other', label: 'אחר' },
-            ]}
-          />
+          <p className="text-sm font-semibold text-text-primary mb-2">מטרות ההשקעה (ניתן לבחור יותר מאחת)</p>
+          <div className="space-y-2">
+            {GOAL_OPTIONS.map((opt) => (
+              <label
+                key={opt.value}
+                className={`
+                  flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all
+                  ${goals.includes(opt.value)
+                    ? 'border-green-secondary bg-green-secondary/5'
+                    : 'border-border hover:border-green-secondary/40'
+                  }
+                `}
+              >
+                <input
+                  type="checkbox"
+                  checked={goals.includes(opt.value)}
+                  onChange={() => toggleGoal(opt.value)}
+                  className="accent-green-secondary w-4 h-4"
+                />
+                <span className="text-sm">{opt.label}</span>
+              </label>
+            ))}
+          </div>
         </div>
-        <RefuseButton field="investmentGoal" label="מטרת ההשקעה" isRefused={isRefused} toggleRefusal={toggleRefusal} />
+        <RefuseButton field="investmentGoals" label="מטרות ההשקעה" isRefused={isRefused} toggleRefusal={toggleRefusal} />
       </div>
 
-      {formData.investmentGoal === 'other' && (
+      {goals.includes('other') && (
         <TextInput
           label="פרט"
           value={formData.investmentGoalOther}

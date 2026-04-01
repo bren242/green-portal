@@ -1,4 +1,4 @@
-import { AssetRow, TextInput, RadioGroup, RefuseButton } from '../ui/FormField'
+import { AssetRow, TextInput, TextArea, RadioGroup, RefuseButton } from '../ui/FormField'
 
 function SectionTitle({ children }) {
   return (
@@ -28,18 +28,25 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
       </p>
 
       {/* Income */}
-      <SectionTitle>הכנסות</SectionTitle>
+      <SectionTitle>הכנסות (חודשי)</SectionTitle>
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="flex-1">
-            <AssetRow label="שכר נטו" asset={formData.income.salary} onChange={(v) => updateIncome('salary', v)} />
+            <AssetRow label="שכר נטו חודשי" asset={formData.income.salary} onChange={(v) => updateIncome('salary', v)} />
           </div>
           <RefuseButton field="income.salary" label="שכר נטו" isRefused={isRefused} toggleRefusal={toggleRefusal} />
         </div>
-        <AssetRow label="פנסיה / קצבה" asset={formData.income.pension} onChange={(v) => updateIncome('pension', v)} />
-        <AssetRow label="הכנסות מנדל״ן" asset={formData.income.realEstate} onChange={(v) => updateIncome('realEstate', v)} />
-        <AssetRow label="הכנסות אחרות" asset={formData.income.other} onChange={(v) => updateIncome('other', v)} />
+        <AssetRow label="פנסיה / קצבה חודשית" asset={formData.income.pension} onChange={(v) => updateIncome('pension', v)} />
+        <AssetRow label="הכנסות מנדל״ן חודשי" asset={formData.income.realEstate} onChange={(v) => updateIncome('realEstate', v)} />
+        <AssetRow label="הכנסות אחרות חודשי" asset={formData.income.other} onChange={(v) => updateIncome('other', v)} />
       </div>
+      <TextArea
+        label="הערות להכנסות"
+        value={formData.incomeNotes || ''}
+        onChange={(v) => updateForm({ incomeNotes: v })}
+        placeholder="פירוט נוסף על מקורות ההכנסה..."
+        rows={2}
+      />
 
       {/* Cash & equivalents */}
       <SectionTitle>עו״ש, מזומן ופקדונות</SectionTitle>
@@ -48,6 +55,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         <AssetRow label="פקדונות בנקאיים" asset={formData.assets.deposits} onChange={(v) => updateAsset('deposits', v)} />
         <AssetRow label="קרנות כספיות" asset={formData.assets.moneyMarket} onChange={(v) => updateAsset('moneyMarket', v)} />
       </div>
+      <TextArea
+        label="הערות"
+        value={formData.cashNotes || ''}
+        onChange={(v) => updateForm({ cashNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Securities */}
       <SectionTitle>ני״ע בארץ ובחו״ל</SectionTitle>
@@ -57,6 +71,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         <AssetRow label="ETF" asset={formData.assets.etf} onChange={(v) => updateAsset('etf', v)} />
         <AssetRow label="ברוקר זר / חו״ל" asset={formData.assets.foreignBroker} onChange={(v) => updateAsset('foreignBroker', v)} />
       </div>
+      <TextArea
+        label="הערות"
+        value={formData.securitiesNotes || ''}
+        onChange={(v) => updateForm({ securitiesNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Savings, Gemel, Hishtalmut */}
       <SectionTitle>חיסכון, גמל והשתלמות</SectionTitle>
@@ -66,6 +87,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         <AssetRow label="גמל להשקעה" asset={formData.assets.gemelInvestment} onChange={(v) => updateAsset('gemelInvestment', v)} />
         <AssetRow label="פוליסת חיסכון" asset={formData.assets.savingsPolicy} onChange={(v) => updateAsset('savingsPolicy', v)} />
       </div>
+      <TextArea
+        label="הערות"
+        value={formData.savingsNotes || ''}
+        onChange={(v) => updateForm({ savingsNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Pension */}
       <SectionTitle>פנסיה</SectionTitle>
@@ -73,6 +101,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         <AssetRow label="קרן פנסיה" asset={formData.assets.pensionFund} onChange={(v) => updateAsset('pensionFund', v)} />
         <AssetRow label="ביטוח מנהלים" asset={formData.assets.bituachMenahalim} onChange={(v) => updateAsset('bituachMenahalim', v)} showGuaranteed />
       </div>
+      <TextArea
+        label="הערות"
+        value={formData.pensionNotes || ''}
+        onChange={(v) => updateForm({ pensionNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Real estate */}
       <SectionTitle>נדל״ן</SectionTitle>
@@ -80,6 +115,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         <AssetRow label="נדל״ן להשקעה" asset={formData.assets.investmentRealEstate} onChange={(v) => updateAsset('investmentRealEstate', v)} />
         <AssetRow label="נדל״ן מגורים (שווי)" asset={formData.assets.residenceRealEstate} onChange={(v) => updateAsset('residenceRealEstate', v)} />
       </div>
+      <TextArea
+        label="הערות"
+        value={formData.realEstateNotes || ''}
+        onChange={(v) => updateForm({ realEstateNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Other */}
       <SectionTitle>אחר</SectionTitle>
@@ -87,6 +129,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         <AssetRow label="עסק / שותפות" asset={formData.assets.business} onChange={(v) => updateAsset('business', v)} />
         <AssetRow label="אחר" asset={formData.assets.other} onChange={(v) => updateAsset('other', v)} />
       </div>
+      <TextArea
+        label="הערות"
+        value={formData.otherAssetsNotes || ''}
+        onChange={(v) => updateForm({ otherAssetsNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Liabilities */}
       <SectionTitle>התחייבויות</SectionTitle>
@@ -127,6 +176,13 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         </div>
         <TextInput label="הוצאות שוטפות חודשיות" value={formData.liabilities.monthlyExpenses} onChange={(v) => updateLiability('monthlyExpenses', v)} placeholder="₪" />
       </div>
+      <TextArea
+        label="הערות להתחייבויות"
+        value={formData.liabilitiesNotes || ''}
+        onChange={(v) => updateForm({ liabilitiesNotes: v })}
+        placeholder="פירוט נוסף..."
+        rows={2}
+      />
 
       {/* Managed portion */}
       <SectionTitle>שיעור הנכסים המופנה לניהול</SectionTitle>

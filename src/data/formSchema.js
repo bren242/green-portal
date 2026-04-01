@@ -53,14 +53,24 @@ export function createEmptyForm() {
     },
     managedPortion: '', // 'up_to_35' | '35_to_70' | 'over_70'
 
+    // Section 2 notes per category
+    incomeNotes: '',
+    cashNotes: '',
+    securitiesNotes: '',
+    savingsNotes: '',
+    pensionNotes: '',
+    realEstateNotes: '',
+    otherAssetsNotes: '',
+    liabilitiesNotes: '',
+
     // Section 3 - Goals & Horizon
-    investmentGoal: '', // 'preserve' | 'income' | 'growth' | 'pension' | 'education' | 'intergenerational' | 'other'
+    investmentGoals: [], // multi-select: ['preserve', 'income', 'growth', ...]
     investmentGoalOther: '',
     investmentHorizon: '', // 'up_to_2' | '2_to_5' | '5_to_10' | 'over_10'
 
     // Section 4 - Liquidity
-    liquidityTimeline: '', // 'up_to_2' | '2_to_5' | 'over_5'
-    liquidityNext3Years: '', // '0' | 'up_to_30' | 'up_to_50' | 'over_50'
+    liquidityTimeline: '', // 'up_to_2' | '2_to_5' | 'over_5' | 'unknown'
+    liquidityNext3Years: '', // '0' | 'up_to_30' | 'up_to_50' | 'over_50' | 'unknown'
 
     // Section 5 - Risk calculator
     riskQ1: '', // 'a' | 'b' | 'c' | 'd'
@@ -125,13 +135,12 @@ export function calculateRiskScore(form) {
   else if (average < 4.5) level = 4
   else level = 5
 
-  // Gap detection
+  // Gap detection - only when two DIFFERENT answers have a gap of 2+
   let hasGap = false
   let gapDetails = ''
-  const questions = ['riskQ1', 'riskQ2', 'riskQ3', 'riskQ4']
   for (let i = 0; i < scores.length; i++) {
     for (let j = i + 1; j < scores.length; j++) {
-      if (Math.abs(scores[i] - scores[j]) >= 2) {
+      if (scores[i] !== scores[j] && Math.abs(scores[i] - scores[j]) >= 2) {
         hasGap = true
         gapDetails = `שים לב — יש פער בין שאלה ${i + 1} לשאלה ${j + 1}. כדאי לדון עם הלקוח לפני קביעת הדרגה.`
         break
