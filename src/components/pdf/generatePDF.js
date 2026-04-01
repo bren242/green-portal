@@ -3,26 +3,35 @@ import { assistantRegular, assistantBold } from '../../assets/fonts/assistantFon
 import { RISK_LEVELS } from '../../data/formSchema'
 import { logoPng } from '../../assets/logoBase64'
 
-// Hebrew RTL helper for jsPDF
-// jsPDF renders LTR only. We reverse logical order so LTR rendering looks RTL.
-// Numbers, English, and symbols stay in their natural LTR order.
+// RTL helper for jsPDF (renders LTR internally, we reverse for visual RTL)
 function rtl(text) {
   if (!text) return ''
   const str = String(text)
-  // Match Hebrew runs vs non-Hebrew runs (numbers, English, punctuation, spaces)
   const segments = str.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+|[^\u0590-\u05FF\uFB1D-\uFB4F]+/g) || []
   return segments
     .reverse()
     .map((seg) => {
-      if (/[\u0590-\u05FF]/.test(seg)) {
-        return seg.split('').reverse().join('')
-      }
-      return seg // numbers, English, symbols stay LTR
+      if (/[\u0590-\u05FF]/.test(seg)) return seg.split('').reverse().join('')
+      return seg
     })
     .join('')
 }
 
-// Colors from DESIGN.md
+// Format number with ₪
+function fmtMoney(val) {
+  if (!val) return '---'
+  const str = String(val)
+  const num = parseFloat(str.replace(/[^\d.-]/g, ''))
+  if (isNaN(num)) return str.includes('₪') ? str : `₪ ${str}`
+  return `₪ ${num.toLocaleString('he-IL')}`
+}
+
+function parseAmount(str) {
+  if (!str) return 0
+  const num = parseFloat(String(str).replace(/[^\d.-]/g, ''))
+  return isNaN(num) ? 0 : num
+}
+
 const COLORS = {
   primary: [27, 58, 47],
   secondary: [62, 122, 92],
@@ -32,17 +41,24 @@ const COLORS = {
   cream: [248, 245, 238],
   surfaceLight: [246, 245, 241],
   border: [221, 213, 191],
-  textPrimary: [26, 26, 26],
+  black: [0, 0, 0],
   textMuted: [90, 90, 90],
   negative: [192, 57, 43],
   white: [255, 255, 255],
-  black: [0, 0, 0],
+}
+
+// Risk level descriptions
+const RISK_DESCRIPTIONS = {
+  1: 'שמירת ערך מקסימלית, תנודות מינימליות, תשואה צנועה מעל פקדון',
+  2: 'חשיפה מוגבלת לסיכון, תשואה מעל אינפלציה לאורך זמן',
+  3: 'איזון בין סיכון לתשואה, תנודות מובנות ומקובלות',
+  4: 'נכונות לסיכון גבוה לטובת תשואה עודפת לטווח ארוך',
+  5: 'חשיפה מקסימלית, מתאים למשקיע מנוסה עם אופק ארוך',
 }
 
 export async function generatePDF(formData, user) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
-  // Register fonts
   doc.addFileToVFS('Assistant-Regular.ttf', assistantRegular)
   doc.addFont('Assistant-Regular.ttf', 'Assistant', 'normal')
   doc.addFileToVFS('Assistant-Bold.ttf', assistantBold)
@@ -54,16 +70,11 @@ export async function generatePDF(formData, user) {
   const rightX = pageWidth - margin
   const contentWidth = pageWidth - margin * 2
   let y = 0
-  let totalPages = 0
 
-  // ==================== HELPERS ====================
-  const setColor = (color) => doc.setTextColor(...color)
-  const setFill = (color) => doc.setFillColor(...color)
-  const setDraw = (color) => doc.setDrawColor(...color)
-
-  const text = (str, x, yPos, options = {}) => {
-    doc.text(rtl(String(str || '')), x, yPos, { align: 'right', ...options })
-  }
+  const setColor = (c) => doc.setTextColor(...c)
+  const setFill = (c) => doc.setFillColor(...c)
+  const setDraw = (c) => doc.setDrawColor(...c)
+  const text = (s, x, yp, o = {}) => doc.text(rtl(String(s || '')), x, yp, { align: 'right', ...o })
 
   const checkPage = (needed = 25) => {
     if (y + needed > pageHeight - 30) {
@@ -73,25 +84,15 @@ export async function generatePDF(formData, user) {
   }
 
   const addPageHeader = () => {
-    // Dark green header bar
     setFill(COLORS.primary)
     doc.rect(0, 0, pageWidth, 14, 'F')
-
-    // Gold accent line
     setFill(COLORS.gold)
     doc.rect(0, 14, pageWidth, 1, 'F')
-
-    // Logo on left side of header
-    try {
-      doc.addImage(logoPng, 'PNG', margin, 2, 28, 10)
-    } catch (e) { /* logo unavailable */ }
-
-    // Title text on right
+    try { doc.addImage(logoPng, 'PNG', margin, 2, 28, 10) } catch (e) {}
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(9)
     setColor(COLORS.goldLight)
     text('איפיון צרכים — GREEN Wealth Management', rightX - 3, 9)
-
     y = 22
   }
 
@@ -108,11 +109,11 @@ export async function generatePDF(formData, user) {
     doc.setFont('Assistant', 'normal')
   }
 
-  const labelValue = (label, value, labelColor = COLORS.black) => {
+  const labelValue = (label, value) => {
     checkPage(8)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(9)
-    setColor(labelColor)
+    setColor(COLORS.textMuted)
     text(label, rightX, y)
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(10)
@@ -123,71 +124,53 @@ export async function generatePDF(formData, user) {
 
   const spacer = (s = 4) => { y += s }
 
-  // Manual table drawing
   const drawTable = (rows) => {
     if (!rows || rows.length === 0) return
-    const rowHeight = 8
-
     for (let i = 0; i < rows.length; i++) {
-      checkPage(rowHeight + 2)
-      const rowY = y
-
+      checkPage(10)
       if (i % 2 === 0) {
         setFill(COLORS.surfaceLight)
-        doc.rect(margin, rowY - 4, contentWidth, rowHeight, 'F')
+        doc.rect(margin, y - 4, contentWidth, 8, 'F')
       }
-
       setDraw(COLORS.border)
       doc.setLineWidth(0.15)
-      doc.line(margin, rowY + rowHeight - 4, margin + contentWidth, rowY + rowHeight - 4)
-
+      doc.line(margin, y + 4, margin + contentWidth, y + 4)
       doc.setFont('Assistant', 'bold')
       doc.setFontSize(9)
       setColor(COLORS.black)
-      text(rows[i][0], rightX - 3, rowY)
-
+      text(rows[i][0], rightX - 3, y)
       doc.setFont('Assistant', 'normal')
-      doc.setFontSize(9)
       setColor(COLORS.black)
-      text(String(rows[i][1] || '---'), rightX - 90, rowY)
-
-      y += rowHeight
+      text(String(rows[i][1] || '---'), rightX - 90, y)
+      y += 8
     }
     y += 2
   }
 
-  // Summary table (3 columns: label, value, highlighted)
   const drawSummaryTable = (rows) => {
-    const rowHeight = 10
     for (let i = 0; i < rows.length; i++) {
-      checkPage(rowHeight + 2)
-      const rowY = y
-      const isHighlight = rows[i][2]
-
-      if (isHighlight) {
+      checkPage(12)
+      const isHL = rows[i][2]
+      if (isHL) {
         setFill(COLORS.primary)
-        doc.rect(margin, rowY - 5, contentWidth, rowHeight, 'F')
+        doc.rect(margin, y - 5, contentWidth, 10, 'F')
         doc.setFont('Assistant', 'bold')
         doc.setFontSize(10)
         setColor(COLORS.white)
       } else {
         setFill(i % 2 === 0 ? COLORS.surfaceLight : COLORS.white)
-        doc.rect(margin, rowY - 5, contentWidth, rowHeight, 'F')
+        doc.rect(margin, y - 5, contentWidth, 10, 'F')
         doc.setFont('Assistant', 'bold')
         doc.setFontSize(9)
         setColor(COLORS.black)
       }
-
       setDraw(COLORS.border)
       doc.setLineWidth(0.15)
-      doc.line(margin, rowY + rowHeight - 5, margin + contentWidth, rowY + rowHeight - 5)
-
-      text(rows[i][0], rightX - 3, rowY)
-
+      doc.line(margin, y + 5, margin + contentWidth, y + 5)
+      text(rows[i][0], rightX - 3, y)
       doc.setFont('Assistant', 'normal')
-      text(String(rows[i][1] || '---'), rightX - 90, rowY)
-
-      y += rowHeight
+      text(String(rows[i][1] || '---'), rightX - 90, y)
+      y += 10
     }
     y += 3
   }
@@ -202,24 +185,67 @@ export async function generatePDF(formData, user) {
     y += 6
   }
 
-  // Helper to parse amount string to number
-  const parseAmount = (str) => {
-    if (!str) return 0
-    const num = parseFloat(String(str).replace(/[^\d.-]/g, ''))
-    return isNaN(num) ? 0 : num
+  // Card-style section for summary page
+  const summaryCard = (title, items) => {
+    const cardHeight = 14 + items.length * 7
+    checkPage(cardHeight + 5)
+
+    // Card background
+    setFill(COLORS.white)
+    setDraw(COLORS.border)
+    doc.setLineWidth(0.3)
+    doc.roundedRect(margin, y, contentWidth, cardHeight, 3, 3, 'FD')
+
+    // Title bar
+    setFill(COLORS.primary)
+    doc.roundedRect(margin, y, contentWidth, 9, 3, 3, 'F')
+    // Bottom corners overlap fix
+    doc.rect(margin, y + 6, contentWidth, 3, 'F')
+
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(9)
+    setColor(COLORS.white)
+    text(title, rightX - 5, y + 6.5)
+    y += 13
+
+    doc.setFontSize(8)
+    for (const [label, value] of items) {
+      doc.setFont('Assistant', 'bold')
+      setColor(COLORS.textMuted)
+      text(label, rightX - 5, y)
+      doc.setFont('Assistant', 'normal')
+      setColor(COLORS.black)
+      text(String(value || '---'), rightX - 55, y)
+      y += 7
+    }
+    y += 5
   }
 
-  // ==================== COVER PAGE ====================
+  // Wrapped text block
+  const textBlock = (content, fontSize = 8) => {
+    if (!content) return
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(fontSize)
+    setColor(COLORS.black)
+    const lines = doc.splitTextToSize(rtl(content), contentWidth)
+    for (const line of lines) {
+      checkPage(5)
+      doc.text(line, rightX, y, { align: 'right' })
+      y += fontSize * 0.5
+    }
+    y += 2
+  }
+
+  const date = new Date().toLocaleDateString('he-IL')
+  const clientName = formData.clientA.fullName || '---'
+
+  // ========================= COVER PAGE =========================
   setFill(COLORS.primary)
   doc.rect(0, 0, pageWidth, 90, 'F')
-
   setFill(COLORS.gold)
   doc.rect(0, 90, pageWidth, 3, 'F')
 
-  // Logo on cover
-  try {
-    doc.addImage(logoPng, 'PNG', pageWidth / 2 - 25, 18, 50, 19)
-  } catch (e) {
+  try { doc.addImage(logoPng, 'PNG', pageWidth / 2 - 25, 18, 50, 19) } catch (e) {
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(32)
     setColor(COLORS.white)
@@ -236,34 +262,47 @@ export async function generatePDF(formData, user) {
   setColor(COLORS.white)
   text('איפיון צרכים והתאמת מדיניות השקעה', pageWidth / 2, 70, { align: 'center' })
 
-  // Info box
+  // Advisor details table on cover
   y = 105
   setFill(COLORS.cream)
   setDraw(COLORS.border)
-  doc.roundedRect(margin + 20, y, contentWidth - 40, 42, 3, 3, 'FD')
+  doc.roundedRect(margin + 10, y, contentWidth - 20, 50, 3, 3, 'FD')
 
   doc.setFont('Assistant', 'normal')
   doc.setFontSize(11)
   setColor(COLORS.black)
+  text(`תאריך: ${date}`, pageWidth / 2 + 35, y + 12)
+  text(`לקוח: ${clientName}`, pageWidth / 2 + 35, y + 22)
+  text(`משווק: ${user.name}`, pageWidth / 2 + 35, y + 32)
+  if (user.idNumber) text(`ת.ז משווק: ${user.idNumber}`, pageWidth / 2 + 35, y + 42)
+  if (user.license) text(`מספר רישיון: ${user.license}`, pageWidth / 2 + 35, y + 42 + (user.idNumber ? 10 : 0))
 
-  const date = new Date().toLocaleDateString('he-IL')
-  const clientName = formData.clientA.fullName || '---'
-
-  text(`תאריך: ${date}`, pageWidth / 2 + 30, y + 13)
-  text(`לקוח: ${clientName}`, pageWidth / 2 + 30, y + 24)
-  text(`בעל הרישיון: ${user.name}`, pageWidth / 2 + 30, y + 35)
-
-  // Footer disclaimer
+  // Footer
   y = 260
   doc.setFontSize(8)
   setColor(COLORS.textMuted)
   text('מסמך זה הופק באמצעות מערכת איפיון צרכים דיגיטלית של GREEN Wealth Management', pageWidth / 2, y, { align: 'center' })
   text('כל הנתונים נמסרו על ידי הלקוח ובאחריותו', pageWidth / 2, y + 5, { align: 'center' })
 
-  // ==================== PAGE 2: PERSONAL DETAILS ====================
+  // ========================= REGULATORY TEXT PAGE =========================
   doc.addPage()
   addPageHeader()
 
+  sectionTitle('הוראות הדין')
+
+  doc.setFont('Assistant', 'normal')
+  doc.setFontSize(9)
+  setColor(COLORS.black)
+
+  const regulatoryText = 'משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות תשנ"ה-1995, להתאים ככל האפשר את השירותים לצרכיו ולהנחיותיו של הלקוח לאחר שבירר עמו את מטרות ההשקעה, את מצבו הכספי לרבות ניירות הערך והנכסים הפיננסיים שלו, ואת שאר הנסיבות הרלוונטיות.'
+  const regulatoryText2 = 'ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון יסייע להתאמה מיטבית של אופי השקעותיו. אי מסירת פרטים עלולה לפגוע ביכולת ההתאמה. ידוע ללקוח כי עליו לעדכן את המשווק בכל שינוי בפרטים שמסר. כל מידע שנמסר ישמר בסודיות, בכפוף לחובת מסירה על פי דין.'
+
+  textBlock(regulatoryText, 9)
+  spacer(3)
+  textBlock(regulatoryText2, 9)
+
+  // ========================= PERSONAL DETAILS =========================
+  spacer(6)
   sectionTitle('פרטים מזהים')
 
   const printClient = (client, title) => {
@@ -274,7 +313,6 @@ export async function generatePDF(formData, user) {
     text(title, rightX, y)
     y += 8
     doc.setFont('Assistant', 'normal')
-
     labelValue('שם מלא', client.fullName)
     labelValue('תעודת זהות', client.idNumber)
     labelValue('תאריך לידה', client.birthDate)
@@ -291,18 +329,17 @@ export async function generatePDF(formData, user) {
     printClient(formData.clientB, 'לקוח ב׳')
   }
 
-  // ==================== FINANCIAL BALANCE ====================
+  // ========================= FINANCIAL BALANCE =========================
   sectionTitle('תמונה כלכלית — התא המשפחתי')
 
   let totalAssets = 0
   let totalLiabilities = 0
 
-  // Income
   const incomeRows = []
-  if (formData.income.salary.has) incomeRows.push(['שכר נטו חודשי', formData.income.salary.amount])
-  if (formData.income.pension.has) incomeRows.push(['פנסיה / קצבה', formData.income.pension.amount])
-  if (formData.income.realEstate.has) incomeRows.push(['הכנסות מנדל״ן', formData.income.realEstate.amount])
-  if (formData.income.other.has) incomeRows.push(['אחר', formData.income.other.amount])
+  if (formData.income.salary.has) incomeRows.push(['שכר נטו חודשי', fmtMoney(formData.income.salary.amount)])
+  if (formData.income.pension.has) incomeRows.push(['פנסיה / קצבה', fmtMoney(formData.income.pension.amount)])
+  if (formData.income.realEstate.has) incomeRows.push(['הכנסות מנדל״ן', fmtMoney(formData.income.realEstate.amount)])
+  if (formData.income.other.has) incomeRows.push(['אחר', fmtMoney(formData.income.other.amount)])
 
   if (incomeRows.length > 0) {
     checkPage(30)
@@ -315,46 +352,35 @@ export async function generatePDF(formData, user) {
   }
   addNote(formData.incomeNotes)
 
-  // Assets
   const assetSections = [
     { title: 'עו״ש, מזומן ופקדונות', items: [
-      ['עו״ש / מזומן', formData.assets.cash],
-      ['פקדונות בנקאיים', formData.assets.deposits],
+      ['עו״ש / מזומן', formData.assets.cash], ['פקדונות בנקאיים', formData.assets.deposits],
       ['קרנות כספיות', formData.assets.moneyMarket],
     ], notes: formData.cashNotes },
     { title: 'ני״ע בארץ ובחו״ל', items: [
-      ['תיק מנוהל', formData.assets.managedPortfolio],
-      ['מניות / אג״ח', formData.assets.stocks],
-      ['ETF', formData.assets.etf],
-      ['ברוקר זר / חו״ל', formData.assets.foreignBroker],
+      ['תיק מנוהל', formData.assets.managedPortfolio], ['מניות / אג״ח', formData.assets.stocks],
+      ['ETF', formData.assets.etf], ['ברוקר זר / חו״ל', formData.assets.foreignBroker],
     ], notes: formData.securitiesNotes },
     { title: 'חיסכון, גמל והשתלמות', items: [
-      ['קרן השתלמות', formData.assets.hishtalmut],
-      ['קופת גמל', formData.assets.gemel],
-      ['גמל להשקעה', formData.assets.gemelInvestment],
-      ['פוליסת חיסכון', formData.assets.savingsPolicy],
+      ['קרן השתלמות', formData.assets.hishtalmut], ['קופת גמל', formData.assets.gemel],
+      ['גמל להשקעה', formData.assets.gemelInvestment], ['פוליסת חיסכון', formData.assets.savingsPolicy],
     ], notes: formData.savingsNotes },
     { title: 'פנסיה', items: [
       ['קרן פנסיה', formData.assets.pensionFund],
-      ['ביטוח מנהלים' + (formData.assets.bituachMenahalim && formData.assets.bituachMenahalim.guaranteedYield ? ' (תשואה מובטחת)' : ''), formData.assets.bituachMenahalim],
+      ['ביטוח מנהלים' + (formData.assets.bituachMenahalim?.guaranteedYield ? ' (תשואה מובטחת)' : ''), formData.assets.bituachMenahalim],
     ], notes: formData.pensionNotes },
     { title: 'נדל״ן', items: [
-      ['נדל״ן להשקעה', formData.assets.investmentRealEstate],
-      ['נדל״ן מגורים', formData.assets.residenceRealEstate],
+      ['נדל״ן להשקעה', formData.assets.investmentRealEstate], ['נדל״ן מגורים', formData.assets.residenceRealEstate],
     ], notes: formData.realEstateNotes },
     { title: 'אחר', items: [
-      ['עסק / שותפות', formData.assets.business],
-      ['אחר', formData.assets.other],
+      ['עסק / שותפות', formData.assets.business], ['אחר', formData.assets.other],
     ], notes: formData.otherAssetsNotes },
   ]
 
   for (const section of assetSections) {
     const rows = section.items
-      .filter(([, asset]) => asset && asset.has)
-      .map(([label, asset]) => {
-        totalAssets += parseAmount(asset.amount)
-        return [label, asset.amount || '---']
-      })
+      .filter(([, a]) => a && a.has)
+      .map(([label, a]) => { totalAssets += parseAmount(a.amount); return [label, fmtMoney(a.amount)] })
     if (rows.length > 0) {
       checkPage(rows.length * 8 + 18)
       doc.setFont('Assistant', 'bold')
@@ -371,13 +397,13 @@ export async function generatePDF(formData, user) {
   const liabRows = []
   if (formData.liabilities.mortgage.has) {
     totalLiabilities += parseAmount(formData.liabilities.mortgage.total)
-    liabRows.push(['משכנתא', `חודשי: ${formData.liabilities.mortgage.monthly || '---'} | יתרה: ${formData.liabilities.mortgage.total || '---'}`])
+    liabRows.push(['משכנתא', `חודשי: ${fmtMoney(formData.liabilities.mortgage.monthly)} | יתרה: ${fmtMoney(formData.liabilities.mortgage.total)}`])
   }
   if (formData.liabilities.loans.has) {
     totalLiabilities += parseAmount(formData.liabilities.loans.total)
-    liabRows.push(['הלוואות', `חודשי: ${formData.liabilities.loans.monthly || '---'} | יתרה: ${formData.liabilities.loans.total || '---'}`])
+    liabRows.push(['הלוואות', `חודשי: ${fmtMoney(formData.liabilities.loans.monthly)} | יתרה: ${fmtMoney(formData.liabilities.loans.total)}`])
   }
-  if (formData.liabilities.monthlyExpenses) liabRows.push(['הוצאות שוטפות', formData.liabilities.monthlyExpenses])
+  if (formData.liabilities.monthlyExpenses) liabRows.push(['הוצאות שוטפות', fmtMoney(formData.liabilities.monthlyExpenses)])
 
   if (liabRows.length > 0) {
     checkPage(30)
@@ -390,10 +416,8 @@ export async function generatePDF(formData, user) {
   }
   addNote(formData.liabilitiesNotes)
 
-  // ===== ASSET SUMMARY TABLE =====
+  // Summary table
   const netWorth = totalAssets - totalLiabilities
-  const fmtNum = (n) => n > 0 ? n.toLocaleString('he-IL') + ' ₪' : '---'
-
   checkPage(40)
   spacer(6)
   doc.setFont('Assistant', 'bold')
@@ -401,21 +425,19 @@ export async function generatePDF(formData, user) {
   setColor(COLORS.primary)
   text('סיכום מאזן', rightX, y)
   y += 7
-
   drawSummaryTable([
-    ['סך נכסים', fmtNum(totalAssets), false],
-    ['סך התחייבויות', fmtNum(totalLiabilities), false],
-    ['שווי נטו', fmtNum(netWorth), true],
+    ['סך נכסים', fmtMoney(totalAssets > 0 ? totalAssets : ''), false],
+    ['סך התחייבויות', fmtMoney(totalLiabilities > 0 ? totalLiabilities : ''), false],
+    ['שווי נטו', fmtMoney(netWorth !== 0 ? netWorth : ''), true],
   ])
 
-  // Managed portion
   if (formData.managedPortion) {
-    spacer(4)
+    spacer(2)
     const portionLabels = { up_to_35: 'עד 35%', '35_to_70': '35%-70%', over_70: 'מעל 70%' }
     labelValue('שיעור נכסים מנוהל', portionLabels[formData.managedPortion])
   }
 
-  // ==================== GOALS & HORIZON ====================
+  // ========================= GOALS & HORIZON =========================
   sectionTitle('מטרות השקעה ואופק')
 
   const goalLabels = {
@@ -429,16 +451,14 @@ export async function generatePDF(formData, user) {
   const horizonLabels = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', '5_to_10': '5-10 שנים', over_10: 'מעל 10 שנים' }
   labelValue('אופק השקעה', horizonLabels[formData.investmentHorizon] || '---')
 
-  // ==================== LIQUIDITY ====================
+  // ========================= LIQUIDITY =========================
   sectionTitle('צרכי נזילות')
-
   const timelineLabels = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
   const next3Labels = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
-
   labelValue('מתי תצטרך את כל הכסף', timelineLabels[formData.liquidityTimeline] || '---')
   labelValue('כמה תצטרך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---')
 
-  // ==================== RISK ASSESSMENT ====================
+  // ========================= RISK ASSESSMENT =========================
   sectionTitle('הערכת סיכון')
 
   const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
@@ -450,15 +470,14 @@ export async function generatePDF(formData, user) {
   labelValue('שאלה 2 — תחושה', q2Labels[formData.riskQ2] || '---')
   labelValue('שאלה 3 — תרחיש', q3Labels[formData.riskQ3] || '---')
   labelValue('שאלה 4 — עדיפות', q4Labels[formData.riskQ4] || '---')
-
-  spacer(4)
+  spacer(3)
 
   if (formData.priorExperience) {
     labelValue('ניסיון קודם', formData.priorExperience === 'yes' ? 'כן' : 'לא')
     if (formData.priorExperienceDetails) labelValue('פירוט', formData.priorExperienceDetails)
   }
 
-  // ==================== ADVISOR SUMMARY & POLICY ====================
+  // ========================= ADVISOR SUMMARY =========================
   sectionTitle('סיכום והמלצת בעל הרישיון')
 
   if (formData.advisorSummary) {
@@ -468,12 +487,7 @@ export async function generatePDF(formData, user) {
     setColor(COLORS.black)
     text('סיכום וניתוח', rightX, y)
     y += 6
-    doc.setFont('Assistant', 'normal')
-    doc.setFontSize(9)
-    setColor(COLORS.black)
-    const lines = doc.splitTextToSize(rtl(formData.advisorSummary), contentWidth)
-    doc.text(lines, rightX, y, { align: 'right' })
-    y += lines.length * 4.5 + 4
+    textBlock(formData.advisorSummary, 9)
   }
 
   if (formData.clientPreferences) {
@@ -483,34 +497,32 @@ export async function generatePDF(formData, user) {
     setColor(COLORS.black)
     text('העדפות / הגבלות לקוח', rightX, y)
     y += 6
-    doc.setFont('Assistant', 'normal')
-    doc.setFontSize(9)
-    setColor(COLORS.black)
-    const lines = doc.splitTextToSize(rtl(formData.clientPreferences), contentWidth)
-    doc.text(lines, rightX, y, { align: 'right' })
-    y += lines.length * 4.5 + 4
+    textBlock(formData.clientPreferences, 9)
   }
 
-  // Risk level box
+  // Risk level box with description
   if (formData.finalRiskLevel > 0) {
-    checkPage(35)
+    checkPage(40)
     const rl = RISK_LEVELS[formData.finalRiskLevel - 1]
-
     setFill(COLORS.cream)
     setDraw(COLORS.gold)
     doc.setLineWidth(0.8)
-    doc.roundedRect(margin, y, contentWidth, 25, 3, 3, 'FD')
+    doc.roundedRect(margin, y, contentWidth, 32, 3, 3, 'FD')
 
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(14)
     setColor(COLORS.primary)
-    text(`דרגת סיכון סופית: ${formData.finalRiskLevel}`, rightX - 5, y + 10)
+    text(`דרגת סיכון סופית: ${formData.finalRiskLevel} — ${rl.name}`, rightX - 5, y + 10)
 
-    doc.setFontSize(11)
+    doc.setFontSize(9)
     setColor(COLORS.secondary)
-    text(`${rl.name} | הפסד מקסימלי: ${rl.maxLoss} | מניות: ${rl.maxStocks} | אג״ח קונצרני: ${rl.corpBonds}`, rightX - 5, y + 19)
+    text(RISK_DESCRIPTIONS[formData.finalRiskLevel], rightX - 5, y + 18)
 
-    y += 32
+    doc.setFontSize(9)
+    setColor(COLORS.black)
+    text(`הפסד מקסימלי: ${rl.maxLoss} | מניות: ${rl.maxStocks} | אג״ח קונצרני: ${rl.corpBonds}`, rightX - 5, y + 26)
+
+    y += 38
   }
 
   if (formData.finalRiskJustification) {
@@ -520,45 +532,33 @@ export async function generatePDF(formData, user) {
     setColor(COLORS.black)
     text('נימוק מקצועי', rightX, y)
     y += 6
-    doc.setFont('Assistant', 'normal')
-    doc.setFontSize(9)
-    setColor(COLORS.black)
-    const lines = doc.splitTextToSize(rtl(formData.finalRiskJustification), contentWidth)
-    doc.text(lines, rightX, y, { align: 'right' })
-    y += lines.length * 4.5 + 4
+    textBlock(formData.finalRiskJustification, 9)
   }
 
-  // Policy parameters
   spacer(3)
   if (formData.equityPct) labelValue('אחוז מניות מקסימלי', formData.equityPct + '%')
   if (formData.corporateBondsPct) labelValue('אג״ח קונצרני', formData.corporateBondsPct === '50' ? 'עד 50%' : 'עד 100%')
   labelValue('מט״ח', formData.forex ? 'כן' : 'לא')
   labelValue('אג״ח בדירוג נמוך', formData.lowRatedBonds ? 'כן' : 'לא')
 
-  // ==================== REFUSALS ====================
+  // ========================= REFUSALS =========================
   if (formData.refusals && formData.refusals.length > 0) {
     checkPage(20 + formData.refusals.length * 6)
     spacer(6)
     setFill(COLORS.offWhite)
     setDraw(COLORS.negative)
     doc.setLineWidth(0.3)
-    const refHeight = 15 + formData.refusals.length * 6
-    doc.roundedRect(margin, y, contentWidth, refHeight, 2, 2, 'FD')
-
+    const refH = 15 + formData.refusals.length * 6
+    doc.roundedRect(margin, y, contentWidth, refH, 2, 2, 'FD')
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(10)
     setColor(COLORS.negative)
     text('שאלות שהלקוח סירב להשיב:', rightX - 5, y + 8)
     y += 14
-
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(9)
     setColor(COLORS.black)
-    formData.refusals.forEach((r) => {
-      text(`• ${r.label}`, rightX - 8, y)
-      y += 6
-    })
-
+    formData.refusals.forEach((r) => { text(`• ${r.label}`, rightX - 8, y); y += 6 })
     y += 4
     doc.setFontSize(8)
     setColor(COLORS.textMuted)
@@ -566,149 +566,119 @@ export async function generatePDF(formData, user) {
     y += 10
   }
 
-  // ==================== SUMMARY PAGE ====================
+  // ========================= SUMMARY PAGE (card layout) =========================
   doc.addPage()
   addPageHeader()
-
   sectionTitle('סיכום תשובות הלקוח')
 
-  const summaryItems = []
+  const fmtNet = netWorth !== 0 ? fmtMoney(netWorth) : '---'
 
-  // Personal
-  summaryItems.push({ section: 'פרטים אישיים', items: [
+  summaryCard('פרטים אישיים', [
     ['שם מלא', formData.clientA.fullName],
     ['תעודת זהות', formData.clientA.idNumber],
     ['טלפון', formData.clientA.phone],
     ['דוא״ל', formData.clientA.email],
-    ['עיסוק', formData.clientA.occupation],
     ['מצב משפחתי', translateMarital(formData.clientA.maritalStatus)],
-  ]})
+  ])
 
   if (formData.signerType === 'couple') {
-    summaryItems.push({ section: 'לקוח ב׳', items: [
+    summaryCard('לקוח ב׳', [
       ['שם מלא', formData.clientB.fullName],
       ['תעודת זהות', formData.clientB.idNumber],
-    ]})
+    ])
   }
 
-  // Financial summary
-  summaryItems.push({ section: 'תמונה כלכלית', items: [
-    ['סך נכסים', fmtNum(totalAssets)],
-    ['סך התחייבויות', fmtNum(totalLiabilities)],
-    ['שווי נטו', fmtNum(netWorth)],
-    ['שיעור נכסים מנוהל', formData.managedPortion ? { up_to_35: 'עד 35%', '35_to_70': '35%-70%', over_70: 'מעל 70%' }[formData.managedPortion] : '---'],
-  ]})
+  summaryCard('תמונה כלכלית', [
+    ['סך נכסים', totalAssets > 0 ? fmtMoney(totalAssets) : '---'],
+    ['סך התחייבויות', totalLiabilities > 0 ? fmtMoney(totalLiabilities) : '---'],
+    ['שווי נטו', fmtNet],
+  ])
 
-  // Goals
-  summaryItems.push({ section: 'מטרות ואופק', items: [
+  summaryCard('מטרות ואופק', [
     ['מטרות השקעה', goals || '---'],
     ['אופק השקעה', horizonLabels[formData.investmentHorizon] || '---'],
-  ]})
+  ])
 
-  // Liquidity
-  summaryItems.push({ section: 'נזילות', items: [
+  summaryCard('נזילות', [
     ['צורך בכל הכסף', timelineLabels[formData.liquidityTimeline] || '---'],
     ['צורך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---'],
-  ]})
+  ])
 
-  // Risk
   const rlFinal = formData.finalRiskLevel > 0 ? RISK_LEVELS[formData.finalRiskLevel - 1] : null
-  summaryItems.push({ section: 'סיכון ומדיניות', items: [
+  summaryCard('סיכון ומדיניות', [
     ['שאלה 1', q1Labels[formData.riskQ1] || '---'],
     ['שאלה 2', q2Labels[formData.riskQ2] || '---'],
     ['שאלה 3', q3Labels[formData.riskQ3] || '---'],
     ['שאלה 4', q4Labels[formData.riskQ4] || '---'],
     ['דרגת סיכון סופית', rlFinal ? `${formData.finalRiskLevel} — ${rlFinal.name}` : '---'],
-    ['ניסיון קודם', formData.priorExperience === 'yes' ? 'כן' : formData.priorExperience === 'no' ? 'לא' : '---'],
-  ]})
+  ])
 
-  // Render summary
-  for (const group of summaryItems) {
-    checkPage(15)
-    doc.setFont('Assistant', 'bold')
-    doc.setFontSize(10)
-    setColor(COLORS.primary)
-    text(group.section, rightX, y)
-    y += 7
+  // ========================= SIGNATURES =========================
+  doc.addPage()
+  addPageHeader()
 
-    for (const [label, value] of group.items) {
-      checkPage(8)
-      doc.setFont('Assistant', 'bold')
-      doc.setFontSize(8)
-      setColor(COLORS.textMuted)
-      text(label, rightX, y)
-      doc.setFont('Assistant', 'normal')
-      doc.setFontSize(9)
-      setColor(COLORS.black)
-      text(String(value || '---'), rightX - 55, y)
-      y += 6
-    }
-    spacer(4)
+  sectionTitle('הצהרות וחתימות')
+
+  // Client declaration
+  checkPage(50)
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(10)
+  setColor(COLORS.primary)
+  text('הצהרת הלקוח', rightX, y)
+  y += 7
+
+  const clientDecl = `אני הח"מ ${clientName} מצהיר כי המידע המופיע לעיל הוא המידע שמסרתי למשווק ההשקעות. הוסבר לי כי מענה מלא יסייע להתאמת תיק ההשקעות לצרכיי, וכי אי מסירת פרטים עלולה לפגוע בשירות. בחתימתי אני מאשר כי מדיניות ההשקעה הוסברה לי ונקבעה בשיתוף פעולה עמי. אני מאשר כי קיבלתי עותק של מסמך זה.`
+  textBlock(clientDecl, 9)
+
+  spacer(5)
+  text(`תאריך: _______________`, rightX, y)
+  y += 10
+  text(`חתימת הלקוח: X ______________`, rightX, y)
+  y += 15
+
+  if (formData.signerType === 'couple') {
+    text(`חתימת לקוח ב׳: X ______________`, rightX, y)
+    y += 15
   }
 
-  // ==================== SIGNATURES ====================
-  checkPage(70)
-  spacer(10)
+  // Advisor confirmation block
+  checkPage(60)
   setDraw(COLORS.primary)
-  doc.setLineWidth(0.5)
-  doc.line(margin, y, pageWidth - margin, y)
-  y += 10
+  doc.setLineWidth(0.3)
+  doc.line(margin, y, rightX, y)
+  y += 8
 
   doc.setFont('Assistant', 'bold')
-  doc.setFontSize(13)
+  doc.setFontSize(10)
   setColor(COLORS.primary)
-  text('חתימות', pageWidth / 2, y, { align: 'center' })
-  y += 12
+  text('אישור בעל הרישיון', rightX, y)
+  y += 7
 
-  const addSignature = (name, role) => {
-    checkPage(30)
-    doc.setFont('Assistant', 'bold')
-    doc.setFontSize(10)
-    setColor(COLORS.primary)
-    text(role, rightX, y)
-    y += 8
+  const advisorName = user.name || '____________'
+  const advisorLicense = user.license || '____________'
+  const advisorDecl = `אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים, הבהרתי לו את משמעות הדבר. בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה בהתאם להוראות החוק.`
+  textBlock(advisorDecl, 9)
 
-    doc.setFont('Assistant', 'normal')
-    doc.setFontSize(9)
-    setColor(COLORS.black)
-    text(name || '_______________', rightX, y)
-    y += 5
+  spacer(5)
+  text(`תאריך: _______________`, rightX, y)
+  y += 10
+  text(`חתימת בעל הרישיון: ______________`, rightX, y)
 
-    setDraw(COLORS.border)
-    doc.setLineWidth(0.3)
-    doc.line(rightX - 60, y, rightX, y)
-    y += 5
-    doc.setFontSize(8)
-    setColor(COLORS.textMuted)
-    text('חתימה                                   תאריך', rightX, y)
-    y += 12
-  }
-
-  addSignature(formData.clientA.fullName, formData.signerType === 'couple' ? 'לקוח א׳' : 'הלקוח')
-  if (formData.signerType === 'couple') {
-    addSignature(formData.clientB.fullName, 'לקוח ב׳')
-  }
-  addSignature(user.name, 'בעל הרישיון')
-
-  // ==================== PAGE NUMBERS (all pages) ====================
-  totalPages = doc.getNumberOfPages()
+  // ========================= PAGE NUMBERS =========================
+  const totalPages = doc.getNumberOfPages()
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i)
-
-    // Logo on left of every page (except cover which already has it)
     if (i > 1) {
-      // Already added via addPageHeader
+      // Logo already via addPageHeader
     }
-
-    // Page number footer
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(7)
     doc.setTextColor(90, 90, 90)
     doc.text(`${i} / ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' })
   }
 
-  // ==================== RETURN BLOB ====================
-  const safeName = (formData.clientA.fullName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
+  // ========================= RETURN =========================
+  const safeName = (clientName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]
   const fileName = `KYC_${dateStr}_${safeName}.pdf`
   const blob = doc.output('blob')

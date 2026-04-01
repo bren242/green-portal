@@ -1,6 +1,6 @@
 export default function WizardProgress({ steps, currentStep, onStepClick }) {
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex flex-wrap items-center gap-1.5 pb-1">
       {steps.map((step, index) => {
         const isActive = index === currentStep
         const isDone = index < currentStep
@@ -9,7 +9,7 @@ export default function WizardProgress({ steps, currentStep, onStepClick }) {
             key={step.id}
             onClick={() => onStepClick(index)}
             className={`
-              flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-pill text-xs font-semibold transition-all cursor-pointer
+              flex items-center gap-1 px-2.5 py-1.5 rounded-pill text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap
               ${isActive
                 ? 'bg-green-primary text-white shadow-card'
                 : isDone
@@ -19,7 +19,7 @@ export default function WizardProgress({ steps, currentStep, onStepClick }) {
             `}
           >
             <span className={`
-              inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold
+              inline-flex items-center justify-center w-4.5 h-4.5 rounded-full text-[9px] font-bold leading-none
               ${isActive
                 ? 'bg-white/20 text-white'
                 : isDone
@@ -29,7 +29,7 @@ export default function WizardProgress({ steps, currentStep, onStepClick }) {
             `}>
               {isDone ? '✓' : index + 1}
             </span>
-            <span className="hidden sm:inline">{step.title}</span>
+            <span>{step.title}</span>
           </button>
         )
       })}

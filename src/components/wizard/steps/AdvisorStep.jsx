@@ -6,10 +6,14 @@ import PDFPreview from '../../pdf/PDFPreview'
 
 export default function AdvisorStep({ formData, updateForm, user }) {
   const [generating, setGenerating] = useState(false)
-  const [pdfData, setPdfData] = useState(null) // { url, fileName, blob }
+  const [pdfData, setPdfData] = useState(null)
   const riskResult = calculateRiskScore(formData)
+  const hasRefusals = formData.refusals && formData.refusals.length > 0
+
+  const canGeneratePDF = !hasRefusals || formData.refusalsConfirmed
 
   const handleGeneratePDF = async () => {
+    if (hasRefusals && !formData.refusalsConfirmed) return
     setGenerating(true)
     try {
       const result = await generatePDF(formData, user)
@@ -27,10 +31,6 @@ export default function AdvisorStep({ formData, updateForm, user }) {
     link.href = pdfData.url
     link.download = pdfData.fileName
     link.click()
-  }
-
-  const handleClosePreview = () => {
-    setPdfData(null)
   }
 
   return (
@@ -98,13 +98,15 @@ export default function AdvisorStep({ formData, updateForm, user }) {
           />
         )}
 
-        {/* Risk level details */}
         {formData.finalRiskLevel > 0 && (
           <div className="bg-surface-light rounded-lg p-3 text-sm space-y-1">
             <div className="font-semibold text-green-primary">
               משמעות דרגה {formData.finalRiskLevel} — {RISK_LEVELS[formData.finalRiskLevel - 1].name}
             </div>
             <div className="text-text-muted">
+              {RISK_LEVELS[formData.finalRiskLevel - 1].description}
+            </div>
+            <div className="text-text-muted text-xs mt-1">
               הפסד מקסימלי: {RISK_LEVELS[formData.finalRiskLevel - 1].maxLoss} |
               מניות מקס׳: {RISK_LEVELS[formData.finalRiskLevel - 1].maxStocks} |
               אג״ח קונצרני: {RISK_LEVELS[formData.finalRiskLevel - 1].corpBonds}
@@ -138,15 +140,28 @@ export default function AdvisorStep({ formData, updateForm, user }) {
         <Checkbox label="אג״ח בדירוג נמוך / לא מדורג" checked={formData.lowRatedBonds} onChange={(v) => updateForm({ lowRatedBonds: v })} />
       </div>
 
-      {/* Refusals summary */}
-      {formData.refusals.length > 0 && (
-        <div className="bg-warning-bg border border-warning-border rounded-card p-4">
-          <h4 className="text-sm font-bold text-warning-red mb-2">שאלות שהלקוח סירב להשיב:</h4>
+      {/* Refusals block with confirmation */}
+      {hasRefusals && (
+        <div className="bg-warning-bg border border-warning-border rounded-card p-4 space-y-3">
+          <h4 className="text-sm font-bold text-warning-red">שאלות שהלקוח סירב להשיב:</h4>
           <ul className="text-sm text-warning-red space-y-1">
             {formData.refusals.map((r) => (
               <li key={r.field}>• {r.label}</li>
             ))}
           </ul>
+          <div className="border-t border-warning-border pt-3">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.refusalsConfirmed}
+                onChange={(e) => updateForm({ refusalsConfirmed: e.target.checked })}
+                className="accent-warning-red w-4 h-4 mt-0.5"
+              />
+              <span className="text-sm text-text-primary">
+                הלקוח אישר כי הובהר לו שאי מסירת מידע עלולה לפגוע באיכות ההמלצה וביכולת ההתאמה
+              </span>
+            </label>
+          </div>
         </div>
       )}
 
@@ -154,19 +169,18 @@ export default function AdvisorStep({ formData, updateForm, user }) {
       <div className="pt-4 border-t border-border">
         <button
           onClick={handleGeneratePDF}
-          disabled={generating}
-          className="w-full py-3 bg-green-primary text-white font-bold rounded-lg hover:bg-green-secondary transition-colors text-base disabled:opacity-50"
+          disabled={generating || !canGeneratePDF}
+          className="w-full py-3 bg-green-primary text-white font-bold rounded-lg hover:bg-green-secondary transition-colors text-base disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {generating ? 'מייצר PDF...' : 'תצוגה מקדימה וייצוא PDF'}
+          {generating ? 'מייצר PDF...' : hasRefusals && !formData.refusalsConfirmed ? 'נא לאשר את בלוק הסירובים' : 'תצוגה מקדימה וייצוא PDF'}
         </button>
       </div>
 
-      {/* PDF Preview Modal */}
       {pdfData && (
         <PDFPreview
           pdfUrl={pdfData.url}
           fileName={pdfData.fileName}
-          onClose={handleClosePreview}
+          onClose={() => setPdfData(null)}
           onDownload={handleDownload}
         />
       )}

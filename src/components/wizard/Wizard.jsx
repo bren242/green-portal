@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createEmptyForm, WIZARD_STEPS } from '../../data/formSchema'
+import { createEmptyForm, WIZARD_STEPS, validateStep } from '../../data/formSchema'
 import WizardHeader from './WizardHeader'
 import WizardProgress from './WizardProgress'
 import GateStep from './steps/GateStep'
@@ -13,9 +13,12 @@ import AdvisorStep from './steps/AdvisorStep'
 export default function Wizard({ user, onLogout, onAdmin }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState(createEmptyForm())
+  const [validationErrors, setValidationErrors] = useState([])
 
   const updateForm = (updates) => {
     setFormData((prev) => ({ ...prev, ...updates }))
+    // Clear validation errors when user edits
+    if (validationErrors.length > 0) setValidationErrors([])
   }
 
   const toggleRefusal = (field, label) => {
@@ -31,6 +34,14 @@ export default function Wizard({ user, onLogout, onAdmin }) {
   const isRefused = (field) => formData.refusals.some((r) => r.field === field)
 
   const nextStep = () => {
+    const stepId = WIZARD_STEPS[currentStep].id
+    const errors = validateStep(stepId, formData)
+    if (errors.length > 0) {
+      setValidationErrors(errors)
+      window.scrollTo(0, 0)
+      return
+    }
+    setValidationErrors([])
     if (currentStep < WIZARD_STEPS.length - 1) {
       setCurrentStep((s) => s + 1)
       window.scrollTo(0, 0)
@@ -38,6 +49,7 @@ export default function Wizard({ user, onLogout, onAdmin }) {
   }
 
   const prevStep = () => {
+    setValidationErrors([])
     if (currentStep > 0) {
       setCurrentStep((s) => s - 1)
       window.scrollTo(0, 0)
@@ -45,6 +57,7 @@ export default function Wizard({ user, onLogout, onAdmin }) {
   }
 
   const goToStep = (index) => {
+    setValidationErrors([])
     setCurrentStep(index)
     window.scrollTo(0, 0)
   }
@@ -73,15 +86,27 @@ export default function Wizard({ user, onLogout, onAdmin }) {
   return (
     <div className="min-h-screen bg-surface-offwhite">
       <WizardHeader user={user} onLogout={onLogout} onAdmin={onAdmin} />
-      <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="max-w-3xl mx-auto px-4 py-5">
         <WizardProgress
           steps={WIZARD_STEPS}
           currentStep={currentStep}
           onStepClick={goToStep}
         />
 
+        {/* Validation errors */}
+        {validationErrors.length > 0 && (
+          <div className="bg-warning-bg border border-warning-border rounded-card p-4 mt-4">
+            <p className="text-sm font-bold text-warning-red mb-2">נא לתקן את השדות הבאים:</p>
+            <ul className="text-sm text-warning-red space-y-1">
+              {validationErrors.map((err) => (
+                <li key={err.field}>• {err.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Main card */}
-        <div className="bg-white rounded-card shadow-card border border-border/50 p-6 md:p-8 mt-5">
+        <div className="bg-white rounded-card shadow-card border border-border/50 p-6 md:p-8 mt-4">
           <div className="mb-6">
             <h2 className="text-lg font-extrabold text-green-primary">
               {WIZARD_STEPS[currentStep].title}

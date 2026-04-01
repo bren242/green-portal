@@ -1,15 +1,11 @@
 // Initial empty form state
 export function createEmptyForm() {
   return {
-    // Gate
-    signerType: '', // 'single' | 'couple'
-
-    // Section 1 - Personal details
+    signerType: '',
     clientA: createEmptyClient(),
     clientB: createEmptyClient(),
-    familyNetWorth: '', // total family financial worth (text)
+    familyNetWorth: '',
 
-    // Section 2 - Financial balance sheet (always household)
     income: {
       salary: { has: false, amount: '' },
       pension: { has: false, amount: '' },
@@ -17,43 +13,31 @@ export function createEmptyForm() {
       other: { has: false, amount: '' },
     },
     assets: {
-      // Cash & equivalents
-      cash: { has: false, amount: '' },         // עו"ש, מזומן
-      deposits: { has: false, amount: '' },      // פקדונות בנקאיים
-      moneyMarket: { has: false, amount: '' },   // קרנות כספיות
-
-      // Securities Israel & abroad
-      managedPortfolio: { has: false, amount: '' },  // תיק מנוהל
-      stocks: { has: false, amount: '' },            // מניות / אג"ח ישיר
-      etf: { has: false, amount: '' },               // ETF
-      foreignBroker: { has: false, amount: '' },     // ברוקר זר / חו"ל
-
-      // Savings, Gemel & Hishtalmut
-      hishtalmut: { has: false, amount: '' },        // קרן השתלמות
-      gemel: { has: false, amount: '' },             // קופת גמל
-      gemelInvestment: { has: false, amount: '' },   // גמל להשקעה
-      savingsPolicy: { has: false, amount: '' },     // פוליסת חיסכון
-
-      // Pension
-      pensionFund: { has: false, amount: '' },       // קרן פנסיה
-      bituachMenahalim: { has: false, amount: '', guaranteedYield: false }, // ביטוח מנהלים
-
-      // Real estate
-      investmentRealEstate: { has: false, amount: '' }, // נדל"ן להשקעה
-      residenceRealEstate: { has: false, amount: '' },  // נדל"ן מגורים
-
-      // Other
-      business: { has: false, amount: '' },          // עסק
-      other: { has: false, amount: '' },             // אחר
+      cash: { has: false, amount: '' },
+      deposits: { has: false, amount: '' },
+      moneyMarket: { has: false, amount: '' },
+      managedPortfolio: { has: false, amount: '' },
+      stocks: { has: false, amount: '' },
+      etf: { has: false, amount: '' },
+      foreignBroker: { has: false, amount: '' },
+      hishtalmut: { has: false, amount: '' },
+      gemel: { has: false, amount: '' },
+      gemelInvestment: { has: false, amount: '' },
+      savingsPolicy: { has: false, amount: '' },
+      pensionFund: { has: false, amount: '' },
+      bituachMenahalim: { has: false, amount: '', guaranteedYield: false },
+      investmentRealEstate: { has: false, amount: '' },
+      residenceRealEstate: { has: false, amount: '' },
+      business: { has: false, amount: '' },
+      other: { has: false, amount: '' },
     },
     liabilities: {
       mortgage: { has: false, monthly: '', total: '' },
       loans: { has: false, monthly: '', total: '' },
       monthlyExpenses: '',
     },
-    managedPortion: '', // 'up_to_35' | '35_to_70' | 'over_70'
+    managedPortion: '',
 
-    // Section 2 notes per category
     incomeNotes: '',
     cashNotes: '',
     securitiesNotes: '',
@@ -63,24 +47,20 @@ export function createEmptyForm() {
     otherAssetsNotes: '',
     liabilitiesNotes: '',
 
-    // Section 3 - Goals & Horizon
-    investmentGoals: [], // multi-select: ['preserve', 'income', 'growth', ...]
+    investmentGoals: [],
     investmentGoalOther: '',
-    investmentHorizon: '', // 'up_to_2' | '2_to_5' | '5_to_10' | 'over_10'
+    investmentHorizon: '',
 
-    // Section 4 - Liquidity
-    liquidityTimeline: '', // 'up_to_2' | '2_to_5' | 'over_5' | 'unknown'
-    liquidityNext3Years: '', // '0' | 'up_to_30' | 'up_to_50' | 'over_50' | 'unknown'
+    liquidityTimeline: '',
+    liquidityNext3Years: '',
 
-    // Section 5 - Risk calculator
-    riskQ1: '', // 'a' | 'b' | 'c' | 'd'
-    riskQ2: '', // 'a' | 'b' | 'c'
-    riskQ3: '', // 'a' | 'b' | 'c' | 'd'
-    riskQ4: '', // 'a' | 'b' | 'c'
-    priorExperience: '', // 'yes' | 'no'
+    riskQ1: '',
+    riskQ2: '',
+    riskQ3: '',
+    riskQ4: '',
+    priorExperience: '',
     priorExperienceDetails: '',
 
-    // Section 6 - Advisor summary
     advisorSummary: '',
     clientPreferences: '',
     calculatedRiskLevel: 0,
@@ -88,11 +68,11 @@ export function createEmptyForm() {
     finalRiskJustification: '',
     forex: false,
     lowRatedBonds: false,
-    corporateBondsPct: '', // '50' | '100'
+    corporateBondsPct: '',
     equityPct: '',
 
-    // Refusals tracking
-    refusals: [], // array of { field, label }
+    refusals: [],
+    refusalsConfirmed: false,
   }
 }
 
@@ -101,7 +81,7 @@ function createEmptyClient() {
     fullName: '',
     idNumber: '',
     birthDate: '',
-    maritalStatus: '', // 'single' | 'married' | 'divorced' | 'widowed'
+    maritalStatus: '',
     dependents: '',
     phone: '',
     email: '',
@@ -135,7 +115,6 @@ export function calculateRiskScore(form) {
   else if (average < 4.5) level = 4
   else level = 5
 
-  // Gap detection - only when two DIFFERENT answers have a gap of 2+
   let hasGap = false
   let gapDetails = ''
   for (let i = 0; i < scores.length; i++) {
@@ -153,12 +132,37 @@ export function calculateRiskScore(form) {
 }
 
 export const RISK_LEVELS = [
-  { level: 1, name: 'שמרן', maxLoss: 'עד 5%', maxStocks: '0%', corpBonds: 'עד 25%' },
-  { level: 2, name: 'שמרן-מתון', maxLoss: 'עד 10%', maxStocks: 'עד 15%', corpBonds: 'עד 50%' },
-  { level: 3, name: 'מאוזן', maxLoss: 'עד 15%', maxStocks: 'עד 25%', corpBonds: 'עד 100%' },
-  { level: 4, name: 'צמיחה', maxLoss: 'מעל 15%', maxStocks: 'עד 35%', corpBonds: 'עד 100%' },
-  { level: 5, name: 'אגרסיבי', maxLoss: 'משמעותי', maxStocks: 'עד 100%', corpBonds: '100%' },
+  { level: 1, name: 'שמרן', maxLoss: 'עד 5%', maxStocks: '0%', corpBonds: 'עד 25%', description: 'שמירת ערך מקסימלית, תנודות מינימליות, תשואה צנועה מעל פקדון' },
+  { level: 2, name: 'שמרן-מתון', maxLoss: 'עד 10%', maxStocks: 'עד 15%', corpBonds: 'עד 50%', description: 'חשיפה מוגבלת לסיכון, תשואה מעל אינפלציה לאורך זמן' },
+  { level: 3, name: 'מאוזן', maxLoss: 'עד 15%', maxStocks: 'עד 25%', corpBonds: 'עד 100%', description: 'איזון בין סיכון לתשואה, תנודות מובנות ומקובלות' },
+  { level: 4, name: 'צמיחה', maxLoss: 'מעל 15%', maxStocks: 'עד 35%', corpBonds: 'עד 100%', description: 'נכונות לסיכון גבוה לטובת תשואה עודפת לטווח ארוך' },
+  { level: 5, name: 'אגרסיבי', maxLoss: 'משמעותי', maxStocks: 'עד 100%', corpBonds: '100%', description: 'חשיפה מקסימלית, מתאים למשקיע מנוסה עם אופק ארוך' },
 ]
+
+// Step validation
+export function validateStep(stepId, formData) {
+  const errors = []
+
+  if (stepId === 'gate') {
+    if (!formData.signerType) errors.push({ field: 'signerType', message: 'נא לבחור סוג חותם' })
+  }
+
+  if (stepId === 'personal') {
+    if (!formData.clientA.fullName) errors.push({ field: 'clientA.fullName', message: 'נא למלא שם מלא' })
+    if (!formData.clientA.idNumber) errors.push({ field: 'clientA.idNumber', message: 'נא למלא תעודת זהות' })
+    if (!formData.clientA.phone) errors.push({ field: 'clientA.phone', message: 'נא למלא טלפון נייד' })
+    if (!formData.clientA.email) errors.push({ field: 'clientA.email', message: 'נא למלא דוא״ל' })
+
+    if (formData.signerType === 'couple') {
+      if (!formData.clientB.fullName) errors.push({ field: 'clientB.fullName', message: 'נא למלא שם מלא (לקוח ב׳)' })
+      if (!formData.clientB.idNumber) errors.push({ field: 'clientB.idNumber', message: 'נא למלא תעודת זהות (לקוח ב׳)' })
+      if (!formData.clientB.phone) errors.push({ field: 'clientB.phone', message: 'נא למלא טלפון נייד (לקוח ב׳)' })
+      if (!formData.clientB.email) errors.push({ field: 'clientB.email', message: 'נא למלא דוא״ל (לקוח ב׳)' })
+    }
+  }
+
+  return errors
+}
 
 export const WIZARD_STEPS = [
   { id: 'gate', title: 'שלב מקדים', subtitle: 'מי חותם על ההסכם?' },

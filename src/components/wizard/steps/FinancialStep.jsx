@@ -65,6 +65,7 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
 
       {/* Securities */}
       <SectionTitle>ני״ע בארץ ובחו״ל</SectionTitle>
+      <p className="text-xs text-gold bg-surface-cream px-3 py-1.5 rounded-lg inline-block mb-2">השקעות בחו״ל — יש להזין שווי שקלי</p>
       <div className="space-y-1">
         <AssetRow label="תיק מנוהל" asset={formData.assets.managedPortfolio} onChange={(v) => updateAsset('managedPortfolio', v)} />
         <AssetRow label="מניות / אג״ח ישיר" asset={formData.assets.stocks} onChange={(v) => updateAsset('stocks', v)} />
