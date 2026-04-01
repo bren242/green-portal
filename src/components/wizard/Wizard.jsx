@@ -79,27 +79,34 @@ export default function Wizard({ user, onLogout, onAdmin }) {
           currentStep={currentStep}
           onStepClick={goToStep}
         />
-        <div className="bg-white rounded-card shadow-card p-6 md:p-8 mt-6">
-          <h2 className="text-xl font-bold text-green-primary mb-1">
-            {WIZARD_STEPS[currentStep].title}
-          </h2>
-          <p className="text-sm text-text-muted mb-6">
-            {WIZARD_STEPS[currentStep].subtitle}
-          </p>
+
+        {/* Main card */}
+        <div className="bg-white rounded-card shadow-card border border-border/50 p-6 md:p-8 mt-5">
+          <div className="mb-6">
+            <h2 className="text-lg font-extrabold text-green-primary">
+              {WIZARD_STEPS[currentStep].title}
+            </h2>
+            <p className="text-sm text-text-muted mt-0.5">
+              {WIZARD_STEPS[currentStep].subtitle}
+            </p>
+            <div className="h-[2px] bg-gold/30 mt-3 rounded-full" />
+          </div>
           {renderStep()}
         </div>
-        <div className="flex justify-between mt-6">
+
+        {/* Navigation */}
+        <div className="flex justify-between mt-5">
           <button
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="px-6 py-2.5 border border-border rounded-lg text-sm font-semibold text-text-primary hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 border border-border rounded-card text-sm font-semibold text-text-primary hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed shadow-sm"
           >
             הקודם
           </button>
           {currentStep < WIZARD_STEPS.length - 1 ? (
             <button
               onClick={nextStep}
-              className="px-6 py-2.5 bg-green-primary text-white rounded-lg text-sm font-semibold hover:bg-green-secondary transition-colors"
+              className="px-8 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
             >
               הבא
             </button>

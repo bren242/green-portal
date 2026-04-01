@@ -18,6 +18,7 @@ body {
   color: #1A1A1A;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
 }
 
 input, select, textarea, button {
@@ -26,4 +27,23 @@ input, select, textarea, button {
 
 input, textarea {
   autocomplete: off;
+}
+
+/* Hide scrollbar on step progress */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Focus ring consistency */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+/* Smooth transitions */
+button, a, input, select {
+  transition: all 0.15s ease;
 }

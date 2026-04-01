@@ -1,11 +1,15 @@
 import jsPDF from 'jspdf'
 import { assistantRegular, assistantBold } from '../../assets/fonts/assistantFonts'
 import { RISK_LEVELS } from '../../data/formSchema'
+import { logoPng } from '../../assets/logoBase64'
 
-// Hebrew RTL helper - reverse text for jsPDF display
+// Hebrew RTL helper for jsPDF
+// jsPDF renders LTR only. We reverse logical order so LTR rendering looks RTL.
+// Numbers, English, and symbols stay in their natural LTR order.
 function rtl(text) {
   if (!text) return ''
   const str = String(text)
+  // Match Hebrew runs vs non-Hebrew runs (numbers, English, punctuation, spaces)
   const segments = str.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+|[^\u0590-\u05FF\uFB1D-\uFB4F]+/g) || []
   return segments
     .reverse()
@@ -13,7 +17,7 @@ function rtl(text) {
       if (/[\u0590-\u05FF]/.test(seg)) {
         return seg.split('').reverse().join('')
       }
-      return seg
+      return seg // numbers, English, symbols stay LTR
     })
     .join('')
 }
@@ -32,6 +36,7 @@ const COLORS = {
   textMuted: [90, 90, 90],
   negative: [192, 57, 43],
   white: [255, 255, 255],
+  black: [0, 0, 0],
 }
 
 export async function generatePDF(formData, user) {
@@ -49,6 +54,7 @@ export async function generatePDF(formData, user) {
   const rightX = pageWidth - margin
   const contentWidth = pageWidth - margin * 2
   let y = 0
+  let totalPages = 0
 
   // ==================== HELPERS ====================
   const setColor = (color) => doc.setTextColor(...color)
@@ -59,30 +65,34 @@ export async function generatePDF(formData, user) {
     doc.text(rtl(String(str || '')), x, yPos, { align: 'right', ...options })
   }
 
-  const textLeft = (str, x, yPos) => {
-    doc.text(String(str || ''), x, yPos, { align: 'left' })
-  }
-
   const checkPage = (needed = 25) => {
-    if (y + needed > pageHeight - 25) {
+    if (y + needed > pageHeight - 30) {
       doc.addPage()
-      y = 25
       addPageHeader()
     }
   }
 
   const addPageHeader = () => {
+    // Dark green header bar
     setFill(COLORS.primary)
-    doc.rect(0, 0, pageWidth, 12, 'F')
+    doc.rect(0, 0, pageWidth, 14, 'F')
+
+    // Gold accent line
+    setFill(COLORS.gold)
+    doc.rect(0, 14, pageWidth, 1, 'F')
+
+    // Logo on left side of header
+    try {
+      doc.addImage(logoPng, 'PNG', margin, 2, 28, 10)
+    } catch (e) { /* logo unavailable */ }
+
+    // Title text on right
     doc.setFont('Assistant', 'bold')
-    doc.setFontSize(8)
+    doc.setFontSize(9)
     setColor(COLORS.goldLight)
-    text('GREEN Wealth Management', rightX - 5, 8)
-    setColor(COLORS.white)
-    doc.setFont('Assistant', 'normal')
-    doc.setFontSize(7)
-    textLeft(rtl('איפיון צרכים'), margin + 5, 8)
-    y = 20
+    text('איפיון צרכים — GREEN Wealth Management', rightX - 3, 9)
+
+    y = 22
   }
 
   const sectionTitle = (title) => {
@@ -94,62 +104,92 @@ export async function generatePDF(formData, user) {
     setColor(COLORS.white)
     text(title, rightX - 5, y + 7)
     y += 16
-    setColor(COLORS.textPrimary)
+    setColor(COLORS.black)
     doc.setFont('Assistant', 'normal')
   }
 
-  const labelValue = (label, value) => {
+  const labelValue = (label, value, labelColor = COLORS.black) => {
     checkPage(8)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(9)
-    setColor(COLORS.textMuted)
+    setColor(labelColor)
     text(label, rightX, y)
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(10)
-    setColor(COLORS.textPrimary)
-    text(String(value || '---'), rightX - 50, y)
-    y += 6
+    setColor(COLORS.black)
+    text(String(value || '---'), rightX - 55, y)
+    y += 7
   }
 
   const spacer = (s = 4) => { y += s }
 
-  // Manual table drawing (no autoTable dependency)
+  // Manual table drawing
   const drawTable = (rows) => {
     if (!rows || rows.length === 0) return
     const rowHeight = 8
-    const colValueWidth = 55
-    const colLabelWidth = contentWidth - colValueWidth
 
     for (let i = 0; i < rows.length; i++) {
       checkPage(rowHeight + 2)
       const rowY = y
 
-      // Alternating row background
       if (i % 2 === 0) {
         setFill(COLORS.surfaceLight)
         doc.rect(margin, rowY - 4, contentWidth, rowHeight, 'F')
       }
 
-      // Border bottom
       setDraw(COLORS.border)
       doc.setLineWidth(0.15)
       doc.line(margin, rowY + rowHeight - 4, margin + contentWidth, rowY + rowHeight - 4)
 
-      // Label (right column, bold)
       doc.setFont('Assistant', 'bold')
       doc.setFontSize(9)
-      setColor(COLORS.textPrimary)
+      setColor(COLORS.black)
       text(rows[i][0], rightX - 3, rowY)
 
-      // Value (left column, normal)
       doc.setFont('Assistant', 'normal')
       doc.setFontSize(9)
-      setColor(COLORS.textMuted)
-      text(String(rows[i][1] || '---'), rightX - colLabelWidth - 3, rowY)
+      setColor(COLORS.black)
+      text(String(rows[i][1] || '---'), rightX - 90, rowY)
 
       y += rowHeight
     }
     y += 2
+  }
+
+  // Summary table (3 columns: label, value, highlighted)
+  const drawSummaryTable = (rows) => {
+    const rowHeight = 10
+    for (let i = 0; i < rows.length; i++) {
+      checkPage(rowHeight + 2)
+      const rowY = y
+      const isHighlight = rows[i][2]
+
+      if (isHighlight) {
+        setFill(COLORS.primary)
+        doc.rect(margin, rowY - 5, contentWidth, rowHeight, 'F')
+        doc.setFont('Assistant', 'bold')
+        doc.setFontSize(10)
+        setColor(COLORS.white)
+      } else {
+        setFill(i % 2 === 0 ? COLORS.surfaceLight : COLORS.white)
+        doc.rect(margin, rowY - 5, contentWidth, rowHeight, 'F')
+        doc.setFont('Assistant', 'bold')
+        doc.setFontSize(9)
+        setColor(COLORS.black)
+      }
+
+      setDraw(COLORS.border)
+      doc.setLineWidth(0.15)
+      doc.line(margin, rowY + rowHeight - 5, margin + contentWidth, rowY + rowHeight - 5)
+
+      text(rows[i][0], rightX - 3, rowY)
+
+      doc.setFont('Assistant', 'normal')
+      text(String(rows[i][1] || '---'), rightX - 90, rowY)
+
+      y += rowHeight
+    }
+    y += 3
   }
 
   const addNote = (noteText) => {
@@ -162,41 +202,58 @@ export async function generatePDF(formData, user) {
     y += 6
   }
 
+  // Helper to parse amount string to number
+  const parseAmount = (str) => {
+    if (!str) return 0
+    const num = parseFloat(String(str).replace(/[^\d.-]/g, ''))
+    return isNaN(num) ? 0 : num
+  }
+
   // ==================== COVER PAGE ====================
   setFill(COLORS.primary)
-  doc.rect(0, 0, pageWidth, 85, 'F')
+  doc.rect(0, 0, pageWidth, 90, 'F')
 
   setFill(COLORS.gold)
-  doc.rect(0, 85, pageWidth, 3, 'F')
+  doc.rect(0, 90, pageWidth, 3, 'F')
 
-  doc.setFont('Assistant', 'bold')
-  doc.setFontSize(32)
-  setColor(COLORS.white)
-  doc.text('GREEN', pageWidth / 2, 35, { align: 'center' })
-  doc.setFontSize(11)
-  setColor(COLORS.goldLight)
-  doc.text('WEALTH MANAGEMENT', pageWidth / 2, 45, { align: 'center' })
-
-  doc.setFontSize(22)
-  setColor(COLORS.white)
-  text('איפיון צרכים והתאמת מדיניות השקעה', pageWidth / 2, 65, { align: 'center' })
-
-  y = 100
-  setFill(COLORS.cream)
-  setDraw(COLORS.border)
-  doc.roundedRect(margin + 20, y, contentWidth - 40, 40, 3, 3, 'FD')
+  // Logo on cover
+  try {
+    doc.addImage(logoPng, 'PNG', pageWidth / 2 - 25, 18, 50, 19)
+  } catch (e) {
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(32)
+    setColor(COLORS.white)
+    doc.text('GREEN', pageWidth / 2, 35, { align: 'center' })
+  }
 
   doc.setFont('Assistant', 'normal')
   doc.setFontSize(11)
-  setColor(COLORS.textPrimary)
+  setColor(COLORS.goldLight)
+  doc.text('WEALTH MANAGEMENT', pageWidth / 2, 48, { align: 'center' })
+
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(22)
+  setColor(COLORS.white)
+  text('איפיון צרכים והתאמת מדיניות השקעה', pageWidth / 2, 70, { align: 'center' })
+
+  // Info box
+  y = 105
+  setFill(COLORS.cream)
+  setDraw(COLORS.border)
+  doc.roundedRect(margin + 20, y, contentWidth - 40, 42, 3, 3, 'FD')
+
+  doc.setFont('Assistant', 'normal')
+  doc.setFontSize(11)
+  setColor(COLORS.black)
 
   const date = new Date().toLocaleDateString('he-IL')
   const clientName = formData.clientA.fullName || '---'
 
-  text(`תאריך: ${date}`, pageWidth / 2 + 30, y + 12)
-  text(`לקוח: ${clientName}`, pageWidth / 2 + 30, y + 22)
-  text(`בעל הרישיון: ${user.name}`, pageWidth / 2 + 30, y + 32)
+  text(`תאריך: ${date}`, pageWidth / 2 + 30, y + 13)
+  text(`לקוח: ${clientName}`, pageWidth / 2 + 30, y + 24)
+  text(`בעל הרישיון: ${user.name}`, pageWidth / 2 + 30, y + 35)
 
+  // Footer disclaimer
   y = 260
   doc.setFontSize(8)
   setColor(COLORS.textMuted)
@@ -210,7 +267,7 @@ export async function generatePDF(formData, user) {
   sectionTitle('פרטים מזהים')
 
   const printClient = (client, title) => {
-    checkPage(50)
+    checkPage(55)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(11)
     setColor(COLORS.secondary)
@@ -236,6 +293,9 @@ export async function generatePDF(formData, user) {
 
   // ==================== FINANCIAL BALANCE ====================
   sectionTitle('תמונה כלכלית — התא המשפחתי')
+
+  let totalAssets = 0
+  let totalLiabilities = 0
 
   // Income
   const incomeRows = []
@@ -291,7 +351,10 @@ export async function generatePDF(formData, user) {
   for (const section of assetSections) {
     const rows = section.items
       .filter(([, asset]) => asset && asset.has)
-      .map(([label, asset]) => [label, asset.amount || '---'])
+      .map(([label, asset]) => {
+        totalAssets += parseAmount(asset.amount)
+        return [label, asset.amount || '---']
+      })
     if (rows.length > 0) {
       checkPage(rows.length * 8 + 18)
       doc.setFont('Assistant', 'bold')
@@ -306,8 +369,14 @@ export async function generatePDF(formData, user) {
 
   // Liabilities
   const liabRows = []
-  if (formData.liabilities.mortgage.has) liabRows.push(['משכנתא', `חודשי: ${formData.liabilities.mortgage.monthly || '---'} | יתרה: ${formData.liabilities.mortgage.total || '---'}`])
-  if (formData.liabilities.loans.has) liabRows.push(['הלוואות', `חודשי: ${formData.liabilities.loans.monthly || '---'} | יתרה: ${formData.liabilities.loans.total || '---'}`])
+  if (formData.liabilities.mortgage.has) {
+    totalLiabilities += parseAmount(formData.liabilities.mortgage.total)
+    liabRows.push(['משכנתא', `חודשי: ${formData.liabilities.mortgage.monthly || '---'} | יתרה: ${formData.liabilities.mortgage.total || '---'}`])
+  }
+  if (formData.liabilities.loans.has) {
+    totalLiabilities += parseAmount(formData.liabilities.loans.total)
+    liabRows.push(['הלוואות', `חודשי: ${formData.liabilities.loans.monthly || '---'} | יתרה: ${formData.liabilities.loans.total || '---'}`])
+  }
   if (formData.liabilities.monthlyExpenses) liabRows.push(['הוצאות שוטפות', formData.liabilities.monthlyExpenses])
 
   if (liabRows.length > 0) {
@@ -320,6 +389,24 @@ export async function generatePDF(formData, user) {
     drawTable(liabRows)
   }
   addNote(formData.liabilitiesNotes)
+
+  // ===== ASSET SUMMARY TABLE =====
+  const netWorth = totalAssets - totalLiabilities
+  const fmtNum = (n) => n > 0 ? n.toLocaleString('he-IL') + ' ₪' : '---'
+
+  checkPage(40)
+  spacer(6)
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(10)
+  setColor(COLORS.primary)
+  text('סיכום מאזן', rightX, y)
+  y += 7
+
+  drawSummaryTable([
+    ['סך נכסים', fmtNum(totalAssets), false],
+    ['סך התחייבויות', fmtNum(totalLiabilities), false],
+    ['שווי נטו', fmtNum(netWorth), true],
+  ])
 
   // Managed portion
   if (formData.managedPortion) {
@@ -348,8 +435,8 @@ export async function generatePDF(formData, user) {
   const timelineLabels = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
   const next3Labels = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
 
-  labelValue('צורך בכל הכסף', timelineLabels[formData.liquidityTimeline] || '---')
-  labelValue('צורך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---')
+  labelValue('מתי תצטרך את כל הכסף', timelineLabels[formData.liquidityTimeline] || '---')
+  labelValue('כמה תצטרך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---')
 
   // ==================== RISK ASSESSMENT ====================
   sectionTitle('הערכת סיכון')
@@ -378,12 +465,12 @@ export async function generatePDF(formData, user) {
     checkPage(20)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(9)
-    setColor(COLORS.textMuted)
+    setColor(COLORS.black)
     text('סיכום וניתוח', rightX, y)
     y += 6
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(9)
-    setColor(COLORS.textPrimary)
+    setColor(COLORS.black)
     const lines = doc.splitTextToSize(rtl(formData.advisorSummary), contentWidth)
     doc.text(lines, rightX, y, { align: 'right' })
     y += lines.length * 4.5 + 4
@@ -393,12 +480,12 @@ export async function generatePDF(formData, user) {
     checkPage(20)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(9)
-    setColor(COLORS.textMuted)
+    setColor(COLORS.black)
     text('העדפות / הגבלות לקוח', rightX, y)
     y += 6
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(9)
-    setColor(COLORS.textPrimary)
+    setColor(COLORS.black)
     const lines = doc.splitTextToSize(rtl(formData.clientPreferences), contentWidth)
     doc.text(lines, rightX, y, { align: 'right' })
     y += lines.length * 4.5 + 4
@@ -430,12 +517,12 @@ export async function generatePDF(formData, user) {
     checkPage(15)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(9)
-    setColor(COLORS.textMuted)
+    setColor(COLORS.black)
     text('נימוק מקצועי', rightX, y)
     y += 6
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(9)
-    setColor(COLORS.textPrimary)
+    setColor(COLORS.black)
     const lines = doc.splitTextToSize(rtl(formData.finalRiskJustification), contentWidth)
     doc.text(lines, rightX, y, { align: 'right' })
     y += lines.length * 4.5 + 4
@@ -466,6 +553,7 @@ export async function generatePDF(formData, user) {
 
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(9)
+    setColor(COLORS.black)
     formData.refusals.forEach((r) => {
       text(`• ${r.label}`, rightX - 8, y)
       y += 6
@@ -478,8 +566,88 @@ export async function generatePDF(formData, user) {
     y += 10
   }
 
+  // ==================== SUMMARY PAGE ====================
+  doc.addPage()
+  addPageHeader()
+
+  sectionTitle('סיכום תשובות הלקוח')
+
+  const summaryItems = []
+
+  // Personal
+  summaryItems.push({ section: 'פרטים אישיים', items: [
+    ['שם מלא', formData.clientA.fullName],
+    ['תעודת זהות', formData.clientA.idNumber],
+    ['טלפון', formData.clientA.phone],
+    ['דוא״ל', formData.clientA.email],
+    ['עיסוק', formData.clientA.occupation],
+    ['מצב משפחתי', translateMarital(formData.clientA.maritalStatus)],
+  ]})
+
+  if (formData.signerType === 'couple') {
+    summaryItems.push({ section: 'לקוח ב׳', items: [
+      ['שם מלא', formData.clientB.fullName],
+      ['תעודת זהות', formData.clientB.idNumber],
+    ]})
+  }
+
+  // Financial summary
+  summaryItems.push({ section: 'תמונה כלכלית', items: [
+    ['סך נכסים', fmtNum(totalAssets)],
+    ['סך התחייבויות', fmtNum(totalLiabilities)],
+    ['שווי נטו', fmtNum(netWorth)],
+    ['שיעור נכסים מנוהל', formData.managedPortion ? { up_to_35: 'עד 35%', '35_to_70': '35%-70%', over_70: 'מעל 70%' }[formData.managedPortion] : '---'],
+  ]})
+
+  // Goals
+  summaryItems.push({ section: 'מטרות ואופק', items: [
+    ['מטרות השקעה', goals || '---'],
+    ['אופק השקעה', horizonLabels[formData.investmentHorizon] || '---'],
+  ]})
+
+  // Liquidity
+  summaryItems.push({ section: 'נזילות', items: [
+    ['צורך בכל הכסף', timelineLabels[formData.liquidityTimeline] || '---'],
+    ['צורך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---'],
+  ]})
+
+  // Risk
+  const rlFinal = formData.finalRiskLevel > 0 ? RISK_LEVELS[formData.finalRiskLevel - 1] : null
+  summaryItems.push({ section: 'סיכון ומדיניות', items: [
+    ['שאלה 1', q1Labels[formData.riskQ1] || '---'],
+    ['שאלה 2', q2Labels[formData.riskQ2] || '---'],
+    ['שאלה 3', q3Labels[formData.riskQ3] || '---'],
+    ['שאלה 4', q4Labels[formData.riskQ4] || '---'],
+    ['דרגת סיכון סופית', rlFinal ? `${formData.finalRiskLevel} — ${rlFinal.name}` : '---'],
+    ['ניסיון קודם', formData.priorExperience === 'yes' ? 'כן' : formData.priorExperience === 'no' ? 'לא' : '---'],
+  ]})
+
+  // Render summary
+  for (const group of summaryItems) {
+    checkPage(15)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(10)
+    setColor(COLORS.primary)
+    text(group.section, rightX, y)
+    y += 7
+
+    for (const [label, value] of group.items) {
+      checkPage(8)
+      doc.setFont('Assistant', 'bold')
+      doc.setFontSize(8)
+      setColor(COLORS.textMuted)
+      text(label, rightX, y)
+      doc.setFont('Assistant', 'normal')
+      doc.setFontSize(9)
+      setColor(COLORS.black)
+      text(String(value || '---'), rightX - 55, y)
+      y += 6
+    }
+    spacer(4)
+  }
+
   // ==================== SIGNATURES ====================
-  checkPage(60)
+  checkPage(70)
   spacer(10)
   setDraw(COLORS.primary)
   doc.setLineWidth(0.5)
@@ -493,7 +661,7 @@ export async function generatePDF(formData, user) {
   y += 12
 
   const addSignature = (name, role) => {
-    checkPage(25)
+    checkPage(30)
     doc.setFont('Assistant', 'bold')
     doc.setFontSize(10)
     setColor(COLORS.primary)
@@ -502,7 +670,7 @@ export async function generatePDF(formData, user) {
 
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(9)
-    setColor(COLORS.textPrimary)
+    setColor(COLORS.black)
     text(name || '_______________', rightX, y)
     y += 5
 
@@ -513,7 +681,7 @@ export async function generatePDF(formData, user) {
     doc.setFontSize(8)
     setColor(COLORS.textMuted)
     text('חתימה                                   תאריך', rightX, y)
-    y += 10
+    y += 12
   }
 
   addSignature(formData.clientA.fullName, formData.signerType === 'couple' ? 'לקוח א׳' : 'הלקוח')
@@ -521,6 +689,23 @@ export async function generatePDF(formData, user) {
     addSignature(formData.clientB.fullName, 'לקוח ב׳')
   }
   addSignature(user.name, 'בעל הרישיון')
+
+  // ==================== PAGE NUMBERS (all pages) ====================
+  totalPages = doc.getNumberOfPages()
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i)
+
+    // Logo on left of every page (except cover which already has it)
+    if (i > 1) {
+      // Already added via addPageHeader
+    }
+
+    // Page number footer
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(7)
+    doc.setTextColor(90, 90, 90)
+    doc.text(`${i} / ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' })
+  }
 
   // ==================== RETURN BLOB ====================
   const safeName = (formData.clientA.fullName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
