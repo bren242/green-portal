@@ -1,0 +1,151 @@
+import { useState } from 'react'
+import { TextArea, TextInput, RadioGroup, Checkbox } from '../ui/FormField'
+import { calculateRiskScore, RISK_LEVELS } from '../../../data/formSchema'
+import { generatePDF } from '../../pdf/generatePDF'
+
+export default function AdvisorStep({ formData, updateForm, user }) {
+  const [generating, setGenerating] = useState(false)
+  const riskResult = calculateRiskScore(formData)
+
+  const handleGeneratePDF = async () => {
+    setGenerating(true)
+    try {
+      await generatePDF(formData, user)
+    } catch (err) {
+      console.error('PDF generation error:', err)
+      alert('שגיאה ביצירת PDF: ' + err.message)
+    }
+    setGenerating(false)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-surface-cream border border-gold/30 rounded-card p-4 text-sm">
+        <span className="font-bold text-green-primary">חלק זה מיועד לבעל הרישיון בלבד</span>
+        <span className="text-text-muted"> — לא מוצג ללקוח ב-PDF</span>
+      </div>
+
+      <TextArea
+        label="סיכום וניתוח"
+        value={formData.advisorSummary}
+        onChange={(v) => updateForm({ advisorSummary: v })}
+        placeholder="סיכום הפגישה, תובנות, הערכה מקצועית..."
+        rows={4}
+      />
+
+      <TextArea
+        label="העדפות / הגבלות לקוח"
+        value={formData.clientPreferences}
+        onChange={(v) => updateForm({ clientPreferences: v })}
+        placeholder="העדפות ספציפיות, הגבלות, דגשים..."
+        rows={3}
+      />
+
+      {/* Risk level selection */}
+      <div className="bg-white border border-border rounded-card p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-green-primary">דרגת סיכון מחושבת:</span>
+          <span className="text-xl font-extrabold text-green-primary">
+            {riskResult.level > 0 ? `${riskResult.level} (${RISK_LEVELS[riskResult.level - 1]?.name})` : 'טרם חושב'}
+          </span>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-text-primary mb-2">
+            דרגת סיכון סופית (נקבעת ע״י בעל הרישיון)
+          </label>
+          <div className="flex gap-2">
+            {RISK_LEVELS.map((rl) => (
+              <button
+                key={rl.level}
+                onClick={() => updateForm({ finalRiskLevel: rl.level })}
+                className={`
+                  flex-1 py-3 rounded-lg text-center transition-all border-2
+                  ${formData.finalRiskLevel === rl.level
+                    ? 'border-green-secondary bg-green-secondary/10 text-green-primary font-bold'
+                    : 'border-border text-text-muted hover:border-green-secondary/40'
+                  }
+                `}
+              >
+                <div className="text-lg font-bold">{rl.level}</div>
+                <div className="text-xs">{rl.name}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {formData.finalRiskLevel > 0 && formData.finalRiskLevel !== riskResult.level && (
+          <TextArea
+            label="נימוק לפער בין הדרגה המחושבת לסופית"
+            value={formData.finalRiskJustification}
+            onChange={(v) => updateForm({ finalRiskJustification: v })}
+            placeholder='לדוגמה: "מכיוון שניהול התיקים מהווה ~50% מסך נכסי הלקוח..."'
+            rows={3}
+          />
+        )}
+
+        {/* Risk level details */}
+        {formData.finalRiskLevel > 0 && (
+          <div className="bg-surface-light rounded-lg p-3 text-sm space-y-1">
+            <div className="font-semibold text-green-primary">
+              משמעות דרגה {formData.finalRiskLevel} — {RISK_LEVELS[formData.finalRiskLevel - 1].name}
+            </div>
+            <div className="text-text-muted">
+              הפסד מקסימלי: {RISK_LEVELS[formData.finalRiskLevel - 1].maxLoss} |
+              מניות מקס׳: {RISK_LEVELS[formData.finalRiskLevel - 1].maxStocks} |
+              אג״ח קונצרני: {RISK_LEVELS[formData.finalRiskLevel - 1].corpBonds}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Policy parameters */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextInput
+          label="אחוז מניות מקסימלי"
+          value={formData.equityPct}
+          onChange={(v) => updateForm({ equityPct: v })}
+          placeholder="%"
+        />
+        <RadioGroup
+          label="אג״ח קונצרני"
+          name="corporateBondsPct"
+          value={formData.corporateBondsPct}
+          onChange={(v) => updateForm({ corporateBondsPct: v })}
+          options={[
+            { value: '50', label: 'עד 50%' },
+            { value: '100', label: 'עד 100%' },
+          ]}
+        />
+      </div>
+
+      <div className="flex gap-6">
+        <Checkbox label="מט״ח" checked={formData.forex} onChange={(v) => updateForm({ forex: v })} />
+        <Checkbox label="אג״ח בדירוג נמוך / לא מדורג" checked={formData.lowRatedBonds} onChange={(v) => updateForm({ lowRatedBonds: v })} />
+      </div>
+
+      {/* Refusals summary */}
+      {formData.refusals.length > 0 && (
+        <div className="bg-warning-bg border border-warning-border rounded-card p-4">
+          <h4 className="text-sm font-bold text-warning-red mb-2">שאלות שהלקוח סירב להשיב:</h4>
+          <ul className="text-sm text-warning-red space-y-1">
+            {formData.refusals.map((r) => (
+              <li key={r.field}>• {r.label}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Generate PDF */}
+      <div className="pt-4 border-t border-border">
+        <button
+          onClick={handleGeneratePDF}
+          disabled={generating}
+          className="w-full py-3 bg-green-primary text-white font-bold rounded-lg hover:bg-green-secondary transition-colors text-base disabled:opacity-50"
+        >
+          {generating ? 'מייצר PDF...' : 'ייצר PDF לחתימה'}
+        </button>
+      </div>
+    </div>
+  )
+}

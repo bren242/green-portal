@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm -v)",
+      "Bash(npm.cmd -v)",
+      "Bash(npm.cmd create:*)",
+      "Bash(npm.cmd install:*)",
+      "Bash(npx.cmd vite:*)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
