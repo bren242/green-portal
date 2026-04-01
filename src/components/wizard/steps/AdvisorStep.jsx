@@ -2,20 +2,35 @@ import { useState } from 'react'
 import { TextArea, TextInput, RadioGroup, Checkbox } from '../ui/FormField'
 import { calculateRiskScore, RISK_LEVELS } from '../../../data/formSchema'
 import { generatePDF } from '../../pdf/generatePDF'
+import PDFPreview from '../../pdf/PDFPreview'
 
 export default function AdvisorStep({ formData, updateForm, user }) {
   const [generating, setGenerating] = useState(false)
+  const [pdfData, setPdfData] = useState(null) // { url, fileName, blob }
   const riskResult = calculateRiskScore(formData)
 
   const handleGeneratePDF = async () => {
     setGenerating(true)
     try {
-      await generatePDF(formData, user)
+      const result = await generatePDF(formData, user)
+      setPdfData(result)
     } catch (err) {
       console.error('PDF generation error:', err)
       alert('שגיאה ביצירת PDF: ' + err.message)
     }
     setGenerating(false)
+  }
+
+  const handleDownload = () => {
+    if (!pdfData) return
+    const link = document.createElement('a')
+    link.href = pdfData.url
+    link.download = pdfData.fileName
+    link.click()
+  }
+
+  const handleClosePreview = () => {
+    setPdfData(null)
   }
 
   return (
@@ -142,9 +157,19 @@ export default function AdvisorStep({ formData, updateForm, user }) {
           disabled={generating}
           className="w-full py-3 bg-green-primary text-white font-bold rounded-lg hover:bg-green-secondary transition-colors text-base disabled:opacity-50"
         >
-          {generating ? 'מייצר PDF...' : 'ייצר PDF לחתימה'}
+          {generating ? 'מייצר PDF...' : 'תצוגה מקדימה וייצוא PDF'}
         </button>
       </div>
+
+      {/* PDF Preview Modal */}
+      {pdfData && (
+        <PDFPreview
+          pdfUrl={pdfData.url}
+          fileName={pdfData.fileName}
+          onClose={handleClosePreview}
+          onDownload={handleDownload}
+        />
+      )}
     </div>
   )
 }

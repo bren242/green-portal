@@ -1,14 +1,12 @@
 import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import { assistantRegular, assistantBold } from '../../assets/fonts/assistantFonts'
 import { RISK_LEVELS } from '../../data/formSchema'
 
 // Hebrew RTL helper - reverse text for jsPDF display
 function rtl(text) {
   if (!text) return ''
-  // Split into segments: Hebrew vs non-Hebrew (numbers, English, symbols)
-  const segments = text.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+|[^\u0590-\u05FF\uFB1D-\uFB4F]+/g) || []
-  // Reverse order of segments and reverse Hebrew segments internally
+  const str = String(text)
+  const segments = str.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+|[^\u0590-\u05FF\uFB1D-\uFB4F]+/g) || []
   return segments
     .reverse()
     .map((seg) => {
@@ -22,17 +20,17 @@ function rtl(text) {
 
 // Colors from DESIGN.md
 const COLORS = {
-  primary: [27, 58, 47],       // #1B3A2F
-  secondary: [62, 122, 92],    // #3E7A5C
-  gold: [184, 151, 90],        // #B8975A
-  goldLight: [212, 180, 131],  // #D4B483
-  offWhite: [244, 243, 239],   // #F4F3EF
-  cream: [248, 245, 238],      // #F8F5EE
-  surfaceLight: [246, 245, 241],// #F6F5F1
-  border: [221, 213, 191],     // #DDD5BF
-  textPrimary: [26, 26, 26],   // #1A1A1A
-  textMuted: [90, 90, 90],     // #5A5A5A
-  negative: [192, 57, 43],     // #C0392B
+  primary: [27, 58, 47],
+  secondary: [62, 122, 92],
+  gold: [184, 151, 90],
+  goldLight: [212, 180, 131],
+  offWhite: [244, 243, 239],
+  cream: [248, 245, 238],
+  surfaceLight: [246, 245, 241],
+  border: [221, 213, 191],
+  textPrimary: [26, 26, 26],
+  textMuted: [90, 90, 90],
+  negative: [192, 57, 43],
   white: [255, 255, 255],
 }
 
@@ -58,11 +56,11 @@ export async function generatePDF(formData, user) {
   const setDraw = (color) => doc.setDrawColor(...color)
 
   const text = (str, x, yPos, options = {}) => {
-    doc.text(rtl(str), x, yPos, { align: 'right', ...options })
+    doc.text(rtl(String(str || '')), x, yPos, { align: 'right', ...options })
   }
 
   const textLeft = (str, x, yPos) => {
-    doc.text(str, x, yPos, { align: 'left' })
+    doc.text(String(str || ''), x, yPos, { align: 'left' })
   }
 
   const checkPage = (needed = 25) => {
@@ -74,7 +72,6 @@ export async function generatePDF(formData, user) {
   }
 
   const addPageHeader = () => {
-    // Thin header bar
     setFill(COLORS.primary)
     doc.rect(0, 0, pageWidth, 12, 'F')
     doc.setFont('Assistant', 'bold')
@@ -110,22 +107,68 @@ export async function generatePDF(formData, user) {
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(10)
     setColor(COLORS.textPrimary)
-    text(value || '---', rightX - 50, y)
+    text(String(value || '---'), rightX - 50, y)
     y += 6
   }
 
   const spacer = (s = 4) => { y += s }
 
+  // Manual table drawing (no autoTable dependency)
+  const drawTable = (rows) => {
+    if (!rows || rows.length === 0) return
+    const rowHeight = 8
+    const colValueWidth = 55
+    const colLabelWidth = contentWidth - colValueWidth
+
+    for (let i = 0; i < rows.length; i++) {
+      checkPage(rowHeight + 2)
+      const rowY = y
+
+      // Alternating row background
+      if (i % 2 === 0) {
+        setFill(COLORS.surfaceLight)
+        doc.rect(margin, rowY - 4, contentWidth, rowHeight, 'F')
+      }
+
+      // Border bottom
+      setDraw(COLORS.border)
+      doc.setLineWidth(0.15)
+      doc.line(margin, rowY + rowHeight - 4, margin + contentWidth, rowY + rowHeight - 4)
+
+      // Label (right column, bold)
+      doc.setFont('Assistant', 'bold')
+      doc.setFontSize(9)
+      setColor(COLORS.textPrimary)
+      text(rows[i][0], rightX - 3, rowY)
+
+      // Value (left column, normal)
+      doc.setFont('Assistant', 'normal')
+      doc.setFontSize(9)
+      setColor(COLORS.textMuted)
+      text(String(rows[i][1] || '---'), rightX - colLabelWidth - 3, rowY)
+
+      y += rowHeight
+    }
+    y += 2
+  }
+
+  const addNote = (noteText) => {
+    if (!noteText) return
+    checkPage(12)
+    doc.setFont('Assistant', 'normal')
+    doc.setFontSize(8)
+    setColor(COLORS.textMuted)
+    text(`הערות: ${noteText}`, rightX, y)
+    y += 6
+  }
+
   // ==================== COVER PAGE ====================
-  // Green background bar
   setFill(COLORS.primary)
   doc.rect(0, 0, pageWidth, 85, 'F')
 
-  // Gold accent line
   setFill(COLORS.gold)
   doc.rect(0, 85, pageWidth, 3, 'F')
 
-  // Logo placeholder - text version
   doc.setFont('Assistant', 'bold')
   doc.setFontSize(32)
   setColor(COLORS.white)
@@ -134,12 +177,10 @@ export async function generatePDF(formData, user) {
   setColor(COLORS.goldLight)
   doc.text('WEALTH MANAGEMENT', pageWidth / 2, 45, { align: 'center' })
 
-  // Title
   doc.setFontSize(22)
   setColor(COLORS.white)
   text('איפיון צרכים והתאמת מדיניות השקעה', pageWidth / 2, 65, { align: 'center' })
 
-  // Info box below cover
   y = 100
   setFill(COLORS.cream)
   setDraw(COLORS.border)
@@ -156,7 +197,6 @@ export async function generatePDF(formData, user) {
   text(`לקוח: ${clientName}`, pageWidth / 2 + 30, y + 22)
   text(`בעל הרישיון: ${user.name}`, pageWidth / 2 + 30, y + 32)
 
-  // Footer disclaimer
   y = 260
   doc.setFontSize(8)
   setColor(COLORS.textMuted)
@@ -198,13 +238,6 @@ export async function generatePDF(formData, user) {
   sectionTitle('תמונה כלכלית — התא המשפחתי')
 
   // Income
-  checkPage(30)
-  doc.setFont('Assistant', 'bold')
-  doc.setFontSize(10)
-  setColor(COLORS.primary)
-  text('הכנסות (חודשי)', rightX, y)
-  y += 7
-
   const incomeRows = []
   if (formData.income.salary.has) incomeRows.push(['שכר נטו חודשי', formData.income.salary.amount])
   if (formData.income.pension.has) incomeRows.push(['פנסיה / קצבה', formData.income.pension.amount])
@@ -212,12 +245,15 @@ export async function generatePDF(formData, user) {
   if (formData.income.other.has) incomeRows.push(['אחר', formData.income.other.amount])
 
   if (incomeRows.length > 0) {
-    addTable(doc, incomeRows, y)
-    y += incomeRows.length * 8 + 10
+    checkPage(30)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(10)
+    setColor(COLORS.primary)
+    text('הכנסות (חודשי)', rightX, y)
+    y += 7
+    drawTable(incomeRows)
   }
-  if (formData.incomeNotes) {
-    addNote(doc, formData.incomeNotes)
-  }
+  addNote(formData.incomeNotes)
 
   // Assets
   const assetSections = [
@@ -240,7 +276,7 @@ export async function generatePDF(formData, user) {
     ], notes: formData.savingsNotes },
     { title: 'פנסיה', items: [
       ['קרן פנסיה', formData.assets.pensionFund],
-      ['ביטוח מנהלים' + (formData.assets.bituachMenahalim.guaranteedYield ? ' (תשואה מובטחת)' : ''), formData.assets.bituachMenahalim],
+      ['ביטוח מנהלים' + (formData.assets.bituachMenahalim && formData.assets.bituachMenahalim.guaranteedYield ? ' (תשואה מובטחת)' : ''), formData.assets.bituachMenahalim],
     ], notes: formData.pensionNotes },
     { title: 'נדל״ן', items: [
       ['נדל״ן להשקעה', formData.assets.investmentRealEstate],
@@ -253,7 +289,9 @@ export async function generatePDF(formData, user) {
   ]
 
   for (const section of assetSections) {
-    const rows = section.items.filter(([, asset]) => asset.has).map(([label, asset]) => [label, asset.amount || '---'])
+    const rows = section.items
+      .filter(([, asset]) => asset && asset.has)
+      .map(([label, asset]) => [label, asset.amount || '---'])
     if (rows.length > 0) {
       checkPage(rows.length * 8 + 18)
       doc.setFont('Assistant', 'bold')
@@ -261,30 +299,27 @@ export async function generatePDF(formData, user) {
       setColor(COLORS.primary)
       text(section.title, rightX, y)
       y += 7
-      addTable(doc, rows, y)
-      y += rows.length * 8 + 8
-      if (section.notes) addNote(doc, section.notes)
+      drawTable(rows)
+      addNote(section.notes)
     }
   }
 
   // Liabilities
-  checkPage(30)
-  doc.setFont('Assistant', 'bold')
-  doc.setFontSize(10)
-  setColor(COLORS.primary)
-  text('התחייבויות', rightX, y)
-  y += 7
-
   const liabRows = []
   if (formData.liabilities.mortgage.has) liabRows.push(['משכנתא', `חודשי: ${formData.liabilities.mortgage.monthly || '---'} | יתרה: ${formData.liabilities.mortgage.total || '---'}`])
   if (formData.liabilities.loans.has) liabRows.push(['הלוואות', `חודשי: ${formData.liabilities.loans.monthly || '---'} | יתרה: ${formData.liabilities.loans.total || '---'}`])
   if (formData.liabilities.monthlyExpenses) liabRows.push(['הוצאות שוטפות', formData.liabilities.monthlyExpenses])
 
   if (liabRows.length > 0) {
-    addTable(doc, liabRows, y)
-    y += liabRows.length * 8 + 8
+    checkPage(30)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(10)
+    setColor(COLORS.primary)
+    text('התחייבויות', rightX, y)
+    y += 7
+    drawTable(liabRows)
   }
-  if (formData.liabilitiesNotes) addNote(doc, formData.liabilitiesNotes)
+  addNote(formData.liabilitiesNotes)
 
   // Managed portion
   if (formData.managedPortion) {
@@ -319,7 +354,6 @@ export async function generatePDF(formData, user) {
   // ==================== RISK ASSESSMENT ====================
   sectionTitle('הערכת סיכון')
 
-  // Risk questions answers
   const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
   const q2Labels = { a: 'מעדיף לישון בשקט', b: 'מוכן לתנודות לטובת תשואה', c: 'משקיע לטווח ארוך, תנודות לא מדאיגות' }
   const q3Labels = { a: 'רוצה לצאת', b: 'שוקל לצמצם סיכון', c: 'מחזיק ומחכה', d: 'רואה הזדמנות להוסיף' }
@@ -332,7 +366,6 @@ export async function generatePDF(formData, user) {
 
   spacer(4)
 
-  // Prior experience
   if (formData.priorExperience) {
     labelValue('ניסיון קודם', formData.priorExperience === 'yes' ? 'כן' : 'לא')
     if (formData.priorExperienceDetails) labelValue('פירוט', formData.priorExperienceDetails)
@@ -376,7 +409,6 @@ export async function generatePDF(formData, user) {
     checkPage(35)
     const rl = RISK_LEVELS[formData.finalRiskLevel - 1]
 
-    // Risk level highlight box
     setFill(COLORS.cream)
     setDraw(COLORS.gold)
     doc.setLineWidth(0.8)
@@ -417,7 +449,7 @@ export async function generatePDF(formData, user) {
   labelValue('אג״ח בדירוג נמוך', formData.lowRatedBonds ? 'כן' : 'לא')
 
   // ==================== REFUSALS ====================
-  if (formData.refusals.length > 0) {
+  if (formData.refusals && formData.refusals.length > 0) {
     checkPage(20 + formData.refusals.length * 6)
     spacer(6)
     setFill(COLORS.offWhite)
@@ -460,7 +492,6 @@ export async function generatePDF(formData, user) {
   text('חתימות', pageWidth / 2, y, { align: 'center' })
   y += 12
 
-  // Signature helper
   const addSignature = (name, role) => {
     checkPage(25)
     doc.setFont('Assistant', 'bold')
@@ -491,45 +522,13 @@ export async function generatePDF(formData, user) {
   }
   addSignature(user.name, 'בעל הרישיון')
 
-  // ==================== SAVE ====================
+  // ==================== RETURN BLOB ====================
   const safeName = (formData.clientA.fullName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]
-  doc.save(`KYC_${dateStr}_${safeName}.pdf`)
-
-  // ==================== HELPER FUNCTIONS ====================
-  function addTable(d, rows, startY) {
-    autoTable(d, {
-      body: rows.map(([label, value]) => [rtl(value || '---'), rtl(label)]),
-      startY,
-      margin: { right: margin, left: margin },
-      styles: {
-        font: 'Assistant',
-        fontStyle: 'normal',
-        fontSize: 9,
-        halign: 'right',
-        cellPadding: 2,
-        lineColor: COLORS.border,
-        lineWidth: 0.2,
-      },
-      columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: contentWidth - 50, fontStyle: 'bold' },
-      },
-      alternateRowStyles: { fillColor: COLORS.surfaceLight },
-      didDrawPage: () => { y = d.lastAutoTable.finalY + 4 },
-    })
-    y = d.lastAutoTable.finalY + 4
-  }
-
-  function addNote(d, noteText) {
-    if (!noteText) return
-    checkPage(12)
-    d.setFont('Assistant', 'normal')
-    d.setFontSize(8)
-    setColor(COLORS.textMuted)
-    text(`הערות: ${noteText}`, rightX, y)
-    y += 6
-  }
+  const fileName = `KYC_${dateStr}_${safeName}.pdf`
+  const blob = doc.output('blob')
+  const url = URL.createObjectURL(blob)
+  return { url, fileName, blob }
 }
 
 function translateMarital(status) {
