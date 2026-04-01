@@ -27,12 +27,14 @@ export default function AdvisorStep({ formData, updateForm, user }) {
 
   const handleDownload = () => {
     if (!pdfData) return
-    const blob = new Blob([pdfData.blob], { type: 'application/pdf' })
+    const blob = new Blob([pdfData.pdfBytes], { type: 'application/pdf' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = pdfData.fileName
+    document.body.appendChild(a)
     a.click()
+    document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 

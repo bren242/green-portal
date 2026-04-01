@@ -2,6 +2,7 @@ import jsPDF from 'jspdf'
 import { assistantRegular, assistantBold } from '../../assets/fonts/assistantFonts'
 import { RISK_LEVELS } from '../../data/formSchema'
 import { logoPng } from '../../assets/logoBase64'
+import { getUserById } from '../../data/users'
 
 // RTL helper for jsPDF (renders LTR internally, we reverse for visual RTL)
 function rtl(text) {
@@ -57,6 +58,9 @@ const RISK_DESCRIPTIONS = {
 }
 
 export async function generatePDF(formData, user) {
+  // ⑧ Fetch fresh user data from store (reflects admin edits in real-time)
+  const freshUser = getUserById(user.id) || user
+
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
   doc.addFileToVFS('Assistant-Regular.ttf', assistantRegular)
@@ -76,6 +80,7 @@ export async function generatePDF(formData, user) {
   const setDraw = (c) => doc.setDrawColor(...c)
   const text = (s, x, yp, o = {}) => doc.text(rtl(String(s || '')), x, yp, { align: 'right', ...o })
 
+  // ⑥ Improved pagination — if title + 3 lines of content don't fit, go to new page
   const checkPage = (needed = 25) => {
     if (y + needed > pageHeight - 30) {
       doc.addPage()
@@ -96,8 +101,9 @@ export async function generatePDF(formData, user) {
     y = 22
   }
 
+  // ⑥ Section titles check for enough room for title + at least 3 content lines (~35mm)
   const sectionTitle = (title) => {
-    checkPage(20)
+    checkPage(45)
     setFill(COLORS.primary)
     doc.roundedRect(margin, y, contentWidth, 10, 2, 2, 'F')
     doc.setFont('Assistant', 'bold')
@@ -262,20 +268,57 @@ export async function generatePDF(formData, user) {
   setColor(COLORS.white)
   text('איפיון צרכים והתאמת מדיניות השקעה', pageWidth / 2, 70, { align: 'center' })
 
-  // Advisor details table on cover
+  // ③ Advisor details TABLE on cover — 3 columns
   y = 105
+
+  // Client + date row
   setFill(COLORS.cream)
   setDraw(COLORS.border)
-  doc.roundedRect(margin + 10, y, contentWidth - 20, 50, 3, 3, 'FD')
-
+  doc.setLineWidth(0.3)
+  doc.roundedRect(margin + 10, y, contentWidth - 20, 22, 3, 3, 'FD')
   doc.setFont('Assistant', 'normal')
   doc.setFontSize(11)
   setColor(COLORS.black)
-  text(`תאריך: ${date}`, pageWidth / 2 + 35, y + 12)
-  text(`לקוח: ${clientName}`, pageWidth / 2 + 35, y + 22)
-  text(`משווק: ${user.name}`, pageWidth / 2 + 35, y + 32)
-  if (user.idNumber) text(`ת.ז משווק: ${user.idNumber}`, pageWidth / 2 + 35, y + 42)
-  if (user.license) text(`מספר רישיון: ${user.license}`, pageWidth / 2 + 35, y + 42 + (user.idNumber ? 10 : 0))
+  text(`תאריך: ${date}`, pageWidth / 2 + 35, y + 9)
+  text(`לקוח: ${clientName}`, pageWidth / 2 + 35, y + 18)
+
+  y += 28
+
+  // Advisor info table — 3 columns
+  const tableY = y
+  const colWidth = (contentWidth - 20) / 3
+  const tableX = margin + 10
+
+  // Header row
+  setFill(COLORS.primary)
+  doc.roundedRect(tableX, tableY, contentWidth - 20, 10, 2, 2, 'F')
+  doc.rect(tableX, tableY + 7, contentWidth - 20, 3, 'F') // fix bottom corners
+
+  doc.setFont('Assistant', 'bold')
+  doc.setFontSize(9)
+  setColor(COLORS.white)
+  text('שם המשווק', tableX + contentWidth - 20 - 5, tableY + 7)
+  text('תעודת זהות', tableX + colWidth * 2 - 10 - 5, tableY + 7)
+  text('מספר רישיון', tableX + colWidth - 10 - 5, tableY + 7)
+
+  // Data row
+  setFill(COLORS.cream)
+  doc.rect(tableX, tableY + 10, contentWidth - 20, 10, 'F')
+  setDraw(COLORS.border)
+  doc.roundedRect(tableX, tableY + 10, contentWidth - 20, 10, 0, 0, 'S')
+
+  doc.setFont('Assistant', 'normal')
+  doc.setFontSize(10)
+  setColor(COLORS.black)
+  text(freshUser.name || '---', tableX + contentWidth - 20 - 5, tableY + 17)
+  text(freshUser.idNumber || '---', tableX + colWidth * 2 - 10 - 5, tableY + 17)
+  text(freshUser.license || '---', tableX + colWidth - 10 - 5, tableY + 17)
+
+  // Column separator lines
+  setDraw(COLORS.border)
+  doc.setLineWidth(0.2)
+  doc.line(tableX + colWidth * 2 - 10, tableY, tableX + colWidth * 2 - 10, tableY + 20)
+  doc.line(tableX + colWidth - 10, tableY, tableX + colWidth - 10, tableY + 20)
 
   // Footer
   y = 260
@@ -284,7 +327,7 @@ export async function generatePDF(formData, user) {
   text('מסמך זה הופק באמצעות מערכת איפיון צרכים דיגיטלית של GREEN Wealth Management', pageWidth / 2, y, { align: 'center' })
   text('כל הנתונים נמסרו על ידי הלקוח ובאחריותו', pageWidth / 2, y + 5, { align: 'center' })
 
-  // ========================= REGULATORY TEXT PAGE =========================
+  // ========================= ④ REGULATORY TEXT PAGE — EXACT WORDING =========================
   doc.addPage()
   addPageHeader()
 
@@ -294,12 +337,21 @@ export async function generatePDF(formData, user) {
   doc.setFontSize(9)
   setColor(COLORS.black)
 
-  const regulatoryText = 'משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות תשנ"ה-1995, להתאים ככל האפשר את השירותים לצרכיו ולהנחיותיו של הלקוח לאחר שבירר עמו את מטרות ההשקעה, את מצבו הכספי לרבות ניירות הערך והנכסים הפיננסיים שלו, ואת שאר הנסיבות הרלוונטיות.'
-  const regulatoryText2 = 'ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון יסייע להתאמה מיטבית של אופי השקעותיו. אי מסירת פרטים עלולה לפגוע ביכולת ההתאמה. ידוע ללקוח כי עליו לעדכן את המשווק בכל שינוי בפרטים שמסר. כל מידע שנמסר ישמר בסודיות, בכפוף לחובת מסירה על פי דין.'
+  const regParagraph1 = 'משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות תשנ״ה-1995 (להלן: ״החוק״), להתאים, ככל האפשר, את השירותים שמשווק ההשקעות נותן ללקוח לצרכיו ולהנחיותיו של הלקוח וזאת לאחר שמשווק ההשקעות בירר עם הלקוח את מטרות ההשקעה, את מצבו הכספי לרבות ניירות הערך והנכסים הפיננסיים של הלקוח, ואת שאר הנסיבות הרלוונטיות לעניין זה.'
 
-  textBlock(regulatoryText, 9)
+  const regParagraph2 = 'ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון שלהלן יסייע למשווק ההשקעות להתאים בצורה המיטבית האפשרית את אופי השקעותיו לצרכיו המיוחדים של הלקוח. וכן אי מסירת פרטים או מסירת פרטים חלקית עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לצרכי הלקוח, ובמידה שלא יתקבל מהלקוח מידע שיהווה תשתית מספקת להתאמת מדיניות ההשקעה, לא יתאפשר מתן השירותים לפי חוק.'
+
+  const regParagraph3 = 'ידוע ללקוח כי קיימת חשיבות לעדכן את משווק ההשקעות בכל שינוי שיחול ביחס לפרטים שמסר במסגרת מסמך זה וכן כי עליו לעדכן את משווק ההשקעות בכל שינוי שיחול בפרטים כאמור.'
+
+  const regParagraph4 = 'משווק ההשקעות הבהיר ללקוח כי כל פרט שהלקוח מוסר למשווק ההשקעות ישמר בסודיות על ידי משווק ההשקעות אך סודיות זו כפופה לחובת משווק ההשקעות למסור ידיעות על פי כל דין.'
+
+  textBlock(regParagraph1, 9)
   spacer(3)
-  textBlock(regulatoryText2, 9)
+  textBlock(regParagraph2, 9)
+  spacer(3)
+  textBlock(regParagraph3, 9)
+  spacer(3)
+  textBlock(regParagraph4, 9)
 
   // ========================= PERSONAL DETAILS =========================
   spacer(6)
@@ -334,12 +386,14 @@ export async function generatePDF(formData, user) {
 
   let totalAssets = 0
   let totalLiabilities = 0
+  let totalMonthlyIncome = 0
+  let totalMonthlyExpenses = 0
 
   const incomeRows = []
-  if (formData.income.salary.has) incomeRows.push(['שכר נטו חודשי', fmtMoney(formData.income.salary.amount)])
-  if (formData.income.pension.has) incomeRows.push(['פנסיה / קצבה', fmtMoney(formData.income.pension.amount)])
-  if (formData.income.realEstate.has) incomeRows.push(['הכנסות מנדל״ן', fmtMoney(formData.income.realEstate.amount)])
-  if (formData.income.other.has) incomeRows.push(['אחר', fmtMoney(formData.income.other.amount)])
+  if (formData.income.salary.has) { const amt = parseAmount(formData.income.salary.amount); totalMonthlyIncome += amt; incomeRows.push(['שכר נטו חודשי', fmtMoney(formData.income.salary.amount)]) }
+  if (formData.income.pension.has) { const amt = parseAmount(formData.income.pension.amount); totalMonthlyIncome += amt; incomeRows.push(['פנסיה / קצבה', fmtMoney(formData.income.pension.amount)]) }
+  if (formData.income.realEstate.has) { const amt = parseAmount(formData.income.realEstate.amount); totalMonthlyIncome += amt; incomeRows.push(['הכנסות מנדל״ן', fmtMoney(formData.income.realEstate.amount)]) }
+  if (formData.income.other.has) { const amt = parseAmount(formData.income.other.amount); totalMonthlyIncome += amt; incomeRows.push(['אחר', fmtMoney(formData.income.other.amount)]) }
 
   if (incomeRows.length > 0) {
     checkPage(30)
@@ -397,13 +451,18 @@ export async function generatePDF(formData, user) {
   const liabRows = []
   if (formData.liabilities.mortgage.has) {
     totalLiabilities += parseAmount(formData.liabilities.mortgage.total)
+    totalMonthlyExpenses += parseAmount(formData.liabilities.mortgage.monthly)
     liabRows.push(['משכנתא', `חודשי: ${fmtMoney(formData.liabilities.mortgage.monthly)} | יתרה: ${fmtMoney(formData.liabilities.mortgage.total)}`])
   }
   if (formData.liabilities.loans.has) {
     totalLiabilities += parseAmount(formData.liabilities.loans.total)
+    totalMonthlyExpenses += parseAmount(formData.liabilities.loans.monthly)
     liabRows.push(['הלוואות', `חודשי: ${fmtMoney(formData.liabilities.loans.monthly)} | יתרה: ${fmtMoney(formData.liabilities.loans.total)}`])
   }
-  if (formData.liabilities.monthlyExpenses) liabRows.push(['הוצאות שוטפות', fmtMoney(formData.liabilities.monthlyExpenses)])
+  if (formData.liabilities.monthlyExpenses) {
+    totalMonthlyExpenses += parseAmount(formData.liabilities.monthlyExpenses)
+    liabRows.push(['הוצאות שוטפות', fmtMoney(formData.liabilities.monthlyExpenses)])
+  }
 
   if (liabRows.length > 0) {
     checkPage(30)
@@ -416,7 +475,7 @@ export async function generatePDF(formData, user) {
   }
   addNote(formData.liabilitiesNotes)
 
-  // Summary table
+  // Asset summary table
   const netWorth = totalAssets - totalLiabilities
   checkPage(40)
   spacer(6)
@@ -430,6 +489,23 @@ export async function generatePDF(formData, user) {
     ['סך התחייבויות', fmtMoney(totalLiabilities > 0 ? totalLiabilities : ''), false],
     ['שווי נטו', fmtMoney(netWorth !== 0 ? netWorth : ''), true],
   ])
+
+  // ⑦ Monthly balance summary
+  const monthlyBalance = totalMonthlyIncome - totalMonthlyExpenses
+  if (totalMonthlyIncome > 0 || totalMonthlyExpenses > 0) {
+    checkPage(40)
+    spacer(4)
+    doc.setFont('Assistant', 'bold')
+    doc.setFontSize(10)
+    setColor(COLORS.primary)
+    text('מאזן חודשי', rightX, y)
+    y += 7
+    drawSummaryTable([
+      ['סך הכנסות חודשיות', fmtMoney(totalMonthlyIncome > 0 ? totalMonthlyIncome : ''), false],
+      ['סך הוצאות חודשיות', fmtMoney(totalMonthlyExpenses > 0 ? totalMonthlyExpenses : ''), false],
+      ['מאזן חודשי', fmtMoney(monthlyBalance !== 0 ? monthlyBalance : ''), true],
+    ])
+  }
 
   if (formData.managedPortion) {
     spacer(2)
@@ -641,7 +717,7 @@ export async function generatePDF(formData, user) {
     y += 15
   }
 
-  // Advisor confirmation block
+  // ⑤ Advisor confirmation block — EXACT WORDING from spec
   checkPage(60)
   setDraw(COLORS.primary)
   doc.setLineWidth(0.3)
@@ -654,9 +730,9 @@ export async function generatePDF(formData, user) {
   text('אישור בעל הרישיון', rightX, y)
   y += 7
 
-  const advisorName = user.name || '____________'
-  const advisorLicense = user.license || '____________'
-  const advisorDecl = `אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים, הבהרתי לו את משמעות הדבר. בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה בהתאם להוראות החוק.`
+  const advisorName = freshUser.name || '____________'
+  const advisorLicense = freshUser.license || '____________'
+  const advisorDecl = `אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק.`
   textBlock(advisorDecl, 9)
 
   spacer(5)
@@ -668,23 +744,20 @@ export async function generatePDF(formData, user) {
   const totalPages = doc.getNumberOfPages()
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i)
-    if (i > 1) {
-      // Logo already via addPageHeader
-    }
     doc.setFont('Assistant', 'normal')
     doc.setFontSize(7)
     doc.setTextColor(90, 90, 90)
     doc.text(`${i} / ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' })
   }
 
-  // ========================= RETURN =========================
+  // ========================= ① RETURN — pure client-side =========================
   const safeName = (clientName || 'client').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]
   const fileName = `KYC_${dateStr}_${safeName}.pdf`
   const pdfBytes = doc.output('arraybuffer')
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' })
-  const url = URL.createObjectURL(blob)
-  return { url, fileName, blob: pdfBytes }
+  const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const previewUrl = URL.createObjectURL(previewBlob)
+  return { url: previewUrl, fileName, pdfBytes }
 }
 
 function translateMarital(status) {
