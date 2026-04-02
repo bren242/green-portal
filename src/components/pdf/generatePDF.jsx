@@ -2,6 +2,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, StyleSheet, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
 import { getUserById } from '../../data/users'
+import { logoPng } from '../../assets/logoBase64'
 
 // ==================== FONT REGISTRATION ====================
 Font.register({
@@ -219,7 +220,7 @@ const PageHeader = ({ clientName, date }) => (
         <Text style={s.headerCenterDate}>{date}</Text>
       </View>
       {/* Left side — logo */}
-      <Image src="/logo.png" style={s.headerLogo} />
+      <Image src={logoPng} style={s.headerLogo} />
     </View>
     <View style={s.headerGoldLine} />
   </View>
@@ -406,45 +407,46 @@ const KYCDocument = ({ formData, user }) => {
   return (
     <Document>
       {/* ==================== COVER PAGE ==================== */}
-      <Page size="A4" style={{ fontFamily: 'Assistant', direction: 'rtl' }}>
-        <View style={s.coverBg} />
-        <View style={s.coverGold} />
-
-        {/* Logo */}
-        <View style={{ alignItems: 'center', marginTop: 60 }}>
-          <Image src="/logo.png" style={{ height: 60 }} />
-          <Text style={{ fontSize: 11, color: C.goldLight, marginTop: 8 }}>WEALTH MANAGEMENT</Text>
-        </View>
-
-        {/* Title */}
-        <View style={{ alignItems: 'center', marginTop: 40 }}>
-          <Text style={{ fontSize: 22, fontWeight: 'bold', color: C.white }}>אפיון צרכים והתאמת מדיניות השקעה</Text>
-        </View>
-
-        {/* Client + Date box */}
-        <View style={{ marginHorizontal: 50, marginTop: 60, backgroundColor: C.offWhite, borderRadius: 4, borderWidth: 0.5, borderColor: C.border, padding: 14 }}>
-          <LabelValue label="תאריך" value={date} even />
-          <LabelValue label="לקוח" value={clientName} />
-        </View>
-
-        {/* Advisor table */}
-        <View style={{ marginHorizontal: 50, marginTop: 12 }}>
-          <View style={s.tableHeaderRow}>
-            <Text style={s.tableHeaderCell}>שם המשווק</Text>
-            <Text style={s.tableHeaderCell}>תעודת זהות</Text>
-            <Text style={s.tableHeaderCell}>מספר רישיון</Text>
-          </View>
-          <View style={[s.tableRow, { backgroundColor: C.cream }]}>
-            <Text style={s.tableCell}>{user.name || '---'}</Text>
-            <Text style={s.tableCell}>{user.idNumber || '---'}</Text>
-            <Text style={s.tableCell}>{user.license || '---'}</Text>
+      <Page size="A4" style={{ fontFamily: 'Assistant', direction: 'rtl', backgroundColor: C.white }}>
+        {/* רצועה 1 — Header בז׳, גובה 50px */}
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 50, backgroundColor: '#F4F3EF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }}>
+          {/* שמאל — לוגו */}
+          <Image src={logoPng} style={{ height: 34, width: 120 }} />
+          {/* ימין — שם לקוח + תאריך */}
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <Text style={{ fontSize: 11, color: C.primary }}>{clientName}</Text>
+            <Text style={{ fontSize: 10, color: C.textMuted, marginTop: 1 }}>{date}</Text>
           </View>
         </View>
 
-        {/* Footer text */}
-        <View style={{ position: 'absolute', bottom: 40, left: 0, right: 0, alignItems: 'center' }}>
-          <Text style={{ fontSize: 8, color: C.textMuted }}>מסמך זה הופק באמצעות מערכת איפיון צרכים דיגיטלית של GREEN Wealth Management</Text>
-          <Text style={{ fontSize: 8, color: C.textMuted, marginTop: 2 }}>כל הנתונים נמסרו על ידי הלקוח ובאחריותו</Text>
+        {/* רצועה 2 — פס ירוק, גובה 60px */}
+        <View style={{ position: 'absolute', top: 50, left: 0, right: 0, height: 60, backgroundColor: C.primary, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: C.gold, textAlign: 'center' }}>
+            אפיון צרכים והתאמת מדיניות השקעה
+          </Text>
+        </View>
+
+        {/* גוף העמוד — טבלת משווק */}
+        <View style={{ marginTop: 140, paddingHorizontal: 30 }}>
+          {/* Header row */}
+          <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderTopLeftRadius: 3, borderTopRightRadius: 3, paddingVertical: 6, paddingHorizontal: 10 }}>
+            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>שם המשווק</Text>
+            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>תעודת זהות</Text>
+            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>מספר רישיון</Text>
+          </View>
+          {/* Data row */}
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 6, paddingHorizontal: 10, backgroundColor: C.surfaceLight, borderBottomLeftRadius: 3, borderBottomRightRadius: 3, borderWidth: 0.5, borderColor: C.border, borderTopWidth: 0 }}>
+            <Text style={{ flex: 1, fontSize: 10, color: C.black, textAlign: 'right' }}>{user.name || '---'}</Text>
+            <Text style={{ flex: 1, fontSize: 10, color: C.black, textAlign: 'right' }}>{user.idNumber || '---'}</Text>
+            <Text style={{ flex: 1, fontSize: 10, color: C.black, textAlign: 'right' }}>{user.license || '---'}</Text>
+          </View>
+        </View>
+
+        {/* תחתית — disclaimer */}
+        <View style={{ position: 'absolute', bottom: 30, left: 0, right: 0, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: C.textMuted, textAlign: 'center' }}>
+            כל הנתונים נמסרו על ידי הלקוח ובאחריותו
+          </Text>
         </View>
 
         <PageFooter />
