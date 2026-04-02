@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, View, Image, Font, StyleSheet } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 
-// ==================== FONT REGISTRATION ====================
+// ── Font Registration ──────────────────────────────────────────
 Font.register({
   family: 'Assistant',
   fonts: [
@@ -12,111 +12,127 @@ Font.register({
 })
 Font.registerHyphenationCallback((word) => [word])
 
-// ==================== DESIGN SYSTEM ====================
+// ── Design Tokens (from DESIGN.md) ────────────────────────────
 export const C = {
-  primary: '#1B3A2F',
-  secondary: '#3E7A5C',
-  gold: '#B8975A',
-  goldLight: '#D4B483',
-  offWhite: '#F4F3EF',
-  cream: '#F8F5EE',
-  surfaceLight: '#F6F5F1',
-  border: '#DDD5BF',
-  black: '#1A1A1A',
-  textMuted: '#5A5A5A',
-  negative: '#C0392B',
-  white: '#FFFFFF',
+  primary:      '#1B3A2F',
+  secondary:    '#3E7A5C',
+  gold:         '#B8975A',
+  goldLight:    '#D4B483',
+  offWhite:     '#F4F3EF',
+  cream:        '#F8F5EE',
+  surface:      '#F6F5F1',
+  border:       '#DDD5BF',
+  black:        '#1A1A1A',
+  muted:        '#5A5A5A',
+  negative:     '#C0392B',
+  white:        '#FFFFFF',
 }
 
-export const SPACING = {
-  xs: 2,
-  sm: 4,
-  md: 8,
-  lg: 14,
-  xl: 20,
-  xxl: 30,
-}
-
-// ==================== BASE STYLES ====================
-export const basePageStyle = {
+// ── Page Styles ────────────────────────────────────────────────
+export const coverPageStyle = {
   fontFamily: 'Assistant',
   direction: 'rtl',
-  paddingTop: 58,
-  paddingBottom: 40,
+  backgroundColor: C.white,
+}
+
+export const contentPageStyle = {
+  fontFamily: 'Assistant',
+  direction: 'rtl',
+  paddingTop: 56,
+  paddingBottom: 36,
   paddingHorizontal: 36,
   fontSize: 10,
   color: C.black,
 }
 
-// ==================== PAGE HEADER (pages 2+) ====================
+// ── Page Header (pages 2+) ────────────────────────────────────
 export const PageHeader = () => (
-  <View fixed>
-    <View style={headerStyles.bar}>
-      <Image src={logoPng} style={headerStyles.logo} />
-      <View style={headerStyles.right}>
-        <Text style={headerStyles.title}>אפיון צרכים והתאמת מדיניות השקעה</Text>
+  <View fixed style={hdr.wrap}>
+    <View style={hdr.bar}>
+      <Image src={logoPng} style={hdr.logo} />
+      <View style={hdr.titleWrap}>
+        <Text style={hdr.title}>אפיון צרכים והתאמת מדיניות השקעה</Text>
       </View>
     </View>
-    <View style={headerStyles.goldLine} />
+    <View style={hdr.line} />
   </View>
 )
 
-const headerStyles = StyleSheet.create({
+const hdr = StyleSheet.create({
+  wrap: {},
   bar: {
     position: 'absolute', top: 0, left: 0, right: 0,
-    height: 44, backgroundColor: '#1B3A2F',
-    flexDirection: 'row', alignItems: 'center',
+    height: 40,
+    backgroundColor: C.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
   },
-  goldLine: {
-    position: 'absolute', top: 44, left: 0, right: 0,
-    height: 1, backgroundColor: C.gold,
+  line: {
+    position: 'absolute', top: 40, left: 0, right: 0,
+    height: 1,
+    backgroundColor: C.gold,
   },
-  right: {
-    flex: 1, alignItems: 'flex-end',
-  },
-  title: {
-    fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right',
-  },
-  logo: {
-    height: 28,
-  },
+  logo: { height: 26 },
+  titleWrap: { flex: 1, alignItems: 'flex-end' },
+  title: { fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' },
 })
 
-// ==================== PAGE FOOTER ====================
+// ── Page Footer ────────────────────────────────────────────────
 export const PageFooter = () => (
   <Text
-    style={{ position: 'absolute', bottom: 14, left: 0, right: 0, textAlign: 'center', fontSize: 7, color: C.textMuted }}
+    style={{ position: 'absolute', bottom: 14, left: 0, right: 0, textAlign: 'center', fontSize: 7, color: C.muted }}
     render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
     fixed
   />
 )
 
-// ==================== SECTION TITLE ====================
+// ── Section Title ──────────────────────────────────────────────
 export const SectionTitle = ({ children }) => (
-  <View style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 4, paddingHorizontal: 10, marginTop: SPACING.md, marginBottom: SPACING.sm }} wrap={false} minPresenceAhead={60}>
-    <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{children}</Text>
+  <View
+    style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 5, paddingHorizontal: 10, marginBottom: 10 }}
+    wrap={false}
+    minPresenceAhead={60}
+  >
+    <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>
+      {children}
+    </Text>
   </View>
 )
 
-// ==================== LABEL-VALUE ROW ====================
+// ── Section Gap ────────────────────────────────────────────────
+export const SectionGap = () => <View style={{ height: 20 }} />
+
+// ── Label → Value Row ──────────────────────────────────────────
 export const LabelValue = ({ label, value, even }) => (
-  <View style={[{ flexDirection: 'row-reverse', justifyContent: 'flex-start', paddingVertical: 3, paddingHorizontal: 4 }, even ? { backgroundColor: C.surfaceLight } : null]}>
-    <Text style={{ width: '40%', fontSize: 9, fontWeight: 'bold', color: C.textMuted, textAlign: 'right' }}>{label}</Text>
-    <Text style={{ width: '60%', fontSize: 10, color: C.black, textAlign: 'right' }}>{value || '---'}</Text>
+  <View style={[
+    { flexDirection: 'row-reverse', paddingVertical: 4, paddingHorizontal: 6 },
+    even && { backgroundColor: C.surface },
+  ]}>
+    <Text style={{ width: '38%', fontSize: 9, fontWeight: 'bold', color: C.muted, textAlign: 'right' }}>
+      {label}
+    </Text>
+    <Text style={{ width: '62%', fontSize: 10, color: C.black, textAlign: 'right' }}>
+      {value || '---'}
+    </Text>
   </View>
 )
 
-// ==================== DATA TABLE ====================
+// ── Data Table ─────────────────────────────────────────────────
 export const DataTable = ({ headers, rows }) => (
   <View>
     {headers && (
-      <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderRadius: 2, paddingVertical: 4, paddingHorizontal: 6 }}>
-        {headers.map((h, i) => <Text key={i} style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{h}</Text>)}
+      <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderRadius: 2, paddingVertical: 5, paddingHorizontal: 8 }}>
+        {headers.map((h, i) => (
+          <Text key={i} style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{h}</Text>
+        ))}
       </View>
     )}
     {rows.map((row, i) => (
-      <View key={i} style={[{ flexDirection: 'row-reverse', paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: C.border }, i % 2 === 0 ? { backgroundColor: C.surfaceLight } : null]}>
+      <View key={i} style={[
+        { flexDirection: 'row-reverse', paddingVertical: 4, paddingHorizontal: 8, borderBottomWidth: 0.5, borderBottomColor: C.border },
+        i % 2 === 0 && { backgroundColor: C.surface },
+      ]}>
         {row.map((cell, j) => (
           <Text key={j} style={{ flex: 1, fontSize: 9, textAlign: 'right', color: C.black, fontWeight: j === 0 ? 'bold' : 'normal' }}>{cell}</Text>
         ))}
@@ -125,29 +141,29 @@ export const DataTable = ({ headers, rows }) => (
   </View>
 )
 
-// ==================== SUMMARY ROW ====================
+// ── Summary Row (used inside summary boxes) ────────────────────
 export const SummaryRow = ({ label, value, highlight }) => {
   if (highlight) {
     return (
-      <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 6, borderRadius: 2, marginTop: 2 }}>
+      <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 8, borderRadius: 2, marginTop: 3 }}>
         <Text style={{ flex: 1, fontSize: 10, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{label}</Text>
         <Text style={{ flex: 1, fontSize: 10, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{value}</Text>
       </View>
     )
   }
   return (
-    <View style={{ flexDirection: 'row-reverse', paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: C.border }}>
+    <View style={{ flexDirection: 'row-reverse', paddingVertical: 4, paddingHorizontal: 8, borderBottomWidth: 0.5, borderBottomColor: C.border }}>
       <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', textAlign: 'right', color: C.black }}>{label}</Text>
       <Text style={{ flex: 1, fontSize: 9, textAlign: 'right', color: C.black }}>{value}</Text>
     </View>
   )
 }
 
-// ==================== SUMMARY CARD ====================
+// ── Summary Card (for recap section) ───────────────────────────
 export const SummaryCard = ({ title, items }) => (
   <View style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, marginBottom: 10, overflow: 'hidden' }} wrap={false}>
     <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
-      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{title}</Text>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{title}</Text>
     </View>
     <View style={{ padding: 8 }}>
       {items.map(([label, value], i) => (
@@ -157,41 +173,47 @@ export const SummaryCard = ({ title, items }) => (
   </View>
 )
 
-// ==================== PILL TAG ====================
+// ── Pill Tag ───────────────────────────────────────────────────
 export const PillTag = ({ text }) => (
-  <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 12, paddingVertical: 3, paddingHorizontal: 10, marginLeft: 6, marginBottom: 4 }}>
+  <View style={{
+    backgroundColor: C.cream, borderWidth: 1, borderColor: C.secondary,
+    borderRadius: 12, paddingVertical: 3, paddingHorizontal: 10,
+    marginLeft: 6, marginBottom: 4,
+  }}>
     <Text style={{ fontSize: 8, color: C.primary, fontWeight: 'bold', textAlign: 'center' }}>{text}</Text>
   </View>
 )
 
-// ==================== RISK GAUGE ====================
+// ── Risk Gauge ─────────────────────────────────────────────────
 export const RiskGauge = ({ level, size = 'normal' }) => {
   const labels = ['שמרן', 'שמרן-מתון', 'מאוזן', 'צמיחה', 'אגרסיבי']
   const colors = ['#2E7D32', '#66BB6A', C.gold, '#EF6C00', C.negative]
-  const isSmall = size === 'small'
-  const dotSize = isSmall ? 16 : 22
-  const fontSize = isSmall ? 6 : 7
+  const sm = size === 'small'
+  const dot = sm ? 16 : 22
 
   return (
-    <View style={{ alignItems: 'center', marginVertical: isSmall ? 4 : 8 }}>
+    <View style={{ alignItems: 'center', marginVertical: sm ? 4 : 8 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         {[1, 2, 3, 4, 5].map((n) => {
-          const isActive = n === level
+          const active = n === level
+          const d = active ? dot + 4 : dot
           return (
-            <View key={n} style={{ alignItems: 'center', marginHorizontal: isSmall ? 4 : 8 }}>
+            <View key={n} style={{ alignItems: 'center', marginHorizontal: sm ? 4 : 8 }}>
               <View style={{
-                width: isActive ? dotSize + 4 : dotSize,
-                height: isActive ? dotSize + 4 : dotSize,
-                borderRadius: (isActive ? dotSize + 4 : dotSize) / 2,
-                backgroundColor: isActive ? colors[n - 1] : C.surfaceLight,
-                borderWidth: isActive ? 2 : 1,
-                borderColor: isActive ? colors[n - 1] : C.border,
-                justifyContent: 'center',
-                alignItems: 'center',
+                width: d, height: d, borderRadius: d / 2,
+                backgroundColor: active ? colors[n - 1] : C.surface,
+                borderWidth: active ? 2 : 1,
+                borderColor: active ? colors[n - 1] : C.border,
+                justifyContent: 'center', alignItems: 'center',
               }}>
-                <Text style={{ fontSize: isSmall ? 7 : 9, fontWeight: 'bold', color: isActive ? C.white : C.textMuted }}>{n}</Text>
+                <Text style={{ fontSize: sm ? 7 : 9, fontWeight: 'bold', color: active ? C.white : C.muted }}>{n}</Text>
               </View>
-              <Text style={{ fontSize, color: isActive ? colors[n - 1] : C.textMuted, marginTop: 2, textAlign: 'center', fontWeight: isActive ? 'bold' : 'normal' }}>{labels[n - 1]}</Text>
+              <Text style={{
+                fontSize: sm ? 6 : 7,
+                color: active ? colors[n - 1] : C.muted,
+                marginTop: 2, textAlign: 'center',
+                fontWeight: active ? 'bold' : 'normal',
+              }}>{labels[n - 1]}</Text>
             </View>
           )
         })}
@@ -200,26 +222,26 @@ export const RiskGauge = ({ level, size = 'normal' }) => {
   )
 }
 
-// ==================== POLICY CUBE ====================
+// ── Policy Cube ────────────────────────────────────────────────
 export const PolicyCube = ({ label, value }) => (
   <View style={{
     width: '23%', backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold,
     borderRadius: 4, padding: 6, alignItems: 'center', marginHorizontal: '1%',
   }}>
-    <Text style={{ fontSize: 7, color: C.textMuted, textAlign: 'center', marginBottom: 2 }}>{label}</Text>
+    <Text style={{ fontSize: 7, color: C.muted, textAlign: 'center', marginBottom: 2 }}>{label}</Text>
     <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.primary, textAlign: 'center' }}>{value || '---'}</Text>
   </View>
 )
 
-// ==================== GOLD BORDERED BOX ====================
-export const GoldBox = ({ children }) => (
-  <View style={{ borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream, marginTop: SPACING.md }}>
+// ── Gold Bordered Box ──────────────────────────────────────────
+export const GoldBox = ({ children, mt }) => (
+  <View style={{ borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.offWhite, marginTop: mt ?? 24 }}>
     {children}
   </View>
 )
 
-// ==================== CLIENT CARD (cover page) ====================
-export const ClientCard = ({ client, title }) => (
+// ── Client Card ────────────────────────────────────────────────
+export const ClientCard = ({ client, title, full }) => (
   <View style={{ flex: 1, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden', marginHorizontal: 3 }} wrap={false}>
     <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
       <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
@@ -227,18 +249,36 @@ export const ClientCard = ({ client, title }) => (
     <View style={{ padding: 8 }}>
       <LabelValue label="שם מלא" value={client.fullName} even />
       <LabelValue label="ת.ז." value={client.idNumber} />
-      <LabelValue label="טלפון" value={client.phone} even />
-      <LabelValue label="דוא״ל" value={client.email} />
+      {full && <>
+        <LabelValue label="תאריך לידה" value={client.birthDate} even />
+        <LabelValue label="מצב משפחתי" value={translateMarital(client.maritalStatus)} />
+        <LabelValue label="נפשות תלויות" value={client.dependents} even />
+      </>}
+      <LabelValue label="טלפון" value={client.phone} even={!full} />
+      <LabelValue label="דוא״ל" value={client.email} even={full} />
+      {full && <LabelValue label="עיסוק" value={client.occupation} />}
     </View>
   </View>
 )
 
-// ==================== HELPERS ====================
+// ── Balance Box (summary sidebar) ──────────────────────────────
+export const BalanceBox = ({ title, rows, highlightLabel, highlightValue }) => (
+  <View style={{ flex: 1, borderWidth: 1, borderColor: C.gold, borderRadius: 4, overflow: 'hidden' }}>
+    <View style={{ backgroundColor: C.primary, paddingVertical: 4, paddingHorizontal: 8 }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
+    </View>
+    <View style={{ padding: 6 }}>
+      {rows.map(([l, v], i) => <SummaryRow key={i} label={l} value={v} />)}
+      <SummaryRow label={highlightLabel} value={highlightValue} highlight />
+    </View>
+  </View>
+)
+
+// ── Helpers ─────────────────────────────────────────────────────
 export function fmtMoney(val) {
   if (!val) return '---'
-  const str = String(val)
-  const num = parseFloat(str.replace(/[^\d.-]/g, ''))
-  if (isNaN(num)) return str.includes('₪') ? str : `₪ ${str}`
+  const num = parseFloat(String(val).replace(/[^\d.-]/g, ''))
+  if (isNaN(num)) return String(val).includes('₪') ? String(val) : `₪ ${val}`
   return `₪ ${num.toLocaleString('he-IL')}`
 }
 
@@ -255,8 +295,5 @@ export function translateMarital(status) {
 
 export function fmtDate() {
   const d = new Date()
-  const dd = String(d.getDate()).padStart(2, '0')
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const yyyy = d.getFullYear()
-  return `${dd}.${mm}.${yyyy}`
+  return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
 }
