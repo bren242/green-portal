@@ -182,9 +182,9 @@ export const KpiRow = ({ title, total, items, notes, isEven }) => (
     </Text>
     <View style={{ flex: 1 }}>
       {items.map(([label, value], i) => (
-        <View key={i} style={{ flexDirection: 'row-reverse', marginBottom: 2 }}>
+        <View key={i} style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 2 }}>
+          <Text style={{ fontSize: 8, color: C.black, fontWeight: 'bold', marginLeft: 6 }}>{value}</Text>
           <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', minWidth: 80 }}>{label}</Text>
-          <Text style={{ fontSize: 8, color: C.black, fontWeight: 'bold', marginRight: 6 }}>{value}</Text>
         </View>
       ))}
       {notes ? (

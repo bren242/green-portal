@@ -159,8 +159,15 @@ const start = Date.now()
 
 try {
   const result = await generatePDF(mockFormData, mockUser)
-  const outPath = path.join(root, 'test_output.pdf')
-  fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
+  let outPath = path.join(root, 'test_output.pdf')
+  try {
+    fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
+  } catch (writeErr) {
+    if (writeErr.code === 'EBUSY') {
+      outPath = path.join(root, `test_output_${Date.now()}.pdf`)
+      fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
+    } else throw writeErr
+  }
 
   const sizeKB = Math.round(fs.statSync(outPath).size / 1024)
   const elapsed = Date.now() - start

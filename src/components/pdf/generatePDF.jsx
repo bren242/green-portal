@@ -305,7 +305,8 @@ const KYCDocument = ({ formData, user }) => {
 
         {formData.managedPortion && (
           <View style={{
-            flexDirection: 'row-reverse',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
             alignItems: 'center',
             backgroundColor: C.surface,
             paddingVertical: 5,
@@ -315,11 +316,11 @@ const KYCDocument = ({ formData, user }) => {
             marginTop: 4,
             borderRadius: 3,
           }}>
-            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
-              שיעור הנכסים המועבר לטיפול GREEN
-            </Text>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 8 }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black }}>
               {portionLabels[formData.managedPortion]}
+            </Text>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary }}>
+              שיעור הנכסים המועבר לטיפול GREEN
             </Text>
           </View>
         )}
@@ -414,20 +415,31 @@ const KYCDocument = ({ formData, user }) => {
         <SectionGap />
         <SectionTitle>סיכום תשובות הלקוח</SectionTitle>
 
-        {isCouple ? (
-          <View style={{ flexDirection: 'row', marginBottom: 10, gap: 6 }} wrap={false}>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" /></View>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" /></View>
-          </View>
-        ) : (
-          <SummaryCard title="פרטים אישיים" items={[
-            ['שם מלא', formData.clientA.fullName],
-            ['תעודת זהות', formData.clientA.idNumber],
-            ['טלפון', formData.clientA.phone],
-            ['דוא״ל', formData.clientA.email],
-            ['מצב משפחתי', translateMarital(formData.clientA.maritalStatus)],
-          ]} />
-        )}
+        <View style={{
+          flexDirection: 'row-reverse',
+          backgroundColor: C.primary,
+          borderRadius: 4,
+          padding: 10,
+          marginBottom: 10,
+          gap: 8,
+        }} wrap={false}>
+          {isCouple ? (
+            <>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 8, color: C.gold, textAlign: 'right', marginBottom: 2 }}>לקוח א׳</Text>
+                <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 8, color: C.gold, textAlign: 'right', marginBottom: 2 }}>לקוח ב׳</Text>
+                <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientB.fullName}</Text>
+              </View>
+            </>
+          ) : (
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName}</Text>
+            </View>
+          )}
+        </View>
 
         <SummaryCard title="תמונה כלכלית" items={[
           ['סך נכסים', totalAssets > 0 ? fmtMoney(totalAssets) : '---'],
@@ -500,7 +512,7 @@ const KYCDocument = ({ formData, user }) => {
         )}
 
         {/* Advisor confirmation */}
-        <View wrap={false} style={{ marginTop: 20, borderTopWidth: 0.5, borderTopColor: C.primary, paddingTop: 12 }}>
+        <View style={{ marginTop: 20, borderTopWidth: 0.5, borderTopColor: C.primary, paddingTop: 12 }}>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>אישור בעל הרישיון</Text>
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
             {`אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק.`}
