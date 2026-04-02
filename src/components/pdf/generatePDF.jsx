@@ -190,7 +190,7 @@ const KYCDocument = ({ formData, user }) => {
 
       {/* ==================== PAGE 2: PERSONAL + FINANCIAL ==================== */}
       <Page size="A4" style={basePageStyle}>
-        <PageHeader clientName={clientName} date={date} />
+        <PageHeader />
         <PageFooter />
 
         <SectionTitle>פרטים מזהים</SectionTitle>
@@ -260,15 +260,15 @@ const KYCDocument = ({ formData, user }) => {
         )}
       </Page>
 
-      {/* ==================== PAGE 3: GOALS + LIQUIDITY + RISK ==================== */}
+      {/* ==================== PAGE 3+: GOALS + RISK + ADVISOR + SUMMARY (continuous flow) ==================== */}
       <Page size="A4" style={basePageStyle}>
-        <PageHeader clientName={clientName} date={date} />
+        <PageHeader />
         <PageFooter />
 
         {/* Goals as pill tags */}
         <SectionTitle>מטרות השקעה ואופק</SectionTitle>
         {goals.length > 0 && (
-          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', marginBottom: 6 }}>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', marginBottom: 4 }}>
             {goals.map((g, i) => <PillTag key={i} text={g} />)}
           </View>
         )}
@@ -283,14 +283,12 @@ const KYCDocument = ({ formData, user }) => {
         {/* Risk Assessment */}
         <SectionTitle>הערכת סיכון</SectionTitle>
 
-        {/* Risk gauge */}
         {formData.finalRiskLevel > 0 && (
-          <View style={{ marginBottom: 8 }}>
+          <View style={{ marginBottom: 6 }}>
             <RiskGauge level={formData.finalRiskLevel} />
           </View>
         )}
 
-        {/* Risk questions table */}
         <DataTable
           headers={['שאלה', 'תשובת הלקוח']}
           rows={[
@@ -302,38 +300,31 @@ const KYCDocument = ({ formData, user }) => {
         />
 
         {formData.priorExperience && (
-          <View style={{ marginTop: 6 }}>
+          <View style={{ marginTop: 4 }}>
             <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : 'לא'} even />
             {formData.priorExperienceDetails && <LabelValue label="פירוט" value={formData.priorExperienceDetails} />}
           </View>
         )}
-      </Page>
 
-      {/* ==================== PAGE 4: ADVISOR SUMMARY ==================== */}
-      <Page size="A4" style={basePageStyle}>
-        <PageHeader clientName={clientName} date={date} />
-        <PageFooter />
-
+        {/* Advisor Summary */}
         <SectionTitle>סיכום והמלצת בעל הרישיון</SectionTitle>
 
-        {/* Advisor free text — summary */}
         {formData.advisorSummary && (
-          <View wrap={false} style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.surfaceLight }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 4 }}>סיכום וניתוח</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.6, color: C.black }}>{formData.advisorSummary}</Text>
+          <View wrap={false} style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, padding: 8, marginBottom: 8, backgroundColor: C.surfaceLight }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>סיכום וניתוח</Text>
+            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.advisorSummary}</Text>
           </View>
         )}
 
-        {/* Client preferences */}
         {formData.clientPreferences && (
-          <View wrap={false} style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.surfaceLight }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 4 }}>העדפות / הגבלות לקוח</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.6, color: C.black }}>{formData.clientPreferences}</Text>
+          <View wrap={false} style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, padding: 8, marginBottom: 8, backgroundColor: C.surfaceLight }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>העדפות / הגבלות לקוח</Text>
+            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.clientPreferences}</Text>
           </View>
         )}
 
         {/* 4 Policy cubes */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 10 }} wrap={false}>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 6 }} wrap={false}>
           <PolicyCube label="אחוז מניות מקס׳" value={formData.equityPct ? `${formData.equityPct}%` : '---'} />
           <PolicyCube label="אג״ח קונצרני" value={formData.corporateBondsPct ? (formData.corporateBondsPct === '50' ? 'עד 50%' : 'עד 100%') : '---'} />
           <PolicyCube label="מט״ח" value={formData.forex ? 'כן' : 'לא'} />
@@ -342,14 +333,14 @@ const KYCDocument = ({ formData, user }) => {
 
         {/* Risk level box */}
         {rlFinal && (
-          <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 12, marginTop: 14 }} wrap={false}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
+          <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 10, marginTop: 10 }} wrap={false}>
+            <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
               דרגת סיכון סופית: {formData.finalRiskLevel} — {rlFinal.name}
             </Text>
-            <Text style={{ fontSize: 9, color: C.secondary, textAlign: 'right', marginTop: 4 }}>
+            <Text style={{ fontSize: 9, color: C.secondary, textAlign: 'right', marginTop: 3 }}>
               {rlFinal.description}
             </Text>
-            <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginTop: 4 }}>
+            <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginTop: 3 }}>
               הפסד מקסימלי: {rlFinal.maxLoss} | מניות: {rlFinal.maxStocks} | אג״ח קונצרני: {rlFinal.corpBonds}
             </Text>
             <RiskGauge level={formData.finalRiskLevel} size="small" />
@@ -357,32 +348,28 @@ const KYCDocument = ({ formData, user }) => {
         )}
 
         {formData.finalRiskJustification && (
-          <View wrap={false} style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, padding: 10, backgroundColor: C.surfaceLight }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 4 }}>נימוק מקצועי</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.6, color: C.black }}>{formData.finalRiskJustification}</Text>
+          <View wrap={false} style={{ marginTop: 6, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, padding: 8, backgroundColor: C.surfaceLight }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק מקצועי</Text>
+            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.finalRiskJustification}</Text>
           </View>
         )}
-      </Page>
 
-      {/* ==================== PAGE 5: SUMMARY ==================== */}
-      <Page size="A4" style={basePageStyle}>
-        <PageHeader clientName={clientName} date={date} />
-        <PageFooter />
-
+        {/* Summary section */}
         <SectionTitle>סיכום תשובות הלקוח</SectionTitle>
 
-        <SummaryCard title="פרטים אישיים" items={[
-          ['שם מלא', formData.clientA.fullName],
-          ['תעודת זהות', formData.clientA.idNumber],
-          ['טלפון', formData.clientA.phone],
-          ['דוא״ל', formData.clientA.email],
-          ['מצב משפחתי', translateMarital(formData.clientA.maritalStatus)],
-        ]} />
-
-        {isCouple && (
-          <SummaryCard title="לקוח ב׳" items={[
-            ['שם מלא', formData.clientB.fullName],
-            ['תעודת זהות', formData.clientB.idNumber],
+        {/* ⑧ Couple: side-by-side client cards in summary */}
+        {isCouple ? (
+          <View style={{ flexDirection: 'row-reverse', marginBottom: 8 }} wrap={false}>
+            <ClientCard client={formData.clientA} title="לקוח א׳" />
+            <ClientCard client={formData.clientB} title="לקוח ב׳" />
+          </View>
+        ) : (
+          <SummaryCard title="פרטים אישיים" items={[
+            ['שם מלא', formData.clientA.fullName],
+            ['תעודת זהות', formData.clientA.idNumber],
+            ['טלפון', formData.clientA.phone],
+            ['דוא״ל', formData.clientA.email],
+            ['מצב משפחתי', translateMarital(formData.clientA.maritalStatus)],
           ]} />
         )}
 
@@ -413,7 +400,7 @@ const KYCDocument = ({ formData, user }) => {
 
       {/* ==================== LAST PAGE: SIGNATURES ==================== */}
       <Page size="A4" style={basePageStyle}>
-        <PageHeader clientName={clientName} date={date} />
+        <PageHeader />
         <PageFooter />
 
         <SectionTitle>הצהרות וחתימות</SectionTitle>
@@ -421,39 +408,51 @@ const KYCDocument = ({ formData, user }) => {
         {/* Client declaration */}
         <View wrap={false}>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הצהרת הלקוח</Text>
-          <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.6, marginBottom: 8, color: C.black }}>
+          <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 8, color: C.black }}>
             {`אני הח"מ ${clientName} מצהיר בזאת כי המידע המופיע לעיל הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים. כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי עותק של מסמך זה.`}
           </Text>
-          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>חתימת הלקוח: X ______________</Text>
-          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>תאריך: {date}</Text>
+
+          {/* ⑥ Signature lines — couple side-by-side */}
+          {isCouple ? (
+            <View style={{ flexDirection: 'row-reverse', marginTop: 8 }}>
+              <View style={{ flex: 1, marginLeft: 6 }}>
+                <Text style={{ fontSize: 10, textAlign: 'right', color: C.black }}>חתימת הלקוח ({formData.clientA.fullName}): X _______________</Text>
+                <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+              </View>
+              <View style={{ flex: 1, marginRight: 6 }}>
+                <Text style={{ fontSize: 10, textAlign: 'right', color: C.black }}>חתימת הלקוח ({formData.clientB.fullName}): X _______________</Text>
+                <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+              </View>
+            </View>
+          ) : (
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ fontSize: 10, textAlign: 'right', color: C.black }}>חתימת הלקוח: X _______________</Text>
+              <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+            </View>
+          )}
         </View>
 
-        {isCouple && (
-          <View style={{ marginTop: 12 }}>
-            <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>חתימת לקוח ב׳ ({formData.clientB.fullName || '---'}): X ______________</Text>
-            <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>תאריך: {date}</Text>
-          </View>
-        )}
-
-        {/* Refusals block (red border) */}
+        {/* ⑦ Refusals block with signature */}
         {formData.refusals && formData.refusals.length > 0 && (
-          <View style={{ backgroundColor: C.offWhite, borderWidth: 1.5, borderColor: C.negative, borderRadius: 4, padding: 10, marginTop: 16 }} wrap={false}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.negative, textAlign: 'right', marginBottom: 6 }}>שאלות שהלקוח סירב להשיב:</Text>
+          <View style={{ backgroundColor: C.offWhite, borderWidth: 1.5, borderColor: C.negative, borderRadius: 4, padding: 10, marginTop: 14 }} wrap={false}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.negative, textAlign: 'right', marginBottom: 4 }}>הלקוח סירב להשיב על:</Text>
             {formData.refusals.map((r, i) => (
               <Text key={i} style={{ fontSize: 9, color: C.black, textAlign: 'right', marginBottom: 2 }}>• {r.label}</Text>
             ))}
-            <Text style={{ fontSize: 8, color: C.textMuted, textAlign: 'right', marginTop: 6 }}>הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.</Text>
+            <Text style={{ fontSize: 8, color: C.textMuted, textAlign: 'right', marginTop: 4 }}>הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.</Text>
+            <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>חתימה על הסירובים: X _______________</Text>
+            <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
           </View>
         )}
 
         {/* Advisor confirmation */}
-        <View wrap={false} style={{ marginTop: 20, borderTopWidth: 0.5, borderTopColor: C.primary, paddingTop: 12 }}>
+        <View wrap={false} style={{ marginTop: 16, borderTopWidth: 0.5, borderTopColor: C.primary, paddingTop: 10 }}>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>אישור בעל הרישיון</Text>
-          <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.6, marginBottom: 8, color: C.black }}>
+          <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 8, color: C.black }}>
             {`אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק.`}
           </Text>
-          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>חתימת בעל הרישיון: ______________</Text>
-          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>תאריך: {date}</Text>
+          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>חתימת בעל הרישיון: _______________</Text>
+          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
         </View>
       </Page>
     </Document>

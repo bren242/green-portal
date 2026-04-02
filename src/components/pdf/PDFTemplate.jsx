@@ -41,7 +41,7 @@ export const SPACING = {
 export const basePageStyle = {
   fontFamily: 'Assistant',
   direction: 'rtl',
-  paddingTop: 66,
+  paddingTop: 54,
   paddingBottom: 40,
   paddingHorizontal: 36,
   fontSize: 10,
@@ -49,18 +49,13 @@ export const basePageStyle = {
 }
 
 // ==================== PAGE HEADER (pages 2+) ====================
-export const PageHeader = ({ clientName, date }) => (
+export const PageHeader = () => (
   <View fixed>
     <View style={headerStyles.bar}>
+      <Image src={logoPng} style={headerStyles.logo} />
       <View style={headerStyles.right}>
         <Text style={headerStyles.title}>אפיון צרכים והתאמת מדיניות השקעה</Text>
-        <Text style={headerStyles.client}>{clientName}</Text>
       </View>
-      <View style={headerStyles.dateBox}>
-        <Text style={headerStyles.dateLabel}>תאריך</Text>
-        <Text style={headerStyles.dateValue}>{date}</Text>
-      </View>
-      <Image src={logoPng} style={headerStyles.logo} />
     </View>
     <View style={headerStyles.goldLine} />
   </View>
@@ -69,36 +64,22 @@ export const PageHeader = ({ clientName, date }) => (
 const headerStyles = StyleSheet.create({
   bar: {
     position: 'absolute', top: 0, left: 0, right: 0,
-    height: 48, backgroundColor: C.primary,
+    height: 40, backgroundColor: C.primary,
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 16,
   },
   goldLine: {
-    position: 'absolute', top: 48, left: 0, right: 0,
-    height: 2, backgroundColor: C.gold,
+    position: 'absolute', top: 40, left: 0, right: 0,
+    height: 1, backgroundColor: C.gold,
   },
   right: {
     flex: 1, alignItems: 'flex-end',
   },
   title: {
-    fontSize: 10, fontWeight: 'bold', color: C.white, textAlign: 'right',
-  },
-  client: {
-    fontSize: 9, color: C.gold, textAlign: 'right', marginTop: 1,
-  },
-  dateBox: {
-    borderWidth: 1, borderColor: C.gold, borderRadius: 3,
-    paddingVertical: 3, paddingHorizontal: 10, alignItems: 'center',
-    marginHorizontal: 12,
-  },
-  dateLabel: {
-    fontSize: 6, color: C.gold,
-  },
-  dateValue: {
-    fontSize: 9, fontWeight: 'bold', color: C.white, marginTop: 1,
+    fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right',
   },
   logo: {
-    height: 32, width: 100,
+    height: 26,
   },
 })
 
@@ -113,7 +94,7 @@ export const PageFooter = () => (
 
 // ==================== SECTION TITLE ====================
 export const SectionTitle = ({ children }) => (
-  <View style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 5, paddingHorizontal: 10, marginTop: SPACING.lg, marginBottom: SPACING.md }} wrap={false} minPresenceAhead={60}>
+  <View style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 4, paddingHorizontal: 10, marginTop: SPACING.md, marginBottom: SPACING.sm }} wrap={false} minPresenceAhead={60}>
     <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{children}</Text>
   </View>
 )
