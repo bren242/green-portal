@@ -146,8 +146,25 @@ const KYCDocument = ({ formData, user }) => {
           </View>
         </View>
 
+        {/* Document Title */}
+        <View style={{
+          backgroundColor: C.primary,
+          paddingVertical: 14,
+          paddingHorizontal: 30,
+          alignItems: 'center',
+        }}>
+          <Text style={{
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: C.gold,
+            textAlign: 'center',
+          }}>
+            אפיון צרכים והתאמת מדיניות השקעה
+          </Text>
+        </View>
+
         {/* Body */}
-        <View style={{ marginTop: 80, paddingHorizontal: 30 }}>
+        <View style={{ marginTop: 0, paddingHorizontal: 30 }}>
 
           {/* Advisor table */}
           <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderTopLeftRadius: 3, borderTopRightRadius: 3, paddingVertical: 6, paddingHorizontal: 10 }}>
@@ -162,24 +179,7 @@ const KYCDocument = ({ formData, user }) => {
           </View>
 
           {/* Client blocks */}
-          {!isCouple && (
-            <View style={{
-              marginTop: 16,
-              backgroundColor: C.surface,
-              borderWidth: 1,
-              borderColor: C.gold,
-              borderRadius: 4,
-              padding: 10,
-              flexDirection: 'row-reverse',
-              justifyContent: 'space-between',
-            }}>
-              <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary }}>{formData.clientA.fullName}</Text>
-              <Text style={{ fontSize: 9, color: C.muted }}>ת.ז: {formData.clientA.idNumber}</Text>
-              <Text style={{ fontSize: 9, color: C.muted }}>{formData.clientA.phone}</Text>
-              <Text style={{ fontSize: 9, color: C.muted }}>{formData.clientA.email}</Text>
-            </View>
-          )}
-          {isCouple && (
+          {isCouple ? (
             <View style={{ marginTop: 16, flexDirection: 'row', gap: 8 }}>
               {[
                 { client: formData.clientA, title: 'לקוח א׳' },
@@ -187,19 +187,26 @@ const KYCDocument = ({ formData, user }) => {
               ].map(({ client, title }, i) => (
                 <View key={i} style={{
                   flex: 1,
-                  backgroundColor: C.surface,
-                  borderWidth: 1,
-                  borderColor: C.gold,
+                  backgroundColor: C.primary,
                   borderRadius: 4,
                   padding: 10,
                 }}>
-                  <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>{title}</Text>
-                  <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>{client.fullName}</Text>
-                  <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right', marginTop: 2 }}>ת.ז: {client.idNumber}</Text>
-                  <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right' }}>{client.phone}</Text>
-                  <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right' }}>{client.email}</Text>
+                  <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>{title}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{client.fullName || '---'}</Text>
+                  <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>ת.ז: {client.idNumber || '---'}</Text>
                 </View>
               ))}
+            </View>
+          ) : (
+            <View style={{
+              marginTop: 16,
+              backgroundColor: C.primary,
+              borderRadius: 4,
+              padding: 12,
+            }}>
+              <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>פרטי הלקוח</Text>
+              <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName || '---'}</Text>
+              <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>ת.ז: {formData.clientA.idNumber || '---'}</Text>
             </View>
           )}
 

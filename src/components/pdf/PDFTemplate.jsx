@@ -182,9 +182,9 @@ export const KpiRow = ({ title, total, items, notes, isEven }) => (
     </Text>
     <View style={{ flex: 1 }}>
       {items.map(([label, value], i) => (
-        <View key={i} style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
-          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginRight: 4 }}>{label}:</Text>
-          <Text style={{ fontSize: 8, color: C.black, textAlign: 'right' }}>{value}</Text>
+        <View key={i} style={{ flexDirection: 'row-reverse', marginBottom: 2 }}>
+          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', minWidth: 80 }}>{label}</Text>
+          <Text style={{ fontSize: 8, color: C.black, fontWeight: 'bold', marginRight: 6 }}>{value}</Text>
         </View>
       ))}
       {notes ? (
@@ -274,7 +274,7 @@ export const GoldBox = ({ children, mt }) => (
 
 // ── Client Card ────────────────────────────────────────────────
 export const ClientCard = ({ client, title, full }) => (
-  <View style={{ flex: 1, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden', marginHorizontal: 3 }} wrap={false}>
+  <View style={{ flex: 1, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, marginHorizontal: 3, minHeight: 140 }} wrap={false}>
     <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
       <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
     </View>
