@@ -128,43 +128,40 @@ const KYCDocument = ({ formData, user }) => {
       {/* ═══════════════════ PAGE 1: COVER ═══════════════════ */}
       <Page size="A4" style={coverPageStyle}>
 
-        {/* Header strip — white with gold border */}
-        <View style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          height: 60,
-          backgroundColor: C.white,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 24,
-          borderBottomWidth: 1,
-          borderBottomColor: C.gold,
-        }}>
-          <Image src={logoPng} style={{ height: 36, width: 'auto' }} />
-          <View style={{ flex: 1, alignItems: 'flex-end' }}>
-            <Text style={{ fontSize: 11, color: C.primary, fontWeight: 'bold' }}>{clientName}</Text>
-            <Text style={{ fontSize: 9, color: C.muted, marginTop: 1 }}>{date}</Text>
+        {/* Header + Title — flow רגיל, ללא absolute */}
+        <View>
+          {/* Header לבן */}
+          <View style={{
+            height: 60,
+            backgroundColor: C.white,
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 24,
+            borderBottomWidth: 1,
+            borderBottomColor: C.gold,
+          }}>
+            <Image src={logoPng} style={{ height: 36, width: 'auto' }} />
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <Text style={{ fontSize: 11, color: C.primary, fontWeight: 'bold' }}>{clientName}</Text>
+              <Text style={{ fontSize: 9, color: C.muted, marginTop: 1 }}>{date}</Text>
+            </View>
+          </View>
+
+          {/* כותרת ירוקה */}
+          <View style={{
+            backgroundColor: C.primary,
+            paddingVertical: 14,
+            paddingHorizontal: 30,
+            alignItems: 'center',
+          }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: C.gold, textAlign: 'center' }}>
+              אפיון צרכים והתאמת מדיניות השקעה
+            </Text>
           </View>
         </View>
 
-        {/* Document Title */}
-        <View style={{
-          backgroundColor: C.primary,
-          paddingVertical: 14,
-          paddingHorizontal: 30,
-          alignItems: 'center',
-        }}>
-          <Text style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: C.gold,
-            textAlign: 'center',
-          }}>
-            אפיון צרכים והתאמת מדיניות השקעה
-          </Text>
-        </View>
-
         {/* Body */}
-        <View style={{ marginTop: 0, paddingHorizontal: 30 }}>
+        <View style={{ paddingHorizontal: 30, paddingTop: 16, paddingBottom: 80 }}>
 
           {/* Advisor table */}
           <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderTopLeftRadius: 3, borderTopRightRadius: 3, paddingVertical: 6, paddingHorizontal: 10 }}>
@@ -198,27 +195,23 @@ const KYCDocument = ({ formData, user }) => {
               ))}
             </View>
           ) : (
-            <View style={{
-              marginTop: 16,
-              backgroundColor: C.primary,
-              borderRadius: 4,
-              padding: 12,
-            }}>
+            <View style={{ marginTop: 16, backgroundColor: C.primary, borderRadius: 4, padding: 12 }}>
               <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>פרטי הלקוח</Text>
               <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName || '---'}</Text>
               <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>ת.ז: {formData.clientA.idNumber || '---'}</Text>
             </View>
           )}
 
-          {/* Regulatory text */}
+          {/* Regulatory text — GoldBox */}
           <GoldBox mt={24}>
             {REG_TEXTS.map((txt, i) => (
               <Text key={i} style={{ fontSize: 8.5, textAlign: 'right', lineHeight: 1.6, color: C.black, marginTop: i > 0 ? 4 : 0 }}>{txt}</Text>
             ))}
           </GoldBox>
+
         </View>
 
-        {/* Bottom disclaimer */}
+        {/* Bottom disclaimer — absolute */}
         <View style={{ position: 'absolute', bottom: 30, left: 0, right: 0, alignItems: 'center' }}>
           <Text style={{ fontSize: 9, color: C.muted, textAlign: 'center' }}>כל הנתונים נמסרו על ידי הלקוח ובאחריותו</Text>
         </View>
@@ -235,8 +228,8 @@ const KYCDocument = ({ formData, user }) => {
         <SectionTitle>פרטים מזהים</SectionTitle>
         {isCouple ? (
           <View style={{ flexDirection: 'row', gap: 6 }}>
-            <View style={{ flex: 1 }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
-            <View style={{ flex: 1 }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
+            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
+            <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
           </View>
         ) : (
           <View style={{ width: '100%' }}>

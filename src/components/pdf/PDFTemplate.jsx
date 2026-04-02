@@ -274,7 +274,7 @@ export const GoldBox = ({ children, mt }) => (
 
 // ── Client Card ────────────────────────────────────────────────
 export const ClientCard = ({ client, title, full }) => (
-  <View style={{ flex: 1, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, marginHorizontal: 3, minHeight: 140 }} wrap={false}>
+  <View style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, marginHorizontal: 3, minHeight: 140 }} wrap={false}>
     <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
       <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
     </View>
