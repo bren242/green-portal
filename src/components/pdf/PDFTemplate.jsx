@@ -46,26 +46,25 @@ export const contentPageStyle = {
 }
 
 // ── Page Header (pages 2+) ────────────────────────────────────
-export const PageHeader = ({ clientName, date }) => (
-  <View fixed style={{ marginBottom: 8 }}>
+export const PageHeader = ({ clientName, date, docTitle }) => (
+  <View fixed style={{ marginBottom: 12 }}>
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: C.primary,
-      paddingHorizontal: 16,
+      backgroundColor: C.white,
+      paddingHorizontal: 20,
       paddingVertical: 8,
-      height: 44,
+      borderBottomWidth: 1,
+      borderBottomColor: C.gold,
     }}>
-      <Image
-        src={logoPng}
-        style={{ height: 28, width: 'auto' }}
-      />
+      <Image src={logoPng} style={{ height: 30, width: 'auto' }} />
       <View style={{ flex: 1, alignItems: 'flex-end' }}>
-        {clientName && <Text style={{ fontSize: 9, color: C.gold, fontWeight: 'bold' }}>{clientName}</Text>}
-        {date && <Text style={{ fontSize: 8, color: C.goldLight, marginTop: 1 }}>{date}</Text>}
+        <Text style={{ fontSize: 9, color: C.primary, fontWeight: 'bold' }}>
+          {docTitle ? `אפיון צרכים — ${docTitle}` : 'אפיון צרכים'}
+        </Text>
+        <Text style={{ fontSize: 8, color: C.muted, marginTop: 1 }}>{date}</Text>
       </View>
     </View>
-    <View style={{ height: 1, backgroundColor: C.gold }} />
   </View>
 )
 
@@ -164,41 +163,45 @@ export const SummaryCard = ({ title, items }) => (
   </View>
 )
 
-// ── Sector Box (financial category) ────────────────────────────
-export const SectorBox = ({ title, rows, total, notes }) => (
-  <View style={{ marginBottom: 12, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden' }} wrap={false}>
-    <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
-      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{title}</Text>
+// ── KPI Row (financial sector row) ─────────────────────────────
+export const KpiRow = ({ title, total, items, notes, isEven }) => (
+  <View style={{
+    flexDirection: 'row-reverse',
+    alignItems: 'flex-start',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: isEven ? C.surface : C.white,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.border,
+  }} wrap={false}>
+    <Text style={{ width: '28%', fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
+      {title}
+    </Text>
+    <Text style={{ width: '18%', fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
+      {total}
+    </Text>
+    <View style={{ flex: 1 }}>
+      {items.map(([label, value], i) => (
+        <View key={i} style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginRight: 4 }}>{label}:</Text>
+          <Text style={{ fontSize: 8, color: C.black, textAlign: 'right' }}>{value}</Text>
+        </View>
+      ))}
+      {notes ? (
+        <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', marginTop: 2 }}>
+          הערות: {notes}
+        </Text>
+      ) : null}
     </View>
-    {rows.map(([label, value], i) => (
-      <View key={i} style={{
-        flexDirection: 'row-reverse',
-        paddingVertical: 4,
-        paddingHorizontal: 10,
-        backgroundColor: i % 2 === 0 ? C.surface : C.white,
-      }}>
-        <Text style={{ flex: 1, fontSize: 9, color: C.black, textAlign: 'right' }}>{label}</Text>
-        <Text style={{ fontSize: 9, color: C.black, textAlign: 'left' }}>{value}</Text>
-      </View>
-    ))}
-    {notes && (
-      <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', paddingHorizontal: 10, paddingBottom: 4 }}>
-        הערות: {notes}
-      </Text>
-    )}
-    {total && (
-      <View style={{
-        flexDirection: 'row-reverse',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        backgroundColor: '#E8F0EC',
-        borderTopWidth: 0.5,
-        borderTopColor: C.gold,
-      }}>
-        <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>סה״כ</Text>
-        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'left' }}>{total}</Text>
-      </View>
-    )}
+  </View>
+)
+
+// ── KPI Table Header ───────────────────────────────────────────
+export const KpiHeader = () => (
+  <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 3, marginBottom: 4 }}>
+    <Text style={{ width: '28%', fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>סקטור</Text>
+    <Text style={{ width: '18%', fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>סה״כ</Text>
+    <Text style={{ flex: 1, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>פירוט</Text>
   </View>
 )
 
@@ -306,14 +309,14 @@ export const BalanceBox = ({ title, rows, highlightLabel, highlightValue }) => (
 // ── Signature Line (RTL: label right, writing line left) ───────
 export const SignatureLine = ({ label }) => (
   <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 14, marginBottom: 2 }}>
-    <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginRight: 0 }}>
-      X {label}
-    </Text>
+    <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>X {label}</Text>
     <View style={{
-      width: 180,
+      flex: 1,
+      maxWidth: 200,
       borderBottomWidth: 1,
       borderBottomColor: C.primary,
-      marginLeft: 8,
+      marginRight: 10,
+      marginBottom: 2,
     }} />
   </View>
 )

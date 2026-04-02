@@ -8,7 +8,7 @@ import {
   PageHeader, PageFooter, SectionTitle, SectionGap,
   LabelValue, DataTable, SummaryRow, SummaryCard,
   PillTag, RiskGauge, PolicyCube, GoldBox,
-  ClientCard, BalanceBox, SectorBox, SignatureLine, DateLine,
+  ClientCard, BalanceBox, KpiRow, KpiHeader, SignatureLine, DateLine,
   fmtMoney, parseAmount, translateMarital, fmtDate,
 } from './PDFTemplate'
 
@@ -128,24 +128,26 @@ const KYCDocument = ({ formData, user }) => {
       {/* ═══════════════════ PAGE 1: COVER ═══════════════════ */}
       <Page size="A4" style={coverPageStyle}>
 
-        {/* Header strip — offWhite */}
-        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 50, backgroundColor: C.offWhite, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }}>
-          <Image src={logoPng} style={{ height: 34 }} />
+        {/* Header strip — white with gold border */}
+        <View style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: 60,
+          backgroundColor: C.white,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 24,
+          borderBottomWidth: 1,
+          borderBottomColor: C.gold,
+        }}>
+          <Image src={logoPng} style={{ height: 36, width: 'auto' }} />
           <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text style={{ fontSize: 11, color: C.primary, fontWeight: 'bold' }}>{clientName}</Text>
-            <Text style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>{date}</Text>
+            <Text style={{ fontSize: 9, color: C.muted, marginTop: 1 }}>{date}</Text>
           </View>
         </View>
 
-        {/* Title strip — primary green */}
-        <View style={{ position: 'absolute', top: 50, left: 0, right: 0, height: 60, backgroundColor: C.primary, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: C.gold, textAlign: 'center' }}>
-            אפיון צרכים והתאמת מדיניות השקעה
-          </Text>
-        </View>
-
         {/* Body */}
-        <View style={{ marginTop: 140, paddingHorizontal: 30 }}>
+        <View style={{ marginTop: 80, paddingHorizontal: 30 }}>
 
           {/* Advisor table */}
           <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderTopLeftRadius: 3, borderTopRightRadius: 3, paddingVertical: 6, paddingHorizontal: 10 }}>
@@ -159,14 +161,46 @@ const KYCDocument = ({ formData, user }) => {
             <Text style={{ flex: 1, fontSize: 10, color: C.black, textAlign: 'right' }}>{user.license || '---'}</Text>
           </View>
 
-          {/* Client cards */}
-          {isCouple ? (
-            <View style={{ flexDirection: 'row', marginTop: 20, gap: 6 }}>
-              <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" /></View>
-              <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" /></View>
+          {/* Client blocks */}
+          {!isCouple && (
+            <View style={{
+              marginTop: 16,
+              backgroundColor: C.surface,
+              borderWidth: 1,
+              borderColor: C.gold,
+              borderRadius: 4,
+              padding: 10,
+              flexDirection: 'row-reverse',
+              justifyContent: 'space-between',
+            }}>
+              <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary }}>{formData.clientA.fullName}</Text>
+              <Text style={{ fontSize: 9, color: C.muted }}>ת.ז: {formData.clientA.idNumber}</Text>
+              <Text style={{ fontSize: 9, color: C.muted }}>{formData.clientA.phone}</Text>
+              <Text style={{ fontSize: 9, color: C.muted }}>{formData.clientA.email}</Text>
             </View>
-          ) : (
-            <View style={{ marginTop: 20 }}><ClientCard client={formData.clientA} title="פרטי הלקוח" /></View>
+          )}
+          {isCouple && (
+            <View style={{ marginTop: 16, flexDirection: 'row', gap: 8 }}>
+              {[
+                { client: formData.clientA, title: 'לקוח א׳' },
+                { client: formData.clientB, title: 'לקוח ב׳' },
+              ].map(({ client, title }, i) => (
+                <View key={i} style={{
+                  flex: 1,
+                  backgroundColor: C.surface,
+                  borderWidth: 1,
+                  borderColor: C.gold,
+                  borderRadius: 4,
+                  padding: 10,
+                }}>
+                  <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>{title}</Text>
+                  <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>{client.fullName}</Text>
+                  <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right', marginTop: 2 }}>ת.ז: {client.idNumber}</Text>
+                  <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right' }}>{client.phone}</Text>
+                  <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right' }}>{client.email}</Text>
+                </View>
+              ))}
+            </View>
           )}
 
           {/* Regulatory text */}
@@ -187,52 +221,63 @@ const KYCDocument = ({ formData, user }) => {
 
       {/* ═══════════════════ PAGE 2+: CONTENT (continuous) ═══════════════════ */}
       <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName={clientName} date={date} />
+        <PageHeader clientName={clientName} date={date} docTitle={clientName} />
         <PageFooter />
 
         {/* ── Personal Details ────────────────────────────── */}
         <SectionTitle>פרטים מזהים</SectionTitle>
         {isCouple ? (
-          <View style={{ flexDirection: 'row', gap: 6 }} wrap={false}>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <View style={{ flex: 1 }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
+            <View style={{ flex: 1 }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
           </View>
         ) : (
-          <ClientCard client={formData.clientA} title="פרטי הלקוח" full />
+          <View style={{ width: '100%' }}>
+            <ClientCard client={formData.clientA} title="פרטי הלקוח" full />
+          </View>
         )}
 
         {/* ── Financial Picture ───────────────────────────── */}
         <SectionGap />
         <SectionTitle>תמונה כלכלית — התא המשפחתי</SectionTitle>
 
+        {/* KPI Table Header */}
+        <KpiHeader />
+
         {/* Income */}
         {incomeRows.length > 0 && (
-          <SectorBox
+          <KpiRow
             title="הכנסות (חודשי)"
-            rows={incomeRows}
             total={fmtMoney(totalMonthlyIncome)}
+            items={incomeRows}
             notes={formData.incomeNotes}
+            isEven={false}
           />
         )}
 
         {/* Asset categories */}
-        {processedAssets.map((sec, idx) => (
-          <SectorBox
-            key={idx}
-            title={sec.title}
-            rows={sec.rows}
-            total={fmtMoney(sec.rows.reduce((s, [,v]) => s + parseAmount(v), 0))}
-            notes={sec.notes}
-          />
-        ))}
+        {processedAssets.map((sec, idx) => {
+          const secTotal = sec.rows.reduce((s, [, v]) => s + parseAmount(v.replace(/[^\d.]/g, '')), 0)
+          return (
+            <KpiRow
+              key={idx}
+              title={sec.title}
+              total={fmtMoney(secTotal)}
+              items={sec.rows}
+              notes={sec.notes}
+              isEven={idx % 2 === 0}
+            />
+          )
+        })}
 
         {/* Liabilities */}
         {liabRows.length > 0 && (
-          <SectorBox
+          <KpiRow
             title="התחייבויות"
-            rows={liabRows}
             total={fmtMoney(totalLiabilities)}
+            items={liabRows}
             notes={formData.liabilitiesNotes}
+            isEven={processedAssets.length % 2 === 0}
           />
         )}
 
@@ -261,17 +306,21 @@ const KYCDocument = ({ formData, user }) => {
         {formData.managedPortion && (
           <View style={{
             flexDirection: 'row-reverse',
+            alignItems: 'center',
             backgroundColor: C.surface,
             paddingVertical: 5,
             paddingHorizontal: 10,
             borderTopWidth: 0.5,
             borderTopColor: C.gold,
             marginTop: 4,
+            borderRadius: 3,
           }}>
             <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
               שיעור הנכסים המועבר לטיפול GREEN
             </Text>
-            <Text style={{ fontSize: 9, color: C.black }}>{portionLabels[formData.managedPortion]}</Text>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 8 }}>
+              {portionLabels[formData.managedPortion]}
+            </Text>
           </View>
         )}
 
@@ -436,7 +485,7 @@ const KYCDocument = ({ formData, user }) => {
         </View>
 
         {/* Refusals block */}
-        {formData.refusals && formData.refusals.length > 0 && (
+        {Array.isArray(formData.refusals) && formData.refusals.length > 0 && (
           <View style={{ borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 12, marginTop: 20 }} wrap={false}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הלקוח סירב להשיב על:</Text>
             {formData.refusals.map((r, i) => (
