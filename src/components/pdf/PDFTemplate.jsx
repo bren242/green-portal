@@ -205,6 +205,46 @@ export const KpiHeader = () => (
   </View>
 )
 
+// ── Sector Card (financial section — 2 per row) ───────────────
+export const SectorCard = ({ title, total, items, notes }) => (
+  <View style={{
+    width: '48%',
+    borderWidth: 1,
+    borderColor: C.gold,
+    borderRadius: 4,
+    marginBottom: 8,
+    overflow: 'hidden',
+  }} wrap={false}>
+    <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>
+        {title}
+      </Text>
+    </View>
+    <View style={{ backgroundColor: C.white, padding: 10 }}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
+        {total}
+      </Text>
+      {items.map(([label, value], i) => (
+        <View key={i} style={{
+          flexDirection: 'row-reverse',
+          justifyContent: 'space-between',
+          borderTopWidth: 0.5,
+          borderTopColor: C.border,
+          paddingVertical: 3,
+        }}>
+          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>{label}</Text>
+          <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.black }}>{value}</Text>
+        </View>
+      ))}
+      {notes && (
+        <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', marginTop: 4 }}>
+          {notes}
+        </Text>
+      )}
+    </View>
+  </View>
+)
+
 // ── Pill Tag ───────────────────────────────────────────────────
 export const PillTag = ({ text }) => (
   <View style={{

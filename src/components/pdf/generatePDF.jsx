@@ -8,7 +8,7 @@ import {
   PageHeader, PageFooter, SectionTitle, SectionGap,
   LabelValue, DataTable, SummaryRow, SummaryCard,
   PillTag, RiskGauge, PolicyCube, GoldBox,
-  ClientCard, BalanceBox, KpiRow, KpiHeader, SignatureLine, DateLine,
+  ClientCard, BalanceBox, KpiRow, KpiHeader, SectorCard, SignatureLine, DateLine,
   fmtMoney, parseAmount, translateMarital, fmtDate,
 } from './PDFTemplate'
 
@@ -228,8 +228,8 @@ const KYCDocument = ({ formData, user }) => {
         <SectionTitle>פרטים מזהים</SectionTitle>
         {isCouple ? (
           <View style={{ flexDirection: 'row', gap: 6 }}>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
             <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
+            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
           </View>
         ) : (
           <View style={{ width: '100%' }}>
@@ -241,45 +241,41 @@ const KYCDocument = ({ formData, user }) => {
         <SectionGap />
         <SectionTitle>תמונה כלכלית — התא המשפחתי</SectionTitle>
 
-        {/* KPI Table Header */}
-        <KpiHeader />
+        {/* Sector Cards — 2 per row */}
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
 
-        {/* Income */}
-        {incomeRows.length > 0 && (
-          <KpiRow
-            title="הכנסות (חודשי)"
-            total={fmtMoney(totalMonthlyIncome)}
-            items={incomeRows}
-            notes={formData.incomeNotes}
-            isEven={false}
-          />
-        )}
-
-        {/* Asset categories */}
-        {processedAssets.map((sec, idx) => {
-          const secTotal = sec.rows.reduce((s, [, v]) => s + parseAmount(v.replace(/[^\d.]/g, '')), 0)
-          return (
-            <KpiRow
-              key={idx}
-              title={sec.title}
-              total={fmtMoney(secTotal)}
-              items={sec.rows}
-              notes={sec.notes}
-              isEven={idx % 2 === 0}
+          {incomeRows.length > 0 && (
+            <SectorCard
+              title="הכנסות (חודשי)"
+              total={fmtMoney(totalMonthlyIncome)}
+              items={incomeRows}
+              notes={formData.incomeNotes}
             />
-          )
-        })}
+          )}
 
-        {/* Liabilities */}
-        {liabRows.length > 0 && (
-          <KpiRow
-            title="התחייבויות"
-            total={fmtMoney(totalLiabilities)}
-            items={liabRows}
-            notes={formData.liabilitiesNotes}
-            isEven={processedAssets.length % 2 === 0}
-          />
-        )}
+          {processedAssets.map((sec, idx) => {
+            const secTotal = sec.rows.reduce((s, [, v]) => s + parseAmount(v.replace(/[^\d.]/g, '')), 0)
+            return (
+              <SectorCard
+                key={idx}
+                title={sec.title}
+                total={fmtMoney(secTotal)}
+                items={sec.rows}
+                notes={sec.notes}
+              />
+            )
+          })}
+
+          {liabRows.length > 0 && (
+            <SectorCard
+              title="התחייבויות"
+              total={fmtMoney(totalLiabilities)}
+              items={liabRows}
+              notes={formData.liabilitiesNotes}
+            />
+          )}
+
+        </View>
 
         {/* Two summary boxes side-by-side */}
         <View style={{ flexDirection: 'row-reverse', marginTop: 6, gap: 8 }} wrap={false}>
@@ -414,32 +410,6 @@ const KYCDocument = ({ formData, user }) => {
         {/* ── Client Answers Recap ────────────────────────── */}
         <SectionGap />
         <SectionTitle>סיכום תשובות הלקוח</SectionTitle>
-
-        <View style={{
-          flexDirection: 'row-reverse',
-          backgroundColor: C.primary,
-          borderRadius: 4,
-          padding: 10,
-          marginBottom: 10,
-          gap: 8,
-        }} wrap={false}>
-          {isCouple ? (
-            <>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 8, color: C.gold, textAlign: 'right', marginBottom: 2 }}>לקוח א׳</Text>
-                <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 8, color: C.gold, textAlign: 'right', marginBottom: 2 }}>לקוח ב׳</Text>
-                <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientB.fullName}</Text>
-              </View>
-            </>
-          ) : (
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName}</Text>
-            </View>
-          )}
-        </View>
 
         <SummaryCard title="תמונה כלכלית" items={[
           ['סך נכסים', totalAssets > 0 ? fmtMoney(totalAssets) : '---'],
