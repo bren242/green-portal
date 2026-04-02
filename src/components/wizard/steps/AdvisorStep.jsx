@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TextArea, TextInput, RadioGroup, Checkbox } from '../ui/FormField'
 import { calculateRiskScore, RISK_LEVELS } from '../../../data/formSchema'
-import { generatePDF } from '../../pdf/generatePDF'
+import { generatePDF } from '../../pdf/generatePDF.jsx'
 import PDFPreview from '../../pdf/PDFPreview'
 
 export default function AdvisorStep({ formData, updateForm, user }) {
