@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/auth/Login'
 import Wizard from './components/wizard/Wizard'
 import AdminPanel from './components/admin/AdminPanel'
+import PDFPreviewPage from './components/pdf/PDFPreviewPage'
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 
@@ -40,6 +41,11 @@ function App() {
       window.removeEventListener('touchstart', resetActivity)
     }
   }, [user, lastActivity, handleLogout])
+
+  // Dev preview mode — bypass login
+  if (window.location.search.includes('preview=pdf')) {
+    return <PDFPreviewPage />
+  }
 
   if (!user) {
     return <Login onLogin={setUser} />

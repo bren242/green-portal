@@ -41,7 +41,7 @@ export const SPACING = {
 export const basePageStyle = {
   fontFamily: 'Assistant',
   direction: 'rtl',
-  paddingTop: 54,
+  paddingTop: 58,
   paddingBottom: 40,
   paddingHorizontal: 36,
   fontSize: 10,
@@ -64,12 +64,12 @@ export const PageHeader = () => (
 const headerStyles = StyleSheet.create({
   bar: {
     position: 'absolute', top: 0, left: 0, right: 0,
-    height: 40, backgroundColor: C.primary,
+    height: 44, backgroundColor: '#1B3A2F',
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: 16,
   },
   goldLine: {
-    position: 'absolute', top: 40, left: 0, right: 0,
+    position: 'absolute', top: 44, left: 0, right: 0,
     height: 1, backgroundColor: C.gold,
   },
   right: {
@@ -79,7 +79,7 @@ const headerStyles = StyleSheet.create({
     fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right',
   },
   logo: {
-    height: 26,
+    height: 28,
   },
 })
 
@@ -221,10 +221,10 @@ export const GoldBox = ({ children }) => (
 // ==================== CLIENT CARD (cover page) ====================
 export const ClientCard = ({ client, title }) => (
   <View style={{ flex: 1, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden', marginHorizontal: 3 }} wrap={false}>
-    <View style={{ backgroundColor: C.secondary, paddingVertical: 4, paddingHorizontal: 8 }}>
-      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{title}</Text>
+    <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
     </View>
-    <View style={{ padding: 6 }}>
+    <View style={{ padding: 8 }}>
       <LabelValue label="שם מלא" value={client.fullName} even />
       <LabelValue label="ת.ז." value={client.idNumber} />
       <LabelValue label="טלפון" value={client.phone} even />

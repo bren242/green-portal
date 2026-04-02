@@ -109,18 +109,22 @@ const KYCDocument = ({ formData, user }) => {
   const advisorName = user.name || '____________'
   const advisorLicense = user.license || '____________'
 
-  // ---- Client detail printer (for page 2+ personal section) ----
-  const printClientFull = (client, title) => (
-    <View wrap={false}>
-      <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.secondary, textAlign: 'right', marginBottom: 6, marginTop: 8 }}>{title}</Text>
-      <LabelValue label="שם מלא" value={client.fullName} even />
-      <LabelValue label="תעודת זהות" value={client.idNumber} />
-      <LabelValue label="תאריך לידה" value={client.birthDate} even />
-      <LabelValue label="מצב משפחתי" value={translateMarital(client.maritalStatus)} />
-      <LabelValue label="נפשות תלויות" value={client.dependents} even />
-      <LabelValue label="טלפון" value={client.phone} />
-      <LabelValue label="דוא״ל" value={client.email} even />
-      <LabelValue label="עיסוק" value={client.occupation} />
+  // ---- Client detail box (for page 2+ personal section) ----
+  const ClientDetailBox = ({ client, title }) => (
+    <View style={{ flex: 1, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden', marginHorizontal: 3 }}>
+      <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
+        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
+      </View>
+      <View style={{ padding: 8 }}>
+        <LabelValue label="שם מלא" value={client.fullName} even />
+        <LabelValue label="תעודת זהות" value={client.idNumber} />
+        <LabelValue label="תאריך לידה" value={client.birthDate} even />
+        <LabelValue label="מצב משפחתי" value={translateMarital(client.maritalStatus)} />
+        <LabelValue label="נפשות תלויות" value={client.dependents} even />
+        <LabelValue label="טלפון" value={client.phone} />
+        <LabelValue label="דוא״ל" value={client.email} even />
+        <LabelValue label="עיסוק" value={client.occupation} />
+      </View>
     </View>
   )
 
@@ -130,7 +134,7 @@ const KYCDocument = ({ formData, user }) => {
       <Page size="A4" style={{ fontFamily: 'Assistant', direction: 'rtl', backgroundColor: C.white }}>
         {/* רצועה 1 — Header בז׳ */}
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 50, backgroundColor: C.offWhite, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 }}>
-          <Image src={logoPng} style={{ height: 34, width: 120 }} />
+          <Image src={logoPng} style={{ height: 34 }} />
           <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text style={{ fontSize: 11, color: C.primary }}>{clientName}</Text>
             <Text style={{ fontSize: 10, color: C.textMuted, marginTop: 1 }}>{date}</Text>
@@ -160,10 +164,20 @@ const KYCDocument = ({ formData, user }) => {
           </View>
 
           {/* Client details cards */}
-          <View style={{ flexDirection: isCouple ? 'row-reverse' : 'column', marginTop: 20 }}>
-            <ClientCard client={formData.clientA} title={isCouple ? 'לקוח א׳' : 'פרטי הלקוח'} />
-            {isCouple && <ClientCard client={formData.clientB} title="לקוח ב׳" />}
-          </View>
+          {isCouple ? (
+            <View style={{ flexDirection: 'row', marginTop: 20, gap: 6 }}>
+              <View style={{ width: '49%' }}>
+                <ClientCard client={formData.clientB} title="לקוח ב׳" />
+              </View>
+              <View style={{ width: '49%' }}>
+                <ClientCard client={formData.clientA} title="לקוח א׳" />
+              </View>
+            </View>
+          ) : (
+            <View style={{ marginTop: 20 }}>
+              <ClientCard client={formData.clientA} title="פרטי הלקוח" />
+            </View>
+          )}
 
           {/* Regulatory text — gold bordered box */}
           <GoldBox>
@@ -194,8 +208,18 @@ const KYCDocument = ({ formData, user }) => {
         <PageFooter />
 
         <SectionTitle>פרטים מזהים</SectionTitle>
-        {printClientFull(formData.clientA, isCouple ? 'לקוח א׳' : 'פרטי הלקוח')}
-        {isCouple && printClientFull(formData.clientB, 'לקוח ב׳')}
+        {isCouple ? (
+          <View style={{ flexDirection: 'row', gap: 6 }} wrap={false}>
+            <View style={{ width: '49%' }}>
+              <ClientDetailBox client={formData.clientB} title="לקוח ב׳" />
+            </View>
+            <View style={{ width: '49%' }}>
+              <ClientDetailBox client={formData.clientA} title="לקוח א׳" />
+            </View>
+          </View>
+        ) : (
+          <ClientDetailBox client={formData.clientA} title="פרטי הלקוח" />
+        )}
 
         <SectionTitle>תמונה כלכלית — התא המשפחתי</SectionTitle>
 
@@ -359,9 +383,13 @@ const KYCDocument = ({ formData, user }) => {
 
         {/* ⑧ Couple: side-by-side client cards in summary */}
         {isCouple ? (
-          <View style={{ flexDirection: 'row-reverse', marginBottom: 8 }} wrap={false}>
-            <ClientCard client={formData.clientA} title="לקוח א׳" />
-            <ClientCard client={formData.clientB} title="לקוח ב׳" />
+          <View style={{ flexDirection: 'row', marginBottom: 8, gap: 6 }} wrap={false}>
+            <View style={{ width: '49%' }}>
+              <ClientCard client={formData.clientB} title="לקוח ב׳" />
+            </View>
+            <View style={{ width: '49%' }}>
+              <ClientCard client={formData.clientA} title="לקוח א׳" />
+            </View>
           </View>
         ) : (
           <SummaryCard title="פרטים אישיים" items={[
@@ -396,13 +424,8 @@ const KYCDocument = ({ formData, user }) => {
           ['שאלה 4', q4Labels[formData.riskQ4] || '---'],
           ['דרגת סיכון סופית', rlFinal ? `${formData.finalRiskLevel} — ${rlFinal.name}` : '---'],
         ]} />
-      </Page>
 
-      {/* ==================== LAST PAGE: SIGNATURES ==================== */}
-      <Page size="A4" style={basePageStyle}>
-        <PageHeader />
-        <PageFooter />
-
+        {/* ==================== SIGNATURES (continuous flow) ==================== */}
         <SectionTitle>הצהרות וחתימות</SectionTitle>
 
         {/* Client declaration */}
@@ -461,6 +484,7 @@ const KYCDocument = ({ formData, user }) => {
 
 // ==================== EXPORT ====================
 export async function generatePDF(formData, user) {
+  if (!user) throw new Error('משתמש לא מחובר')
   const freshUser = getUserById(user.id) || user
 
   const blob = await pdf(<KYCDocument formData={formData} user={freshUser} />).toBlob()
