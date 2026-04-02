@@ -38,7 +38,7 @@ export const coverPageStyle = {
 export const contentPageStyle = {
   fontFamily: 'Assistant',
   direction: 'rtl',
-  paddingTop: 56,
+  paddingTop: 10,
   paddingBottom: 36,
   paddingHorizontal: 36,
   fontSize: 10,
@@ -46,37 +46,28 @@ export const contentPageStyle = {
 }
 
 // ── Page Header (pages 2+) ────────────────────────────────────
-export const PageHeader = () => (
-  <View fixed style={hdr.wrap}>
-    <View style={hdr.bar}>
-      <Image src={logoPng} style={hdr.logo} />
-      <View style={hdr.titleWrap}>
-        <Text style={hdr.title}>אפיון צרכים והתאמת מדיניות השקעה</Text>
+export const PageHeader = ({ clientName, date }) => (
+  <View fixed style={{ marginBottom: 8 }}>
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: C.primary,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      height: 44,
+    }}>
+      <Image
+        src={logoPng}
+        style={{ height: 28, width: 'auto' }}
+      />
+      <View style={{ flex: 1, alignItems: 'flex-end' }}>
+        {clientName && <Text style={{ fontSize: 9, color: C.gold, fontWeight: 'bold' }}>{clientName}</Text>}
+        {date && <Text style={{ fontSize: 8, color: C.goldLight, marginTop: 1 }}>{date}</Text>}
       </View>
     </View>
-    <View style={hdr.line} />
+    <View style={{ height: 1, backgroundColor: C.gold }} />
   </View>
 )
-
-const hdr = StyleSheet.create({
-  wrap: {},
-  bar: {
-    position: 'absolute', top: 0, left: 0, right: 0,
-    height: 40,
-    backgroundColor: C.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  line: {
-    position: 'absolute', top: 40, left: 0, right: 0,
-    height: 1,
-    backgroundColor: C.gold,
-  },
-  logo: { height: 26 },
-  titleWrap: { flex: 1, alignItems: 'flex-end' },
-  title: { fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' },
-})
 
 // ── Page Footer ────────────────────────────────────────────────
 export const PageFooter = () => (
@@ -90,7 +81,7 @@ export const PageFooter = () => (
 // ── Section Title ──────────────────────────────────────────────
 export const SectionTitle = ({ children }) => (
   <View
-    style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 5, paddingHorizontal: 10, marginBottom: 10 }}
+    style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 5, paddingHorizontal: 10, marginBottom: 10, marginTop: 12 }}
     wrap={false}
     minPresenceAhead={60}
   >
@@ -170,6 +161,44 @@ export const SummaryCard = ({ title, items }) => (
         <LabelValue key={i} label={label} value={value} even={i % 2 === 0} />
       ))}
     </View>
+  </View>
+)
+
+// ── Sector Box (financial category) ────────────────────────────
+export const SectorBox = ({ title, rows, total, notes }) => (
+  <View style={{ marginBottom: 12, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden' }} wrap={false}>
+    <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{title}</Text>
+    </View>
+    {rows.map(([label, value], i) => (
+      <View key={i} style={{
+        flexDirection: 'row-reverse',
+        paddingVertical: 4,
+        paddingHorizontal: 10,
+        backgroundColor: i % 2 === 0 ? C.surface : C.white,
+      }}>
+        <Text style={{ flex: 1, fontSize: 9, color: C.black, textAlign: 'right' }}>{label}</Text>
+        <Text style={{ fontSize: 9, color: C.black, textAlign: 'left' }}>{value}</Text>
+      </View>
+    ))}
+    {notes && (
+      <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', paddingHorizontal: 10, paddingBottom: 4 }}>
+        הערות: {notes}
+      </Text>
+    )}
+    {total && (
+      <View style={{
+        flexDirection: 'row-reverse',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        backgroundColor: '#E8F0EC',
+        borderTopWidth: 0.5,
+        borderTopColor: C.gold,
+      }}>
+        <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>סה״כ</Text>
+        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'left' }}>{total}</Text>
+      </View>
+    )}
   </View>
 )
 
@@ -276,9 +305,16 @@ export const BalanceBox = ({ title, rows, highlightLabel, highlightValue }) => (
 
 // ── Signature Line (RTL: label right, writing line left) ───────
 export const SignatureLine = ({ label }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 10 }}>
-    <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>X {label}</Text>
-    <View style={{ width: 200, borderBottomWidth: 1, borderBottomColor: C.primary, marginRight: 8, marginBottom: 1 }} />
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 14, marginBottom: 2 }}>
+    <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginRight: 0 }}>
+      X {label}
+    </Text>
+    <View style={{
+      width: 180,
+      borderBottomWidth: 1,
+      borderBottomColor: C.primary,
+      marginLeft: 8,
+    }} />
   </View>
 )
 

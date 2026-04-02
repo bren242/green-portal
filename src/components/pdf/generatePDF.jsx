@@ -8,7 +8,7 @@ import {
   PageHeader, PageFooter, SectionTitle, SectionGap,
   LabelValue, DataTable, SummaryRow, SummaryCard,
   PillTag, RiskGauge, PolicyCube, GoldBox,
-  ClientCard, BalanceBox, SignatureLine, DateLine,
+  ClientCard, BalanceBox, SectorBox, SignatureLine, DateLine,
   fmtMoney, parseAmount, translateMarital, fmtDate,
 } from './PDFTemplate'
 
@@ -187,7 +187,7 @@ const KYCDocument = ({ formData, user }) => {
 
       {/* ═══════════════════ PAGE 2+: CONTENT (continuous) ═══════════════════ */}
       <Page size="A4" style={contentPageStyle}>
-        <PageHeader />
+        <PageHeader clientName={clientName} date={date} />
         <PageFooter />
 
         {/* ── Personal Details ────────────────────────────── */}
@@ -207,29 +207,33 @@ const KYCDocument = ({ formData, user }) => {
 
         {/* Income */}
         {incomeRows.length > 0 && (
-          <View wrap={false} style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 4 }}>הכנסות (חודשי)</Text>
-            <DataTable rows={incomeRows} />
-            {formData.incomeNotes ? <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 2 }}>הערות: {formData.incomeNotes}</Text> : null}
-          </View>
+          <SectorBox
+            title="הכנסות (חודשי)"
+            rows={incomeRows}
+            total={fmtMoney(totalMonthlyIncome)}
+            notes={formData.incomeNotes}
+          />
         )}
 
         {/* Asset categories */}
         {processedAssets.map((sec, idx) => (
-          <View key={idx} wrap={false} style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 4 }}>{sec.title}</Text>
-            <DataTable rows={sec.rows} />
-            {sec.notes ? <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 2 }}>הערות: {sec.notes}</Text> : null}
-          </View>
+          <SectorBox
+            key={idx}
+            title={sec.title}
+            rows={sec.rows}
+            total={fmtMoney(sec.rows.reduce((s, [,v]) => s + parseAmount(v), 0))}
+            notes={sec.notes}
+          />
         ))}
 
         {/* Liabilities */}
         {liabRows.length > 0 && (
-          <View wrap={false} style={{ marginBottom: 10 }}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 4 }}>התחייבויות</Text>
-            <DataTable rows={liabRows} />
-            {formData.liabilitiesNotes ? <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 2 }}>הערות: {formData.liabilitiesNotes}</Text> : null}
-          </View>
+          <SectorBox
+            title="התחייבויות"
+            rows={liabRows}
+            total={fmtMoney(totalLiabilities)}
+            notes={formData.liabilitiesNotes}
+          />
         )}
 
         {/* Two summary boxes side-by-side */}
@@ -255,8 +259,19 @@ const KYCDocument = ({ formData, user }) => {
         </View>
 
         {formData.managedPortion && (
-          <View style={{ marginTop: 8 }}>
-            <LabelValue label="שיעור הנכסים המועבר לטיפול GREEN" value={portionLabels[formData.managedPortion]} even />
+          <View style={{
+            flexDirection: 'row-reverse',
+            backgroundColor: C.surface,
+            paddingVertical: 5,
+            paddingHorizontal: 10,
+            borderTopWidth: 0.5,
+            borderTopColor: C.gold,
+            marginTop: 4,
+          }}>
+            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
+              שיעור הנכסים המועבר לטיפול GREEN
+            </Text>
+            <Text style={{ fontSize: 9, color: C.black }}>{portionLabels[formData.managedPortion]}</Text>
           </View>
         )}
 
