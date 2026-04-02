@@ -227,13 +227,13 @@ export const SectorCard = ({ title, total, items, notes }) => (
       {items.map(([label, value], i) => (
         <View key={i} style={{
           flexDirection: 'row-reverse',
-          justifyContent: 'space-between',
+          alignItems: 'center',
           borderTopWidth: 0.5,
           borderTopColor: C.border,
           paddingVertical: 3,
         }}>
-          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>{label}</Text>
-          <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.black }}>{value}</Text>
+          <Text style={{ flex: 1, fontSize: 8, color: C.muted, textAlign: 'right' }}>{label}</Text>
+          <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.black, textAlign: 'left', minWidth: 70 }}>{value}</Text>
         </View>
       ))}
       {notes && (

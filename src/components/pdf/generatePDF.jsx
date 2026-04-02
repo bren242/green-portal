@@ -179,8 +179,8 @@ const KYCDocument = ({ formData, user }) => {
           {isCouple ? (
             <View style={{ marginTop: 16, flexDirection: 'row', gap: 8 }}>
               {[
-                { client: formData.clientA, title: 'לקוח א׳' },
                 { client: formData.clientB, title: 'לקוח ב׳' },
+                { client: formData.clientA, title: 'לקוח א׳' },
               ].map(({ client, title }, i) => (
                 <View key={i} style={{
                   flex: 1,
@@ -277,8 +277,16 @@ const KYCDocument = ({ formData, user }) => {
 
         </View>
 
+        {/* Separator */}
+        <View style={{
+          borderTopWidth: 1,
+          borderTopColor: C.gold,
+          marginTop: 16,
+          marginBottom: 12,
+        }} />
+
         {/* Two summary boxes side-by-side */}
-        <View style={{ flexDirection: 'row-reverse', marginTop: 6, gap: 8 }} wrap={false}>
+        <View style={{ flexDirection: 'row-reverse', gap: 8 }} wrap={false}>
           <BalanceBox
             title="סיכום מאזן"
             rows={[
@@ -330,7 +338,7 @@ const KYCDocument = ({ formData, user }) => {
           </View>
         )}
         {formData.investmentGoalOther && <LabelValue label="פירוט" value={formData.investmentGoalOther} />}
-        <LabelValue label="אופק השקעה" value={horizonLabels[formData.investmentHorizon] || '---'} even />
+        <LabelValue label="אופק השקעה" value={horizonLabels[formData.investmentHorizon] ? `\u202A${horizonLabels[formData.investmentHorizon]}\u202C` : '---'} even />
 
         {/* ── Liquidity ───────────────────────────────────── */}
         <SectionGap />
@@ -436,11 +444,12 @@ const KYCDocument = ({ formData, user }) => {
         ]} />
 
         {/* ── Declarations & Signatures ───────────────────── */}
+        <View wrap={false}>
         <SectionGap />
         <SectionTitle>הצהרות וחתימות</SectionTitle>
 
         {/* Client declaration */}
-        <View wrap={false}>
+        <View>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הצהרת הלקוח</Text>
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
             {`אני הח"מ ${clientName} מצהיר בזאת כי המידע המופיע לעיל הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים. כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי עותק של מסמך זה.`}
@@ -490,6 +499,8 @@ const KYCDocument = ({ formData, user }) => {
           <SignatureLine label="חתימת בעל הרישיון:" />
           <DateLine date={date} />
         </View>
+
+        </View>{/* end wrap={false} declarations wrapper */}
 
       </Page>
     </Document>
