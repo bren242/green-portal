@@ -8,7 +8,7 @@ import {
   PageHeader, PageFooter, SectionTitle, SectionGap,
   LabelValue, DataTable, SummaryRow, SummaryCard,
   PillTag, RiskGauge, PolicyCube, GoldBox,
-  ClientCard, BalanceBox,
+  ClientCard, BalanceBox, SignatureLine, DateLine,
   fmtMoney, parseAmount, translateMarital, fmtDate,
 } from './PDFTemplate'
 
@@ -256,7 +256,7 @@ const KYCDocument = ({ formData, user }) => {
 
         {formData.managedPortion && (
           <View style={{ marginTop: 8 }}>
-            <LabelValue label="שיעור נכסים מנוהל" value={portionLabels[formData.managedPortion]} even />
+            <LabelValue label="שיעור הנכסים המועבר לטיפול GREEN" value={portionLabels[formData.managedPortion]} even />
           </View>
         )}
 
@@ -294,15 +294,10 @@ const KYCDocument = ({ formData, user }) => {
             ['תחושה — גישה לתנודות', q2Labels[formData.riskQ2] || '---'],
             ['תרחיש — ירידה חדה', q3Labels[formData.riskQ3] || '---'],
             ['עדיפות — מטרה מרכזית', q4Labels[formData.riskQ4] || '---'],
+            ['ניסיון קודם בשוק ההון', formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')],
+            ['פירוט ניסיון', formData.priorExperienceDetails || '---'],
           ]}
         />
-
-        {formData.priorExperience && (
-          <View style={{ marginTop: 6 }}>
-            <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : 'לא'} even />
-            {formData.priorExperienceDetails && <LabelValue label="פירוט" value={formData.priorExperienceDetails} />}
-          </View>
-        )}
 
         {/* ── Advisor Summary & Policy ────────────────────── */}
         <SectionGap />
@@ -409,32 +404,34 @@ const KYCDocument = ({ formData, user }) => {
           {isCouple ? (
             <View style={{ flexDirection: 'row-reverse', marginTop: 4 }}>
               <View style={{ flex: 1, marginLeft: 6 }}>
-                <Text style={{ fontSize: 10, textAlign: 'right', color: C.black }}>חתימת הלקוח ({formData.clientA.fullName}): X _______________</Text>
-                <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+                <SignatureLine label={`חתימת הלקוח (${formData.clientA.fullName}):`} />
+                <DateLine date={date} />
               </View>
               <View style={{ flex: 1, marginRight: 6 }}>
-                <Text style={{ fontSize: 10, textAlign: 'right', color: C.black }}>חתימת הלקוח ({formData.clientB.fullName}): X _______________</Text>
-                <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+                <SignatureLine label={`חתימת הלקוח (${formData.clientB.fullName}):`} />
+                <DateLine date={date} />
               </View>
             </View>
           ) : (
             <View style={{ marginTop: 4 }}>
-              <Text style={{ fontSize: 10, textAlign: 'right', color: C.black }}>חתימת הלקוח: X _______________</Text>
-              <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+              <SignatureLine label="חתימת הלקוח:" />
+              <DateLine date={date} />
             </View>
           )}
         </View>
 
         {/* Refusals block */}
         {formData.refusals && formData.refusals.length > 0 && (
-          <View style={{ backgroundColor: C.offWhite, borderWidth: 1.5, borderColor: C.negative, borderRadius: 4, padding: 10, marginTop: 16 }} wrap={false}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.negative, textAlign: 'right', marginBottom: 4 }}>הלקוח סירב להשיב על:</Text>
+          <View style={{ borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 12, marginTop: 20 }} wrap={false}>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הלקוח סירב להשיב על:</Text>
             {formData.refusals.map((r, i) => (
-              <Text key={i} style={{ fontSize: 9, color: C.black, textAlign: 'right', marginBottom: 2 }}>• {r.label}</Text>
+              <Text key={i} style={{ fontSize: 9, color: C.black, textAlign: 'right', marginBottom: 3 }}>• {r.label}</Text>
             ))}
-            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 6 }}>הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.</Text>
-            <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 8, color: C.black }}>חתימה על הסירובים: X _______________</Text>
-            <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 8 }}>
+              הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.
+            </Text>
+            <SignatureLine label="חתימה על הסירובים:" />
+            <DateLine date={date} />
           </View>
         )}
 
@@ -444,8 +441,8 @@ const KYCDocument = ({ formData, user }) => {
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
             {`אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק.`}
           </Text>
-          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 4, color: C.black }}>חתימת בעל הרישיון: _______________</Text>
-          <Text style={{ fontSize: 10, textAlign: 'right', marginTop: 6, color: C.black }}>תאריך: {date}</Text>
+          <SignatureLine label="חתימת בעל הרישיון:" />
+          <DateLine date={date} />
         </View>
 
       </Page>

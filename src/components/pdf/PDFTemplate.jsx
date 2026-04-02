@@ -274,12 +274,28 @@ export const BalanceBox = ({ title, rows, highlightLabel, highlightValue }) => (
   </View>
 )
 
+// ── Signature Line (RTL: label right, writing line left) ───────
+export const SignatureLine = ({ label }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 10 }}>
+    <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>X {label}</Text>
+    <View style={{ width: 200, borderBottomWidth: 1, borderBottomColor: C.primary, marginRight: 8, marginBottom: 1 }} />
+  </View>
+)
+
+// ── Date Line ──────────────────────────────────────────────────
+export const DateLine = ({ date }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 6 }}>
+    <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>תאריך:</Text>
+    <Text style={{ fontSize: 10, color: C.black, marginRight: 8 }}>{date}</Text>
+  </View>
+)
+
 // ── Helpers ─────────────────────────────────────────────────────
 export function fmtMoney(val) {
   if (!val) return '---'
   const num = parseFloat(String(val).replace(/[^\d.-]/g, ''))
-  if (isNaN(num)) return String(val).includes('₪') ? String(val) : `₪ ${val}`
-  return `₪ ${num.toLocaleString('he-IL')}`
+  if (isNaN(num)) return String(val).includes('₪') ? String(val) : `₪${val}`
+  return `₪${num.toLocaleString('he-IL')}`
 }
 
 export function parseAmount(str) {
