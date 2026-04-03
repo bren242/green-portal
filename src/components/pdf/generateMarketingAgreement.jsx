@@ -752,96 +752,88 @@ const BlankMarketingAgreementDoc = () => (
     <Page size="A4" style={pageStyle}>
       <BlankHeader />
 
-      {/* Company header info */}
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 6, marginTop: 4 }}>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
-            גרין סוכנות לביטוח פנסיוני
-          </Text>
-          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
-            ושיווק השקעות (2024) בע"מ,
-          </Text>
-          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
-            מקבוצת אגם לידרים והפניקס
-          </Text>
-          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
-            חברה לביטוח
-          </Text>
+      {/* Advisor table — 4 columns matching Word: company name (merged) | שם המשווק | ת.ז | מס רישיון */}
+      <View style={{ borderWidth: 0.5, borderColor: C.border, marginBottom: 14, marginTop: 4 }}>
+        {/* Header row */}
+        <View style={{ flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: C.border }}>
+          <View style={{ width: '22%', borderLeftWidth: 0.5, borderLeftColor: C.border, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', textAlign: 'right', direction: 'rtl' }}>מס רישיון</Text>
+          </View>
+          <View style={{ width: '20%', borderLeftWidth: 0.5, borderLeftColor: C.border, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', textAlign: 'right', direction: 'rtl' }}>ת.ז</Text>
+          </View>
+          <View style={{ width: '26%', borderLeftWidth: 0.5, borderLeftColor: C.border, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', textAlign: 'right', direction: 'rtl' }}>שם המשווק</Text>
+          </View>
+          <View style={{ width: '32%', paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', textAlign: 'right', direction: 'rtl' }}>גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ,</Text>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', textAlign: 'right', direction: 'rtl' }}>מקבוצת אגם לידרים והפניקס חברה לביטוח</Text>
+          </View>
         </View>
-      </View>
-
-      {/* Advisor row — blank */}
-      <View style={{
-        flexDirection: 'row',
-        borderWidth: 1,
-        borderColor: C.primary,
-        marginBottom: 14,
-      }}>
-        <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
-          <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted, direction: 'rtl' }}>מס רישיון</Text>
-          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
-        </View>
-        <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
-          <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted, direction: 'rtl' }}>ת.ז</Text>
-          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
-        </View>
-        <View style={{ flex: 2, paddingVertical: 4, paddingHorizontal: 6 }}>
-          <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted, direction: 'rtl' }}>שם המשווק</Text>
-          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+        {/* Data row — blank */}
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ width: '22%', borderLeftWidth: 0.5, borderLeftColor: C.border, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+          </View>
+          <View style={{ width: '20%', borderLeftWidth: 0.5, borderLeftColor: C.border, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+          </View>
+          <View style={{ width: '26%', borderLeftWidth: 0.5, borderLeftColor: C.border, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+          </View>
+          <View style={{ width: '32%', paddingVertical: 4, paddingHorizontal: 6 }} />
         </View>
       </View>
 
       {/* Title */}
       <BlankTitle>הסכם שיווק השקעות</BlankTitle>
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 16, color: C.black }}>
-        {'שנערך ונחתם ב'}{BL}{' ביום '}{BLL}
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 16, color: C.black }}>
+        {'שנערך ונחתם ב____________ ביום __ בחודש___ 2026'}
       </Text>
 
       {/* בין */}
-      <Text style={{ fontSize: 11, textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>בין</Text>
+      <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>בין</Text>
 
-      {/* GREEN details */}
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+      {/* GREEN details — all bold, center, matching Word */}
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
         גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ
       </Text>
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
-        ח.פ 516415361 מס' רישיון 852
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+        {'ח.פ 516415361 מס\' רישיון  852'}
       </Text>
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
         ממגדל משה אביב, רחוב ז'בוטניסקי 7 רמת גן
       </Text>
-      <Text style={{ fontSize: 10, textAlign: 'right', direction: 'rtl', marginBottom: 2 }}>
-        דוא"ל
-      </Text>
-      <Text style={{ fontSize: 10, direction: 'ltr', textAlign: 'left', marginBottom: 2 }}>
-        INFO@GREENWM.CO.IL
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+        {'דוא"ל_'}
+        <Text style={{ direction: 'ltr' }}>INFO@GREENWM.CO.IL</Text>
       </Text>
       <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
-        (להלן – "גרין")
+        {'(להלן – "גרין")'}
       </Text>
-      <Text style={{ fontSize: 10, textAlign: 'right', direction: 'rtl', marginBottom: 10 }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'right', direction: 'rtl', marginBottom: 10 }}>
         מצד אחד;
       </Text>
 
       {/* לבין */}
-      <Text style={{ fontSize: 11, textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>לבין</Text>
+      <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>לבין</Text>
 
       {/* Client A */}
       <BlankClientTable idLabel="ת.ז /ח.פ" />
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 10 }}>
-        (להלן – "לקוח א'")
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 10 }}>
+        {'(להלן – "לקוח א\')'}
       </Text>
 
       {/* Client B */}
       <BlankClientTable idLabel="ת.ז" />
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 4 }}>
-        (להלן – "לקוח ב')
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 4 }}>
+        {'(להלן – "לקוח ב\')'}
       </Text>
-      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>
-        (להלן לקוח א' ולקוח ב', אלא אם נקבע במפורש אחרת – "הלקוח")
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>
+        {'(להלן לקוח א\' ולקוח ב\', אלא אם נקבע במפורש אחרת – "הלקוח")'}
       </Text>
 
-      <Text style={{ fontSize: 10, textAlign: 'right', direction: 'rtl', marginBottom: 10 }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'right', direction: 'rtl', marginBottom: 10, textDecoration: 'underline' }}>
         מצד שני;
       </Text>
 
@@ -978,9 +970,9 @@ const BlankMarketingAgreementDoc = () => (
         {'15.3 כל הודעה שנשלחה בין הצדדים לפי הכתובות בכותרת הסכם זה, תיחשב כאילו הגיעה ליעדה, בתוך 3 ימי עסקים ממועד המשלוח באמצעת דואר רשום ו/או בתוך יום עסקים אחד לאחר שנשלחה בדוא"ל או נמסרה במסירה ידנית. לעניין הלקוח, אלא אם נקבע אחרת, מסירה לכל אחד מיחידי הלקוח תיחשב כמסירה למשנהו.'}
       </BPara>
 
-      <BPara style={{ marginTop: 12, marginBottom: 8, fontWeight: 'bold' }}>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginTop: 12, marginBottom: 8, color: C.black }}>
         ולראיה באו הצדדים על החתום:
-      </BPara>
+      </Text>
 
       {/* 3 signatures — space-between, 160pt each */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 16 }}>
