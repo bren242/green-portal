@@ -110,8 +110,8 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
   return (
     <div className="max-w-2xl mx-auto">
       {/* Header with client info */}
-      <div className="bg-white rounded-card shadow-card border border-border/50 p-5 mb-5">
-        <div className="flex items-center justify-between flex-row-reverse">
+      <div className="bg-white rounded-card shadow-card border border-border/50 p-5 mb-5" dir="rtl">
+        <div className="flex items-center justify-between">
           <div className="text-right">
             <h2 className="text-lg font-extrabold text-green-primary">
               {session.clientA.fullName || 'לקוח'}
