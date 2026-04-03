@@ -1,513 +1,555 @@
 import React from 'react'
-import { Document, Page, Text, View, Image, pdf } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
-import {
-  C, coverPageStyle, contentPageStyle,
-  PageHeader, PageFooter, SectionTitle, SectionGap,
-  GoldBox, SignatureLine, DateLine, RiskGauge,
-  fmtDate,
-} from './PDFTemplate'
 
-// ── Local Components ──────────────────────────────────────────
+// ── Font (same registration as PDFTemplate) ───────────────────
+Font.register({
+  family: 'Assistant',
+  fonts: [
+    { src: '/fonts/Assistant-Regular.ttf', fontWeight: 'normal' },
+    { src: '/fonts/Assistant-Bold.ttf', fontWeight: 'bold' },
+  ],
+})
+Font.registerHyphenationCallback((word) => [word])
 
-const BlankLine = ({ width = 160 }) => (
-  <View style={{ borderBottomWidth: 1, borderBottomColor: C.primary, width, marginVertical: 3 }} />
+// ── Colors ────────────────────────────────────────────────────
+const C = {
+  primary: '#1B3A2F',
+  black: '#1A1A1A',
+  muted: '#5A5A5A',
+  line: '#CCCCCC',
+  bg: '#F8F8F8',
+  gold: '#B8975A',
+  white: '#FFFFFF',
+}
+
+// ── Regulatory Texts ──────────────────────────────────────────
+const REG_TEXTS = [
+  'משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות תשנ״ה-1995 (להלן: "החוק"), להתאים, ככל האפשר, את השירותים שמשווק ההשקעות נותן ללקוח לצרכיו ולהנחיותיו של הלקוח וזאת לאחר שמשווק ההשקעות בירר עם הלקוח את מטרות ההשקעה, את מצבו הכספי לרבות ניירות הערך והנכסים הפיננסיים של הלקוח, ואת שאר הנסיבות הרלוונטיות לעניין זה.',
+  'ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון שלהלן יסייע למשווק ההשקעות להתאים בצורה המיטבית האפשרית את אופי השקעותיו לצרכיו המיוחדים של הלקוח. אי מסירת פרטים או מסירת פרטים חלקית עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לצרכי הלקוח.',
+  'ידוע ללקוח כי קיימת חשיבות לעדכן את משווק ההשקעות בכל שינוי שיחול ביחס לפרטים שמסר במסגרת מסמך זה. משווק ההשקעות הבהיר ללקוח כי כל פרט שהלקוח מוסר למשווק ההשקעות ישמר בסודיות על ידי משווק ההשקעות אך סודיות זו כפופה לחובת משווק ההשקעות למסור ידיעות על פי כל דין.',
+  'הלקוח מצהיר כי הוא מודע לכך שהשקעות בשוק ההון כרוכות בסיכון, וכי אין בתשואות עבר כדי להבטיח תשואות עתידיות.',
+]
+
+// ── Page style ────────────────────────────────────────────────
+const pageStyle = {
+  fontFamily: 'Assistant',
+  direction: 'rtl',
+  paddingTop: 30,
+  paddingBottom: 36,
+  paddingHorizontal: 36,
+  fontSize: 11,
+  color: C.black,
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOCAL COMPONENTS
+// ══════════════════════════════════════════════════════════════
+
+const SecTitle = ({ children }) => (
+  <Text style={{
+    fontSize: 12, fontWeight: 'bold', color: C.primary,
+    textAlign: 'right', borderBottomWidth: 1.5,
+    borderBottomColor: C.primary, paddingBottom: 4,
+    marginBottom: 14, marginTop: 18,
+  }}>{children}</Text>
 )
 
-const FieldRow = ({ label, wide = false }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 8 }}>
-    <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.muted, textAlign: 'right', width: wide ? 120 : 80 }}>
-      {label}
-    </Text>
-    <BlankLine width={wide ? 200 : 160} />
+const Field = ({ label, width = 160 }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 12 }}>
+    <Text style={{ fontSize: 10, color: C.muted, marginLeft: 8, minWidth: 90, textAlign: 'right' }}>{label}</Text>
+    <View style={{ width, borderBottomWidth: 1, borderBottomColor: C.black, height: 18 }} />
   </View>
 )
 
-const CheckOption = ({ label, score }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 5 }}>
-    <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 6 }} />
-    <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', flex: 1 }}>{label}</Text>
+const FieldRow2 = ({ right, left }) => (
+  <View style={{ flexDirection: 'row-reverse', marginBottom: 12 }}>
+    <View style={{ flex: 1, marginLeft: 12 }}><Field label={right} width={140} /></View>
+    <View style={{ flex: 1 }}><Field label={left} width={140} /></View>
+  </View>
+)
+
+const Check = ({ label, score }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 9 }}>
+    <View style={{ width: 13, height: 13, borderWidth: 1.5, borderColor: C.black, marginLeft: 8 }} />
+    <Text style={{ fontSize: 10, color: C.black, flex: 1, textAlign: 'right' }}>{label}</Text>
     {score !== undefined && (
-      <Text style={{ fontSize: 8, color: C.muted, marginRight: 8 }}>({score} נק׳)</Text>
+      <Text style={{ fontSize: 9, color: C.muted, marginRight: 6 }}>({score} נק׳)</Text>
     )}
   </View>
 )
 
-const QuestionBlock = ({ num, question, options }) => (
-  <View style={{ marginBottom: 14 }} wrap={false}>
-    <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
-      {num}. {question}
-    </Text>
-    {options.map(({ label, score }, i) => (
-      <CheckOption key={i} label={label} score={score} />
+const WriteLines = ({ count = 3 }) => (
+  <View>
+    {Array.from({ length: count }).map((_, i) => (
+      <View key={i} style={{ borderBottomWidth: 1, borderBottomColor: C.line, height: 24, marginBottom: 6 }} />
     ))}
   </View>
 )
 
-const BlankSector = ({ title, rows }) => (
+const TR = ({ cells, isHeader }) => (
   <View style={{
-    width: '48%', borderWidth: 1, borderColor: C.gold,
-    borderRadius: 4, marginBottom: 8, overflow: 'hidden',
-  }} wrap={false}>
-    <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
-      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{title}</Text>
-    </View>
-    <View style={{ backgroundColor: C.white, padding: 10 }}>
-      <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginBottom: 4 }}>סה״כ:</Text>
-      <BlankLine width={100} />
-      <View style={{ marginTop: 6 }}>
-        {rows.map((label, i) => (
-          <View key={i} style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', borderTopWidth: 0.5, borderTopColor: C.border, paddingVertical: 3 }}>
-            <Text style={{ fontSize: 8, color: C.muted }}>{label}</Text>
-            <BlankLine width={70} />
-          </View>
-        ))}
-      </View>
+    flexDirection: 'row-reverse',
+    borderBottomWidth: 0.5, borderBottomColor: C.line,
+    paddingVertical: 6, paddingHorizontal: 4,
+    backgroundColor: isHeader ? C.white : undefined,
+  }}>
+    {cells.map((cell, i) => (
+      <Text key={i} style={{
+        flex: i === 2 ? 2 : 1, fontSize: isHeader ? 9 : 10,
+        fontWeight: isHeader ? 'bold' : 'normal',
+        color: C.black, textAlign: 'right',
+      }}>{cell}</Text>
+    ))}
+  </View>
+)
+
+const BlankField = ({ width = 80 }) => (
+  <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width, height: 16, marginVertical: 2 }} />
+)
+
+const Sep = () => (
+  <View style={{ borderTopWidth: 1, borderTopColor: C.line, marginVertical: 14 }} />
+)
+
+const PageNum = () => (
+  <Text
+    style={{ position: 'absolute', bottom: 14, left: 0, right: 0, textAlign: 'center', fontSize: 7, color: C.muted }}
+    render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+    fixed
+  />
+)
+
+const SimpleHeader = () => (
+  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: C.gold }}>
+    <Image src={logoPng} style={{ height: 30 }} />
+    <View style={{ flex: 1, alignItems: 'flex-end' }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary }}>GREEN Wealth Management</Text>
     </View>
   </View>
 )
 
-// ── Questionnaire Data ────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+//  DOCUMENT
+// ══════════════════════════════════════════════════════════════
 
-const QUESTIONS = [
-  {
-    num: 1,
-    question: 'אסימטריה — סיכוי מול סיכון: מהי התשואה המקסימלית שאתה מצפה לה, ומהו ההפסד המקסימלי שאתה מוכן לספוג?',
-    options: [
-      { label: 'א. סיכוי עד 6%, סיכון עד 5%', score: 1 },
-      { label: 'ב. סיכוי עד 14%, סיכון עד 10%', score: 2 },
-      { label: 'ג. סיכוי עד 20%, סיכון עד 15%', score: 3 },
-      { label: 'ד. סיכוי מעל 20%, סיכון מעל 15%', score: 5 },
-    ],
-  },
-  {
-    num: 2,
-    question: 'תחושה — גישה לתנודות: כיצד אתה מרגיש לגבי תנודות בשוק ההון?',
-    options: [
-      { label: 'א. מעדיף לישון בשקט — תנודות מטרידות אותי', score: 1 },
-      { label: 'ב. מוכן לתנודות לטובת תשואה גבוהה יותר', score: 3 },
-      { label: 'ג. משקיע לטווח ארוך — תנודות לא מדאיגות אותי', score: 5 },
-    ],
-  },
-  {
-    num: 3,
-    question: 'תרחיש — ירידה חדה: אם ירד תיק ההשקעות שלך ב-15% תוך חודש, מה תעשה?',
-    options: [
-      { label: 'א. רוצה לצאת ולהגן על מה שנשאר', score: 1 },
-      { label: 'ב. שוקל לצמצם סיכון', score: 2 },
-      { label: 'ג. מחזיק ומחכה להתאוששות', score: 3 },
-      { label: 'ד. רואה הזדמנות להוסיף להשקעה', score: 5 },
-    ],
-  },
-  {
-    num: 4,
-    question: 'עדיפות — מטרה מרכזית: מהי המטרה העיקרית שלך מתיק ההשקעות?',
-    options: [
-      { label: 'א. לא להפסיד כסף בשום מקרה', score: 1 },
-      { label: 'ב. לשמור על ערך הכסף מעל אינפלציה', score: 3 },
-      { label: 'ג. צמיחה לטווח ארוך גם במחיר תנודתיות', score: 5 },
-    ],
-  },
-]
+const BlankDocument = () => (
+  <Document>
 
-const RISK_TABLE = [
-  { range: 'פחות מ-2', level: 1, name: 'שמרן', maxLoss: 'עד 5%', maxStocks: '0%' },
-  { range: '2 עד 3', level: 2, name: 'שמרן-מתון', maxLoss: 'עד 10%', maxStocks: 'עד 15%' },
-  { range: '3 עד 3.8', level: 3, name: 'מאוזן', maxLoss: 'עד 15%', maxStocks: 'עד 25%' },
-  { range: '3.8 עד 4.5', level: 4, name: 'צמיחה', maxLoss: 'מעל 15%', maxStocks: 'עד 35%' },
-  { range: '4.5 ומעלה', level: 5, name: 'אגרסיבי', maxLoss: 'משמעותי', maxStocks: 'עד 100%' },
-]
+    {/* ═══════════════════ PAGE 1: COVER ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <SimpleHeader />
+      <PageNum />
 
-const BLANK_SECTORS = [
-  { title: 'הכנסות (חודשי)', rows: ['שכר נטו חודשי', 'פנסיה / קצבה', 'הכנסות מנדל״ן', 'אחר'] },
-  { title: 'עו״ש, מזומן ופקדונות', rows: ['עו״ש / מזומן', 'פקדונות בנקאיים', 'קרנות כספיות'] },
-  { title: 'ני״ע בארץ ובחו״ל', rows: ['תיק מנוהל', 'מניות / אג״ח', 'ETF', 'ברוקר זר'] },
-  { title: 'חיסכון, גמל והשתלמות', rows: ['קרן השתלמות', 'קופת גמל', 'גמל להשקעה', 'פוליסת חיסכון'] },
-  { title: 'פנסיה וביטוח מנהלים', rows: ['קרן פנסיה', 'ביטוח מנהלים'] },
-  { title: 'נדל״ן', rows: ['נדל״ן להשקעה', 'נדל״ן מגורים'] },
-  { title: 'התחייבויות', rows: ['משכנתא (יתרה)', 'משכנתא (חודשי)', 'הלוואות (יתרה)', 'הוצאות שוטפות'] },
-]
+      <View style={{ alignItems: 'center', marginTop: 6, marginBottom: 4 }}>
+        <Text style={{ fontSize: 16, fontWeight: 'bold', color: C.primary }}>אפיון צרכים והתאמת מדיניות השקעה</Text>
+        <Text style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>טופס למילוי ידני</Text>
+      </View>
 
-// ════════════════════════════════════════════════════════════════
-//  BLANK DOCUMENT
-// ════════════════════════════════════════════════════════════════
-const BlankDocument = () => {
-  const date = '___/___/______'
+      <SecTitle>פרטי המשווק</SecTitle>
+      <FieldRow2 right="שם המשווק:" left="מספר רישיון:" />
+      <FieldRow2 right="ת.ז:" left="תאריך פגישה:" />
 
-  return (
-    <Document>
+      <SecTitle>פרטי לקוח א׳</SecTitle>
+      <FieldRow2 right="שם מלא:" left="ת.ז:" />
+      <FieldRow2 right="תאריך לידה:" left="מצב משפחתי:" />
+      <FieldRow2 right="טלפון:" left="דוא״ל:" />
+      <FieldRow2 right="עיסוק:" left="נפשות תלויות:" />
 
-      {/* ═══════════════════ PAGE 1: COVER ═══════════════════ */}
-      <Page size="A4" style={coverPageStyle}>
-        <View>
-          <View style={{ height: 60, backgroundColor: C.white, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, borderBottomWidth: 1, borderBottomColor: C.gold }}>
-            <Image src={logoPng} style={{ height: 36, width: 'auto' }} />
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-              <BlankLine width={140} />
-              <Text style={{ fontSize: 8, color: C.muted, marginTop: 2 }}>שם הלקוח</Text>
-            </View>
-          </View>
-          <View style={{ backgroundColor: C.primary, paddingVertical: 14, alignItems: 'center' }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', color: C.gold }}>
-              אפיון צרכים והתאמת מדיניות השקעה
-            </Text>
-            <Text style={{ fontSize: 10, color: C.goldLight, marginTop: 4 }}>טופס למילוי ידני</Text>
-          </View>
-        </View>
+      <SecTitle>פרטי לקוח ב׳ (אם רלוונטי)</SecTitle>
+      <FieldRow2 right="שם מלא:" left="ת.ז:" />
+      <FieldRow2 right="תאריך לידה:" left="מצב משפחתי:" />
+      <FieldRow2 right="טלפון:" left="דוא״ל:" />
+      <FieldRow2 right="עיסוק:" left="נפשות תלויות:" />
 
-        <View style={{ paddingHorizontal: 30, paddingTop: 16, paddingBottom: 80 }}>
-          {/* Advisor table */}
-          <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, borderTopLeftRadius: 3, borderTopRightRadius: 3, paddingVertical: 6, paddingHorizontal: 10 }}>
-            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>שם המשווק</Text>
-            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>תעודת זהות</Text>
-            <Text style={{ flex: 1, fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>מספר רישיון</Text>
-          </View>
-          <View style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 10, backgroundColor: C.surface, borderBottomLeftRadius: 3, borderBottomRightRadius: 3, borderWidth: 0.5, borderColor: C.border, borderTopWidth: 0 }}>
-            <View style={{ flex: 1 }}><BlankLine /></View>
-            <View style={{ flex: 1 }}><BlankLine /></View>
-            <View style={{ flex: 1 }}><BlankLine /></View>
-          </View>
-
-          {/* Client blocks */}
-          <View style={{ marginTop: 16, flexDirection: 'row-reverse', gap: 8 }}>
-            {['לקוח א׳', 'לקוח ב׳'].map((title, i) => (
-              <View key={i} style={{ flex: 1, backgroundColor: C.primary, borderRadius: 4, padding: 12 }}>
-                <Text style={{ fontSize: 8, color: C.gold, textAlign: 'right', marginBottom: 6 }}>{title}</Text>
-                <BlankLine width={120} />
-                <Text style={{ fontSize: 8, color: C.goldLight, textAlign: 'right', marginTop: 2 }}>שם מלא</Text>
-                <View style={{ marginTop: 6 }}>
-                  <BlankLine width={100} />
-                  <Text style={{ fontSize: 8, color: C.goldLight, textAlign: 'right', marginTop: 2 }}>ת.ז</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* Regulatory text */}
-          <GoldBox mt={20}>
-            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', lineHeight: 1.6 }}>
-              משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות תשנ״ה-1995, להתאים את השירותים לצרכי הלקוח לאחר בירור מטרות ההשקעה, מצבו הכספי ונסיבותיו הרלוונטיות.
-            </Text>
-            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', lineHeight: 1.6, marginTop: 4 }}>
-              ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון יסייע להתאמה מיטבית. אי מסירת פרטים עלולה לפגוע באיכות השירות.
-            </Text>
-          </GoldBox>
-        </View>
-
-        <View style={{ position: 'absolute', bottom: 30, left: 0, right: 0, alignItems: 'center' }}>
-          <Text style={{ fontSize: 9, color: C.muted }}>כל הנתונים נמסרו על ידי הלקוח ובאחריותו</Text>
-        </View>
-        <PageFooter />
-      </Page>
-
-      {/* ═══════════════════ PAGE 2: PERSONAL + FINANCIAL ═══════════════════ */}
-      <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName="________________" date={date} docTitle="________________" />
-        <PageFooter />
-
-        <SectionTitle>פרטים מזהים</SectionTitle>
-        <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
-          {['לקוח א׳', 'לקוח ב׳'].map((title, i) => (
-            <View key={i} style={{ width: '49%', borderWidth: 0.5, borderColor: C.border, borderRadius: 4, minHeight: 160 }}>
-              <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
-                <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{title}</Text>
-              </View>
-              <View style={{ padding: 8 }}>
-                {['שם מלא', 'ת.ז.', 'תאריך לידה', 'מצב משפחתי', 'נפשות תלויות', 'טלפון', 'דוא״ל', 'עיסוק'].map((field, j) => (
-                  <View key={j} style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 5 }}>
-                    <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.muted, width: 70, textAlign: 'right' }}>{field}</Text>
-                    <BlankLine width={80} />
-                  </View>
-                ))}
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <SectionGap />
-        <SectionTitle>תמונה כלכלית — התא המשפחתי</SectionTitle>
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-          {BLANK_SECTORS.map((sec, i) => (
-            <BlankSector key={i} title={sec.title} rows={sec.rows} />
-          ))}
-        </View>
-
-        {/* Balance summary */}
-        <View style={{ borderTopWidth: 1, borderTopColor: C.gold, marginTop: 16, marginBottom: 12 }} />
-        <View style={{ flexDirection: 'row-reverse', gap: 8 }} wrap={false}>
-          {[
-            { title: 'סיכום מאזן', rows: ['סך נכסים', 'סך התחייבויות', 'שווי נטו'] },
-            { title: 'מאזן חודשי', rows: ['סך הכנסות', 'סך הוצאות', 'מאזן חודשי'] },
-          ].map((box, i) => (
-            <View key={i} style={{ flex: 1, borderWidth: 1, borderColor: C.gold, borderRadius: 4, overflow: 'hidden' }}>
-              <View style={{ backgroundColor: C.primary, paddingVertical: 4, paddingHorizontal: 8 }}>
-                <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>{box.title}</Text>
-              </View>
-              <View style={{ padding: 8 }}>
-                {box.rows.map((label, j) => (
-                  <View key={j} style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: 0.5, borderBottomColor: C.border }}>
-                    <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black }}>{label}</Text>
-                    <BlankLine width={80} />
-                  </View>
-                ))}
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {/* GREEN portion */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: C.surface, paddingVertical: 5, paddingHorizontal: 10, borderTopWidth: 0.5, borderTopColor: C.gold, marginTop: 4, borderRadius: 3 }}>
-          <BlankLine width={80} />
-          <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary }}>שיעור הנכסים המועבר לטיפול GREEN</Text>
-        </View>
-      </Page>
-
-      {/* ═══════════════════ PAGE 3: GOALS + LIQUIDITY + EXPERIENCE ═══════════════════ */}
-      <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName="________________" date={date} docTitle="________________" />
-        <PageFooter />
-
-        <SectionTitle>מטרות השקעה ואופק</SectionTitle>
-        <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right', marginBottom: 8 }}>סמן את כל המטרות הרלוונטיות:</Text>
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-          {['שמירת ערך', 'הכנסה שוטפת', 'צמיחה לטווח ארוך', 'חיסכון לפנסיה', 'חינוך ילדים', 'העברה בין-דורית', 'אחר'].map((goal, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 4 }}>
-              <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 6 }} />
-              <Text style={{ fontSize: 9, color: C.black }}>{goal}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 16 }}>
-          <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.muted, marginLeft: 8 }}>אופק השקעה:</Text>
-          {['עד שנתיים', 'שנתיים עד 5', 'שנים 5–10', 'מעל 10 שנים'].map((opt, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginLeft: 12 }}>
-              <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 4 }} />
-              <Text style={{ fontSize: 8, color: C.black }}>{opt}</Text>
-            </View>
-          ))}
-        </View>
-
-        <SectionGap />
-        <SectionTitle>צרכי נזילות</SectionTitle>
-
-        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
-          מתי תצטרך את כל הכסף?
-        </Text>
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-          {['עד שנתיים', 'שנתיים עד 5', 'מעל 5 שנים', 'לא ידוע'].map((opt, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginLeft: 12 }}>
-              <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 4 }} />
-              <Text style={{ fontSize: 8, color: C.black }}>{opt}</Text>
-            </View>
-          ))}
-        </View>
-
-        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
-          כמה תצטרך ב-3 שנים הקרובות?
-        </Text>
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-          {['0%', 'עד 30%', 'עד 50%', 'מעל 50%', 'לא ידוע'].map((opt, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginLeft: 12 }}>
-              <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 4 }} />
-              <Text style={{ fontSize: 8, color: C.black }}>{opt}</Text>
-            </View>
-          ))}
-        </View>
-
-        <SectionGap />
-        <SectionTitle>ניסיון קודם בשוק ההון</SectionTitle>
-        <View style={{ flexDirection: 'row-reverse', gap: 20, marginBottom: 8 }}>
-          {['כן', 'לא'].map((opt, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center' }}>
-              <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 6 }} />
-              <Text style={{ fontSize: 9, color: C.black }}>{opt}</Text>
-            </View>
-          ))}
-        </View>
-        <FieldRow label="פירוט:" wide />
-      </Page>
-
-      {/* ═══════════════════ PAGE 4: RISK QUESTIONNAIRE ═══════════════════ */}
-      <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName="________________" date={date} docTitle="________________" />
-        <PageFooter />
-
-        <SectionTitle>הערכת סיכון — שאלון</SectionTitle>
-        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginBottom: 12 }}>
-          סמן תשובה אחת לכל שאלה. הניקוד מחושב אוטומטית בטבלה בעמוד הבא.
-        </Text>
-
-        {QUESTIONS.map((q, i) => (
-          <QuestionBlock key={i} num={q.num} question={q.question} options={q.options} />
+      {/* Regulatory box */}
+      <View style={{ borderWidth: 1, borderColor: C.primary, borderRadius: 4, padding: 10, marginTop: 14 }}>
+        {REG_TEXTS.map((txt, i) => (
+          <Text key={i} style={{ fontSize: 8.5, textAlign: 'right', lineHeight: 1.6, color: C.black, marginTop: i > 0 ? 4 : 0 }}>{txt}</Text>
         ))}
+      </View>
+    </Page>
 
-        <SectionGap />
-        <SectionTitle>טבלת ניקוד וחישוב דרגת סיכון</SectionTitle>
+    {/* ═══════════════════ PAGE 2: FINANCIAL ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <SimpleHeader />
+      <PageNum />
 
-        {/* Risk score table */}
-        <View style={{ borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden', marginBottom: 12 }}>
-          <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 8 }}>
-            <Text style={{ flex: 1, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>ממוצע ניקוד</Text>
-            <Text style={{ flex: 1, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>דרגת סיכון</Text>
-            <Text style={{ flex: 1, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>שם</Text>
-            <Text style={{ flex: 1, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>הפסד מקס׳</Text>
-            <Text style={{ flex: 1, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>מניות מקס׳</Text>
-          </View>
-          {RISK_TABLE.map((row, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', paddingVertical: 5, paddingHorizontal: 8, backgroundColor: i % 2 === 0 ? C.surface : C.white, borderTopWidth: 0.5, borderTopColor: C.border }}>
-              <Text style={{ flex: 1, fontSize: 8, textAlign: 'right', color: C.black }}>{row.range}</Text>
-              <Text style={{ flex: 1, fontSize: 8, textAlign: 'right', fontWeight: 'bold', color: C.primary }}>{row.level}</Text>
-              <Text style={{ flex: 1, fontSize: 8, textAlign: 'right', color: C.black }}>{row.name}</Text>
-              <Text style={{ flex: 1, fontSize: 8, textAlign: 'right', color: C.black }}>{row.maxLoss}</Text>
-              <Text style={{ flex: 1, fontSize: 8, textAlign: 'right', color: C.black }}>{row.maxStocks}</Text>
-            </View>
+      <SecTitle>תמונה כלכלית — התא המשפחתי</SecTitle>
+
+      {/* Financial table */}
+      <TR cells={['סקטור', 'סה״כ (₪)', 'פירוט עיקרי']} isHeader />
+      {[
+        'הכנסות חודשיות',
+        'עו״ש, מזומן ופקדונות',
+        'ני״ע בארץ ובחו״ל',
+        'חיסכון, גמל והשתלמות',
+        'פנסיה וביטוח מנהלים',
+        'נדל״ן',
+        'אחר (עסק, שותפות)',
+        'התחייבויות (יתרה כוללת)',
+        'הוצאות חודשיות שוטפות',
+      ].map((label, i) => (
+        <View key={i} style={{
+          flexDirection: 'row-reverse',
+          borderBottomWidth: 0.5, borderBottomColor: C.line,
+          paddingVertical: 8, paddingHorizontal: 4,
+          backgroundColor: i % 2 === 0 ? C.bg : C.white,
+        }}>
+          <Text style={{ flex: 1, fontSize: 10, color: C.black, textAlign: 'right', fontWeight: 'bold' }}>{label}</Text>
+          <View style={{ flex: 1, justifyContent: 'flex-end' }}><BlankField width={80} /></View>
+          <View style={{ flex: 2, justifyContent: 'flex-end' }}><BlankField width={160} /></View>
+        </View>
+      ))}
+
+      <Sep />
+
+      {/* Two summary boxes side-by-side */}
+      <View style={{ flexDirection: 'row-reverse', marginBottom: 12 }}>
+        <View style={{ flex: 1, borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 8, marginLeft: 6 }}>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>סיכום מאזן</Text>
+          <Field label="סך נכסים:" width={120} />
+          <Field label="סך התחייבויות:" width={120} />
+          <Field label="שווי נטו:" width={120} />
+        </View>
+        <View style={{ flex: 1, borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 8, marginRight: 6 }}>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>מאזן חודשי</Text>
+          <Field label="סך הכנסות:" width={120} />
+          <Field label="סך הוצאות:" width={120} />
+          <Field label="מאזן חודשי:" width={120} />
+        </View>
+      </View>
+
+      {/* Managed portion */}
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginTop: 4 }}>
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginLeft: 12 }}>שיעור הנכסים המועבר לטיפול GREEN:</Text>
+        <Check label="עד 35%" />
+        <View style={{ width: 16 }} />
+        <Check label="35%-70%" />
+        <View style={{ width: 16 }} />
+        <Check label="מעל 70%" />
+      </View>
+    </Page>
+
+    {/* ═══════════════════ PAGE 3: GOALS + LIQUIDITY + EXPERIENCE ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <SimpleHeader />
+      <PageNum />
+
+      <SecTitle>מטרות השקעה</SecTitle>
+      <Text style={{ fontSize: 10, color: C.muted, textAlign: 'right', marginBottom: 8 }}>סמן את כל המטרות הרלוונטיות:</Text>
+      <Check label="שמירת ערך" />
+      <Check label="הכנסה שוטפת" />
+      <Check label="צמיחה לטווח ארוך" />
+      <Check label="חיסכון לפנסיה" />
+      <Check label="חינוך ילדים" />
+      <Check label="העברה בין-דורית" />
+      <Field label="אחר — פרט:" width={200} />
+
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginTop: 10, marginBottom: 8 }}>אופק השקעה:</Text>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap' }}>
+        <View style={{ width: '25%' }}><Check label="עד שנתיים" /></View>
+        <View style={{ width: '25%' }}><Check label="שנתיים עד 5" /></View>
+        <View style={{ width: '25%' }}><Check label="5–10 שנים" /></View>
+        <View style={{ width: '25%' }}><Check label="מעל 10 שנים" /></View>
+      </View>
+
+      <SecTitle>צרכי נזילות</SecTitle>
+
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>18. מתי תזדקק לכל הכסף שהשקעת? [שאלת חובה]</Text>
+      <Check label="א. בשנתיים הקרובות" />
+      <Check label="ב. בין 2-5 שנים" />
+      <Check label="ג. למעלה מ-5 שנים" />
+
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginTop: 10, marginBottom: 6 }}>19. לאיזה חלק מתיק ההשקעות תזדקק במהלך 3 השנים הקרובות? [שאלת חובה]</Text>
+      <Check label="א. 0% מהתיק" />
+      <Check label="ב. עד 30% מהתיק" />
+      <Check label="ג. עד 50% מהתיק" />
+      <Check label="ד. יותר מ-50% מהתיק" />
+
+      <SecTitle>ניסיון קודם בשוק ההון</SecTitle>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>23. האם נעזרת בעבר בשירותי מנהל/יועץ השקעות?</Text>
+      <View style={{ flexDirection: 'row-reverse' }}>
+        <View style={{ marginLeft: 24 }}><Check label="כן" /></View>
+        <Check label="לא" />
+      </View>
+      <Field label="אם כן, פרט:" width={260} />
+
+      {/* Risk-return explanation */}
+      <View style={{ borderWidth: 1, borderColor: C.line, borderRadius: 4, padding: 10, marginTop: 10 }}>
+        <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right', lineHeight: 1.5, fontWeight: 'bold' }}>
+          בעל הרישיון יסביר ללקוח את הקשר שבין סיכון לתשואה בתיק ההשקעות ובכלל זה יבהיר כי ככל שרמת הסיכון גבוהה יותר, כך גדל הסיכוי לתשואה גבוהה, אך במקביל גם קיים סיכון להפסד גבוה יותר לרבות אובדן חלק מהקרן.
+        </Text>
+      </View>
+    </Page>
+
+    {/* ═══════════════════ PAGE 4: RISK QUESTIONNAIRE ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <SimpleHeader />
+      <PageNum />
+
+      <SecTitle>הערכת סיכון — שאלון</SecTitle>
+      <Text style={{ fontSize: 10, color: C.muted, textAlign: 'right', marginBottom: 10 }}>סמן תשובה אחת לכל שאלה.</Text>
+
+      {/* Q1 */}
+      <View style={{ marginBottom: 14 }} wrap={false}>
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
+          20. אם שווי התיק שלך היה נופל ב-10% או יותר תוך זמן קצר, איך היית מגיב? [שאלת חובה]
+        </Text>
+        <Check label='א. אמכור מיד את כל אחזקותי. יהיה לי קשה להתמודד עם ההפסד.' score={1} />
+        <Check label='ב. אמכור חלק מהשקעה כדי לצמצם את הסיכון.' score={2} />
+        <Check label='ג. זה יקטין את נכסי, אך לא הפסד בעייתי בעיני.' score={3} />
+        <Check label='ד. בהשקעות לפעמים מפסידים ולפעמים מרוויחים, אין לי בעיה עם הפסד כזה.' score={5} />
+      </View>
+
+      {/* Q2 */}
+      <View style={{ marginBottom: 14 }} wrap={false}>
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
+          21. מהי רמת הסיכון שאתה מוכן לקחת כדי להשיג את יעדיך?
+        </Text>
+        <Check label='א. מוכן לקחת סיכון מוגבל, קטן ככל האפשר.' score={1} />
+        <Check label='ב. מוכן לקחת סיכון מסוים, אך לא גבוה.' score={3} />
+        <Check label='ג. מוכן לקחת סיכון גבוה עם סיכוי לרווח ניכר.' score={5} />
+      </View>
+
+      {/* Q3 */}
+      <View style={{ marginBottom: 14 }} wrap={false}>
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
+          22. כאשר השווקים הפיננסיים יורדים, מה סביר לצפות מתיק ההשקעות שלי?
+        </Text>
+        <Check label='א. שווי התיק עלול להיפגע, אך לא במידה ניכרת.' score={1} />
+        <Check label='ב. כשהשווקים יורדים גם שווי התיק יגלם את הירידות.' score={3} />
+        <Check label='ג. בתיק עם סיכונים צריך לצפות לירידות שווי, לעיתים אף משמעותיות.' score={5} />
+      </View>
+
+      {/* Q4 */}
+      <View style={{ marginBottom: 14 }} wrap={false}>
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>
+          אסימטריה — מהי התשואה המקסימלית שאתה מצפה לה ומהו ההפסד המקסימלי שאתה מוכן לספוג?
+        </Text>
+        <Check label='א. סיכוי עד 6%, סיכון עד 5%.' score={1} />
+        <Check label='ב. סיכוי עד 14%, סיכון עד 10%.' score={2} />
+        <Check label='ג. סיכוי עד 20%, סיכון עד 15%.' score={3} />
+        <Check label='ד. סיכוי מעל 20%, סיכון מעל 15%.' score={5} />
+      </View>
+
+      <Sep />
+
+      {/* Refusal clause */}
+      <SecTitle>פסקת סירוב</SecTitle>
+      <View style={{ borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 10 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 8 }}>
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', marginLeft: 8 }}>הלקוח סירב להשיב על שאלה/ות מס׳:</Text>
+          <BlankField width={250} />
+        </View>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 8 }}>
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', marginLeft: 8 }}>שאלה/ות מס׳</Text>
+          <BlankField width={100} />
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', marginHorizontal: 8 }}>אינן רלוונטיות עבור הלקוח.</Text>
+        </View>
+        <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right', marginTop: 4 }}>
+          הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.
+        </Text>
+      </View>
+
+      <Sep />
+
+      {/* Scoring table */}
+      <SecTitle>טבלת ניקוד וחישוב דרגת סיכון</SecTitle>
+      <TR cells={['ממוצע ניקוד', 'דרגה', 'שם', 'הפסד מקס׳', 'מניות מקס׳']} isHeader />
+      {[
+        ['פחות מ-2', '1', 'שמרן', 'עד 5%', '0%'],
+        ['2 עד 3', '2', 'שמרן-מתון', 'עד 10%', 'עד 15%'],
+        ['3 עד 3.8', '3', 'מאוזן', 'עד 15%', 'עד 25%'],
+        ['3.8 עד 4.5', '4', 'צמיחה', 'מעל 15%', 'עד 35%'],
+        ['4.5 ומעלה', '5', 'אגרסיבי', 'משמעותי', 'עד 100%'],
+      ].map((row, i) => (
+        <View key={i} style={{
+          flexDirection: 'row-reverse', borderBottomWidth: 0.5, borderBottomColor: C.line,
+          paddingVertical: 5, paddingHorizontal: 4, backgroundColor: i % 2 === 0 ? C.bg : C.white,
+        }}>
+          {row.map((cell, j) => (
+            <Text key={j} style={{ flex: 1, fontSize: 9, color: C.black, textAlign: 'right' }}>{cell}</Text>
           ))}
         </View>
+      ))}
 
-        {/* Manual calculation */}
-        <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 12 }} wrap={false}>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 10 }}>
-            חישוב ידני
-          </Text>
-          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-around', marginBottom: 10 }}>
-            {['שאלה 1', 'שאלה 2', 'שאלה 3', 'שאלה 4'].map((q, i) => (
-              <View key={i} style={{ alignItems: 'center' }}>
-                <Text style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>{q}</Text>
-                <View style={{ width: 40, height: 24, borderWidth: 1, borderColor: C.primary, borderRadius: 3 }} />
-              </View>
-            ))}
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>ממוצע</Text>
-              <View style={{ width: 50, height: 24, borderWidth: 1.5, borderColor: C.gold, borderRadius: 3, backgroundColor: C.white }} />
-            </View>
+      {/* Manual calculation */}
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', marginTop: 14 }}>
+        {['שאלה 1', 'שאלה 2', 'שאלה 3', 'שאלה 4'].map((q, i) => (
+          <View key={i} style={{ alignItems: 'center', marginHorizontal: 6 }}>
+            <Text style={{ fontSize: 8, color: C.muted, marginBottom: 2 }}>{q}</Text>
+            <View style={{ width: 28, height: 28, borderWidth: 1.5, borderColor: C.black }} />
           </View>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, marginLeft: 8 }}>דרגת סיכון מחושבת:</Text>
-            <View style={{ width: 60, height: 28, borderWidth: 1.5, borderColor: C.primary, borderRadius: 3, backgroundColor: C.white }} />
-          </View>
+        ))}
+        <Text style={{ fontSize: 12, color: C.black, marginHorizontal: 6 }}>=</Text>
+        <View style={{ alignItems: 'center', marginHorizontal: 6 }}>
+          <Text style={{ fontSize: 8, color: C.muted, marginBottom: 2 }}>ממוצע</Text>
+          <View style={{ width: 36, height: 36, borderWidth: 2, borderColor: C.primary }} />
         </View>
-      </Page>
+      </View>
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', marginTop: 8 }}>
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, marginLeft: 8 }}>דרגת סיכון מחושבת:</Text>
+        <View style={{ width: 40, height: 40, borderWidth: 2, borderColor: C.primary }} />
+      </View>
+    </Page>
 
-      {/* ═══════════════════ PAGE 5: ADVISOR SUMMARY ═══════════════════ */}
-      <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName="________________" date={date} docTitle="________________" />
-        <PageFooter />
+    {/* ═══════════════════ PAGE 5: ADVISOR SUMMARY ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <SimpleHeader />
+      <PageNum />
 
-        <SectionTitle>סיכום והמלצת בעל הרישיון</SectionTitle>
+      <SecTitle>סיכום והמלצת בעל הרישיון</SecTitle>
 
-        <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream, minHeight: 80 }}>
-          <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>סיכום וניתוח</Text>
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 8 }} />
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 8 }} />
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }} />
-        </View>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>24. סיכום וניתוח המידע שהתקבל מהלקוח:</Text>
+      <WriteLines count={5} />
 
-        <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream, minHeight: 60 }}>
-          <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>העדפות / הגבלות לקוח</Text>
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 8 }} />
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }} />
-        </View>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginTop: 12, marginBottom: 6 }}>25. העדפות / הגבלות השקעה לקוח:</Text>
+      <WriteLines count={3} />
 
-        {/* Policy cubes */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 6, marginBottom: 12 }} wrap={false}>
-          {[
-            { label: 'אחוז מניות מקס׳', suffix: '%' },
-            { label: 'אג״ח קונצרני', options: 'עד 50% / עד 100%' },
-            { label: 'מט״ח', options: 'כן / לא' },
-            { label: 'אג״ח דירוג נמוך', options: 'כן / לא' },
-          ].map((cube, i) => (
-            <View key={i} style={{ width: '23%', backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 6, alignItems: 'center', marginHorizontal: '1%' }}>
-              <Text style={{ fontSize: 7, color: C.muted, textAlign: 'center', marginBottom: 4 }}>{cube.label}</Text>
-              {cube.options
-                ? <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center' }}>{cube.options}</Text>
-                : <BlankLine width={40} />
-              }
-            </View>
-          ))}
-        </View>
+      <Sep />
 
-        {/* Final risk level */}
-        <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 12 }} wrap={false}>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 8 }}>
-            <Text style={{ fontSize: 12, fontWeight: 'bold', color: C.primary, marginLeft: 8 }}>דרגת סיכון סופית:</Text>
-            <View style={{ width: 40, height: 28, borderWidth: 1.5, borderColor: C.primary, borderRadius: 3, backgroundColor: C.white, marginLeft: 8 }} />
-            <Text style={{ fontSize: 11, color: C.primary }}>—</Text>
-            <View style={{ width: 80, height: 28, borderWidth: 1.5, borderColor: C.primary, borderRadius: 3, backgroundColor: C.white, marginRight: 8 }} />
-          </View>
-          <RiskGauge level={0} />
-          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center', marginTop: 4 }}>* סמן את הדרגה הנבחרת</Text>
-        </View>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 10 }}>26. המלצת בעל הרישיון למדיניות השקעה:</Text>
 
-        <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream, minHeight: 60 }}>
-          <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>נימוק מקצועי</Text>
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border, marginBottom: 8 }} />
-          <View style={{ borderBottomWidth: 1, borderBottomColor: C.border }} />
-        </View>
-      </Page>
-
-      {/* ═══════════════════ PAGE 6: DECLARATIONS & SIGNATURES ═══════════════════ */}
-      <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName="________________" date={date} docTitle="________________" />
-        <PageFooter />
-
-        <View wrap={false}>
-          <SectionGap />
-          <SectionTitle>הצהרות וחתימות</SectionTitle>
-
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הצהרת הלקוח</Text>
-          <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 16, color: C.black }}>
-            אני הח"מ _______________ מצהיר בזאת כי המידע המופיע לעיל הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי עותק של מסמך זה.
-          </Text>
-
-          <View style={{ flexDirection: 'row-reverse', marginTop: 4 }}>
-            <View style={{ flex: 1, marginLeft: 6 }}>
-              <SignatureLine label="חתימת לקוח א׳:" />
-              <DateLine date="___/___/______" />
-            </View>
-            <View style={{ flex: 1, marginRight: 6 }}>
-              <SignatureLine label="חתימת לקוח ב׳:" />
-              <DateLine date="___/___/______" />
-            </View>
+      {/* 4 Policy boxes */}
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginBottom: 12 }}>
+        {/* Max equity */}
+        <View style={{ width: '23%', borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 6, alignItems: 'center' }}>
+          <Text style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>אחוז מניות מקס׳</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+            <Text style={{ fontSize: 10, color: C.black }}>%</Text>
+            <BlankField width={40} />
           </View>
         </View>
+        {/* Corp bonds */}
+        <View style={{ width: '23%', borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 6, alignItems: 'center' }}>
+          <Text style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>אג״ח קונצרני</Text>
+          <View style={{ flexDirection: 'row-reverse' }}>
+            <Check label="עד 50%" />
+          </View>
+          <View style={{ flexDirection: 'row-reverse' }}>
+            <Check label="עד 100%" />
+          </View>
+        </View>
+        {/* Forex */}
+        <View style={{ width: '23%', borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 6, alignItems: 'center' }}>
+          <Text style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>מט״ח</Text>
+          <View style={{ flexDirection: 'row-reverse' }}>
+            <View style={{ marginLeft: 12 }}><Check label="כן" /></View>
+            <Check label="לא" />
+          </View>
+        </View>
+        {/* Low rated bonds */}
+        <View style={{ width: '23%', borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 6, alignItems: 'center' }}>
+          <Text style={{ fontSize: 8, color: C.muted, marginBottom: 4 }}>אג״ח דירוג נמוך</Text>
+          <View style={{ flexDirection: 'row-reverse' }}>
+            <View style={{ marginLeft: 12 }}><Check label="כן" /></View>
+            <Check label="לא" />
+          </View>
+        </View>
+      </View>
 
-        {/* Refusals */}
-        <View style={{ borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 12, marginTop: 20 }} wrap={false}>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הלקוח סירב להשיב על:</Text>
-          {[1, 2, 3].map(i => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 6 }}>
-              <View style={{ width: 12, height: 12, borderWidth: 1, borderColor: C.primary, marginLeft: 6 }} />
-              <BlankLine width={200} />
+      <Sep />
+
+      {/* Final risk level */}
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 10 }}>
+        <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.primary, marginLeft: 8 }}>דרגת סיכון סופית:</Text>
+        <View style={{ width: 36, height: 36, borderWidth: 2, borderColor: C.primary, marginLeft: 8 }} />
+        <Text style={{ fontSize: 11, color: C.black, marginLeft: 8 }}>—</Text>
+        <BlankField width={120} />
+      </View>
+
+      {/* 5 circles */}
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 8 }}>
+        {[
+          { n: 1, label: 'שמרן' },
+          { n: 2, label: 'שמרן-מתון' },
+          { n: 3, label: 'מאוזן' },
+          { n: 4, label: 'צמיחה' },
+          { n: 5, label: 'אגרסיבי' },
+        ].map(({ n, label }) => (
+          <View key={n} style={{ alignItems: 'center', marginHorizontal: 10 }}>
+            <View style={{
+              width: 26, height: 26, borderRadius: 13,
+              borderWidth: 1.5, borderColor: C.black,
+              justifyContent: 'center', alignItems: 'center',
+            }}>
+              <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.black }}>{n}</Text>
             </View>
-          ))}
-          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 4 }}>
-            הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.
-          </Text>
-          <SignatureLine label="חתימה על הסירובים:" />
-          <DateLine date="___/___/______" />
+            <Text style={{ fontSize: 7, color: C.muted, marginTop: 2 }}>{label}</Text>
+          </View>
+        ))}
+      </View>
+      <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center', marginBottom: 10 }}>* עגל את הדרגה הנבחרת</Text>
+
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>נימוק מקצועי:</Text>
+      <WriteLines count={3} />
+    </Page>
+
+    {/* ═══════════════════ PAGE 6: SIGNATURES ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <SimpleHeader />
+      <PageNum />
+
+      <SecTitle>הצהרות וחתימות</SecTitle>
+
+      {/* Client declaration */}
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הצהרת הלקוח</Text>
+      <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 12, color: C.black }}>
+        {'אני הח"מ _______________ מצהיר בזאת כי המידע המופיע לעיל, הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים וכן כי אי מסירת פרטים או מסירת פרטים חלקיים עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לח"מ. כמו כן, כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו ואני מוותר בזאת על כל טענה ו/או תביעה ו/או זכות כלשהי אודות שימוש שלא ייעשה במידע זה. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי העתק בכתב/בדוא״ל של מסמך זה.'}
+      </Text>
+
+      {/* Two signature columns */}
+      <View style={{ flexDirection: 'row-reverse', marginBottom: 16 }}>
+        <View style={{ flex: 1, marginLeft: 8 }}>
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>חתימת לקוח א׳: X _______________</Text>
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', marginTop: 6 }}>תאריך: ___/___/______</Text>
         </View>
-
-        {/* Advisor confirmation */}
-        <View style={{ marginTop: 20, borderTopWidth: 0.5, borderTopColor: C.primary, paddingTop: 12 }}>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>אישור בעל הרישיון</Text>
-          <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
-            אני הח"מ _______________ בעל רישיון שיווק השקעות שמספרו _______________ מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח.
-          </Text>
-          <SignatureLine label="חתימת בעל הרישיון:" />
-          <DateLine date="___/___/______" />
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>חתימת לקוח ב׳: X _______________</Text>
+          <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', marginTop: 6 }}>תאריך: ___/___/______</Text>
         </View>
-      </Page>
+      </View>
 
-    </Document>
-  )
-}
+      <Sep />
 
-// ── Export ──────────────────────────────────────────────────────
+      {/* Refusals block */}
+      <View style={{ borderWidth: 1, borderColor: C.black, borderRadius: 4, padding: 10, marginBottom: 16 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 8 }}>
+          <Text style={{ fontSize: 10, color: C.black, marginLeft: 8 }}>הלקוח סירב להשיב על שאלה/ות מס׳:</Text>
+          <BlankField width={200} />
+        </View>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 8 }}>
+          <Text style={{ fontSize: 10, color: C.black, marginLeft: 8 }}>שאלה/ות מס׳</Text>
+          <BlankField width={100} />
+          <Text style={{ fontSize: 10, color: C.black, marginHorizontal: 8 }}>אינן רלוונטיות עבור הלקוח.</Text>
+        </View>
+        <Text style={{ fontSize: 9, color: C.muted, textAlign: 'right', marginTop: 4 }}>
+          הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.
+        </Text>
+        <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', marginTop: 8 }}>חתימה על הסירובים: X _______________     תאריך: ___/___/______</Text>
+      </View>
+
+      <Sep />
+
+      {/* Advisor confirmation */}
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>אישור בעל הרישיון</Text>
+      <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
+        {'אני הח"מ _______________ בעל רישיון שיווק השקעות שמספרו _______________ מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק.'}
+      </Text>
+      <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>חתימת בעל הרישיון: _______________     תאריך: ___/___/______</Text>
+    </Page>
+
+  </Document>
+)
+
+// ══════════════════════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════════════════════
 export async function generateBlankPDF() {
   const blob = await pdf(<BlankDocument />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
   const previewUrl = URL.createObjectURL(previewBlob)
-  return { url: previewUrl, fileName: 'KYC_טופס_ריק.pdf', pdfBytes }
+  return { url: previewUrl, fileName: 'אפיון צרכים 2026.pdf', pdfBytes }
 }
