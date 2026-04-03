@@ -668,15 +668,13 @@ const BL = '____________' // short blank
 const BLL = '________________________' // long blank
 const BLLL = '____________________________________' // extra long
 
-// ── Blank Signature Block — 170pt, uniform ────────────────────
-const BlankSign = ({ label }) => (
-  <View style={{ alignItems: 'center', width: 170 }}>
-    <View style={{ width: 170, borderBottomWidth: 1, borderBottomColor: C.black, height: 20 }} />
-    <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center', direction: 'rtl', marginTop: 3 }}>{label}</Text>
-    <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 8, width: 170 }}>
-      <View style={{ flex: 1, borderBottomWidth: 1, borderBottomColor: C.black, height: 12 }} />
-      <Text style={{ fontSize: 8, marginLeft: 4, direction: 'rtl' }}>:תאריך</Text>
-    </View>
+// ── Blank Signature Block — unified template ──────────────────
+const BlankSign = ({ label, width = 200 }) => (
+  <View style={{ flexDirection: 'column', alignItems: 'center', width }}>
+    <View style={{ width, borderBottomWidth: 1, borderBottomColor: '#000', height: 1 }} />
+    <Text style={{ fontSize: 9, textAlign: 'center', marginTop: 4, direction: 'rtl' }}>{label}</Text>
+    <View style={{ width: 140, borderBottomWidth: 1, borderBottomColor: '#000', height: 1, marginTop: 12 }} />
+    <Text style={{ fontSize: 9, textAlign: 'right', marginTop: 4, direction: 'rtl' }}>:תאריך</Text>
   </View>
 )
 
@@ -757,16 +755,16 @@ const BlankMarketingAgreementDoc = () => (
       {/* Company header info */}
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 6, marginTop: 4 }}>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
             גרין סוכנות לביטוח פנסיוני
           </Text>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
             ושיווק השקעות (2024) בע"מ,
           </Text>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
             מקבוצת אגם לידרים והפניקס
           </Text>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+          <Text style={{ fontSize: 10, color: C.primary, textAlign: 'right', direction: 'rtl' }}>
             חברה לביטוח
           </Text>
         </View>
@@ -800,10 +798,10 @@ const BlankMarketingAgreementDoc = () => (
       </Text>
 
       {/* בין */}
-      <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>בין</Text>
+      <Text style={{ fontSize: 11, textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>בין</Text>
 
       {/* GREEN details */}
-      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
         גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ
       </Text>
       <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
@@ -826,7 +824,7 @@ const BlankMarketingAgreementDoc = () => (
       </Text>
 
       {/* לבין */}
-      <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>לבין</Text>
+      <Text style={{ fontSize: 11, textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>לבין</Text>
 
       {/* Client A */}
       <BlankClientTable idLabel="ת.ז /ח.פ" />
@@ -849,8 +847,7 @@ const BlankMarketingAgreementDoc = () => (
 
       {/* הואיל opening */}
       <BPara>
-        <Text style={{ fontWeight: 'bold' }}>הואיל </Text>
-        {'וגרין היא סוכנות ביטוח בעלת רישיון סוכן ביטוח בענף הביטוח הפנסיוני בהתאם להוראות חוק הפיקוח על שירותים פיננסיים (ביטוח), תשמ"א-1981 (להלן -"חוק הביטוח") ורישיון משווק השקעות'}
+        {'הואיל וגרין היא סוכנות ביטוח בעלת רישיון סוכן ביטוח בענף הביטוח הפנסיוני בהתאם להוראות חוק הפיקוח על שירותים פיננסיים (ביטוח), תשמ"א-1981 (להלן -"חוק הביטוח") ורישיון משווק השקעות'}
       </BPara>
 
       <PageFooter />
@@ -865,8 +862,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       <BPara style={{ marginTop: 6 }}>
-        <Text style={{ fontWeight: 'bold' }}>והואיל </Text>
-        {'והלקוח מעוניין לקבל מגרין שירותי שיווק השקעות כהגדרתם בחוק ההשקעות (להלן- "השירותים"), לאחר שהובהר לו, כי השירותים הם שירותים נפרדים משירותי השיווק הפנסיוני, ואינם מתייחסים למוצרי ביטוח ו/או מוצרים פנסיוניים המנוהלים על ידי הגופים המוסדיים, ואינם מפוקחים על ידי רשות שוק ההון, ביטוח וחיסכון;'}
+        {'והואיל והלקוח מעוניין לקבל מגרין שירותי שיווק השקעות כהגדרתם בחוק ההשקעות (להלן- "השירותים"), לאחר שהובהר לו, כי השירותים הם שירותים נפרדים משירותי השיווק הפנסיוני, ואינם מתייחסים למוצרי ביטוח ו/או מוצרים פנסיוניים המנוהלים על ידי הגופים המוסדיים, ואינם מפוקחים על ידי רשות שוק ההון, ביטוח וחיסכון;'}
       </BPara>
 
       <BPara>
@@ -898,11 +894,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       <BPara>
-        {'3. גרין תפעל, ככל הניתן, על מנת להתאים את שיווק ההשקעות, במסגרת השירותים, לצרכים ולהנחיות של הלקוח, כפי שיימסרו לגרין, בקשר עם הנתונים כמפורט '}
-        <Text style={{ fontWeight: 'bold' }}>בנספח "ב"</Text>
-        {' להסכם זה. יודגש, כי אי '}
-        <Text style={{ fontWeight: 'bold' }}>מסירת פרטים מלאים</Text>
-        {' בעניין נתוני הלקוח וצרכיו, עלולה לפגוע בשירות הניתן ללקוח, וללקוח לא תהא כל טענה כלפי גרין במקרה של אי התאמת השירות הנובעת מהעברת פרטים מלאים כאמור'}
+        {'3. גרין תפעל, ככל הניתן, על מנת להתאים את שיווק ההשקעות, במסגרת השירותים, לצרכים ולהנחיות של הלקוח, כפי שיימסרו לגרין, בקשר עם הנתונים כמפורט בנספח "ב" להסכם זה. יודגש, כי אי מסירת פרטים מלאים בעניין נתוני הלקוח וצרכיו, עלולה לפגוע בשירות הניתן ללקוח, וללקוח לא תהא כל טענה כלפי גרין במקרה של אי התאמת השירות הנובעת מהעברת פרטים מלאים כאמור'}
       </BPara>
 
       <BPara>
@@ -917,27 +909,19 @@ const BlankMarketingAgreementDoc = () => (
       <BlankHeader />
 
       <BPara>
-        {'5. יודגש, כי הסכם זה חל על שירותי שיווק השקעות המפוקחים על ידי רשות ניירות ערך, וחובותיה של גרין לפי חוק ההשקעות '}
-        <Text style={{ fontWeight: 'bold' }}>אינן חלות</Text>
-        {' על שירותים של הפניית לקוחות לקבלת שירות מצדדים שלישיים, או מתן מידע על ידי גרין, שאינו כולל חיווי דעה או המלצה מקצועית בעניין כדאיות ההשקעה בניירות ערך ו/או בנכסים פיננסיים, שאינו עולה כדי שיווק השקעות.'}
+        {'5. יודגש, כי הסכם זה חל על שירותי שיווק השקעות המפוקחים על ידי רשות ניירות ערך, וחובותיה של גרין לפי חוק ההשקעות אינן חלות על שירותים של הפניית לקוחות לקבלת שירות מצדדים שלישיים, או מתן מידע על ידי גרין, שאינו כולל חיווי דעה או המלצה מקצועית בעניין כדאיות ההשקעה בניירות ערך ו/או בנכסים פיננסיים, שאינו עולה כדי שיווק השקעות.'}
       </BPara>
 
       <BPara>
-        {'6. לשם מתן השירותים מעניק הלקוח לגרין ו/או למי מטעמה, ייפוי כוח לשם פניה ליצרנים כמפורט '}
-        <Text style={{ fontWeight: 'bold' }}>בנספח "ג"</Text>
-        {' להסכם זה. הלקוח מסכים לחתום על ייפוי כוח מתאים לצורך קבלת מידע מכל רלוונטי, וכפי שיידרש מעת לעת.'}
+        {'6. לשם מתן השירותים מעניק הלקוח לגרין ו/או למי מטעמה, ייפוי כוח לשם פניה ליצרנים כמפורט בנספח "ג" להסכם זה. הלקוח מסכים לחתום על ייפוי כוח מתאים לצורך קבלת מידע מכל רלוונטי, וכפי שיידרש מעת לעת.'}
       </BPara>
 
       <BPara>
-        {'7. שירותי השיווק יינתנו במשרדי גרין, בימי העבודה המקובלים במשק ובין השעות 9:00 עד 16:00 או במועדים אחרים כפי שיקבעו בין הצדדים, על אף האמור לעיל, מוסכם בין הצדדים כי '}
-        <Text style={{ textDecoration: 'underline' }}>ניתן</Text>
-        {' להעניק את השירותים גם באמצעות הטלפון ו/או אמצעי היוועדות חזותית, והכל לפי שיקול דעתה של גרין.'}
+        {'7. שירותי השיווק יינתנו במשרדי גרין, בימי העבודה המקובלים במשק ובין השעות 9:00 עד 16:00 או במועדים אחרים כפי שיקבעו בין הצדדים, על אף האמור לעיל, מוסכם בין הצדדים כי ניתן להעניק את השירותים גם באמצעות הטלפון ו/או אמצעי היוועדות חזותית, והכל לפי שיקול דעתה של גרין.'}
       </BPara>
 
       <BPara>
-        {'8. התגמול לגרין יהיה, כמפורט '}
-        <Text style={{ fontWeight: 'bold' }}>בנספח "ד"</Text>
-        {' להסכם זה.'}
+        {'8. התגמול לגרין יהיה, כמפורט בנספח "ד" להסכם זה.'}
       </BPara>
 
       <BPara>
@@ -945,9 +929,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       <BPara>
-        {'10. יובהר ויודגש, כי גרין תעניק את השירותים על פי הסכם זה, ברמה נאותה, אך '}
-        <Text style={{ fontWeight: 'bold' }}>אין במתן השירותים</Text>
-        {' כדי להוות הבטחה או אחריות מכל סוג שהוא לתוצאות ההשקעה או כדאיותה, וגרין אינה אחראית בכל צורה ואופן לפעילותם של צדדים שלישיים.'}
+        {'10. יובהר ויודגש, כי גרין תעניק את השירותים על פי הסכם זה, ברמה נאותה, אך אין במתן השירותים כדי להוות הבטחה או אחריות מכל סוג שהוא לתוצאות ההשקעה או כדאיותה, וגרין אינה אחראית בכל צורה ואופן לפעילותם של צדדים שלישיים.'}
       </BPara>
 
       <BPara>
@@ -959,7 +941,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Signature for clause 12 */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20, marginBottom: 8 }}>
+      <View wrap={false} style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 20, marginBottom: 8 }}>
         <BlankSign label="חתימת הלקוח" />
       </View>
 
@@ -1000,11 +982,11 @@ const BlankMarketingAgreementDoc = () => (
         ולראיה באו הצדדים על החתום:
       </BPara>
 
-      {/* 3 signatures side by side — 170pt each */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
-        <BlankSign label="לקוח ב'" />
-        <BlankSign label="לקוח א'" />
-        <BlankSign label={'גרין סוכנות לביטוח פנסיוני\nושיווק השקעות בע"מ'} />
+      {/* 3 signatures — space-between, 160pt each */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 16 }}>
+        <BlankSign label="לקוח ב'" width={160} />
+        <BlankSign label="לקוח א'" width={160} />
+        <BlankSign label={'גרין סוכנות לביטוח פנסיוני ושיווק השקעות בע"מ'} width={160} />
       </View>
 
       <PageFooter />
@@ -1017,9 +999,7 @@ const BlankMarketingAgreementDoc = () => (
       <BlankTitle>נספח "א"- גילוי נאות</BlankTitle>
 
       <BPara>
-        {'בהתאם לסעיף 16א לחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות, ובניהול תיקי השקעות, תשנ"ה-1995 (להלן – "החוק") גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ (להלן – "החברה") חברה בעלת רישיון '}
-        <Text style={{ fontWeight: 'bold' }}>משווק השקעות ולא יועץ השקעות</Text>
-        {', מקבוצת אגם לידרים (ישראל) סוכנות לביטוח (2003) בע"מ, והפניקס אחזקות בע"מ (להלן – "קבוצת הפניקס").'}
+        {'בהתאם לסעיף 16א לחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות, ובניהול תיקי השקעות, תשנ"ה-1995 (להלן – "החוק") גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ (להלן – "החברה") חברה בעלת רישיון משווק השקעות ולא יועץ השקעות, מקבוצת אגם לידרים (ישראל) סוכנות לביטוח (2003) בע"מ, והפניקס אחזקות בע"מ (להלן – "קבוצת הפניקס").'}
       </BPara>
 
       <BPara>
@@ -1051,7 +1031,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Signature */}
-      <View style={{ marginTop: 60, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+      <View style={{ marginTop: 60, flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
         <BlankSign label="חתימת הלקוח" />
       </View>
 
@@ -1074,7 +1054,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Signature block for option i */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 10, marginBottom: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 10, marginBottom: 16 }}>
         <BlankSign label="חתימת הלקוח" />
       </View>
 
@@ -1094,7 +1074,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Signature block for option ii */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 16 }}>
         <BlankSign label="חתימת הלקוח" />
       </View>
 
@@ -1108,9 +1088,7 @@ const BlankMarketingAgreementDoc = () => (
       <BlankTitle>השקעות בסיכון מיוחד</BlankTitle>
 
       <BPara>
-        {'הלקוח מבקש מבעל הרישיון לקבל שרותים ביחס לעסקאות שכרוכה בהן סיכון מיוחד כמשמעות מונח זה בחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות, תשנ"ה – 1995, כפי שיעודכן מעת לעת ('}
-        <Text style={{ fontWeight: 'bold' }}>"עסקה בסיכון מיוחד"</Text>
-        {').'}
+        {'הלקוח מבקש מבעל הרישיון לקבל שרותים ביחס לעסקאות שכרוכה בהן סיכון מיוחד כמשמעות מונח זה בחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות, תשנ"ה – 1995, כפי שיעודכן מעת לעת ("עסקה בסיכון מיוחד").'}
       </BPara>
 
       <BPara>
@@ -1126,7 +1104,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Signature */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 16 }}>
         <BlankSign label="חתימת הלקוח" />
       </View>
 
