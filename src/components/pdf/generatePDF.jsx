@@ -1,7 +1,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
-import { getUserById } from '../../data/users'
+
 import { logoPng } from '../../assets/logoBase64'
 import {
   C, coverPageStyle, contentPageStyle,
@@ -527,9 +527,7 @@ const KYCDocument = ({ formData, user }) => {
 // ── Export ──────────────────────────────────────────────────────
 export async function generatePDF(formData, user) {
   if (!user) throw new Error('משתמש לא מחובר')
-  // Use user as-is when advisor data is injected from session (name already overridden)
-  // Only fetch fresh from DB when using login user directly
-  const freshUser = user.name && user.idNumber ? user : (getUserById(user.id) || user)
+  const freshUser = user
 
   const blob = await pdf(<KYCDocument formData={formData} user={freshUser} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
