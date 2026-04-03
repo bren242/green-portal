@@ -62,28 +62,27 @@ const SecTitle = ({ children }) => (
 )
 
 const Field = ({ label, width = 160 }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 12 }}>
-    <Text style={{ fontSize: 10, color: '#5A5A5A', flexShrink: 0 }}>{label}</Text>
-    <View style={{ width: 6 }} />
+  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', marginBottom: 12 }}>
+    <Text style={{ fontSize: 10, color: '#5A5A5A', marginRight: 6 }}>{label}</Text>
     <View style={{ width, borderBottomWidth: 1, borderBottomColor: '#1A1A1A', height: 18 }} />
   </View>
 )
 
 const FieldRow2 = ({ right, left }) => (
-  <View style={{ flexDirection: 'row-reverse', marginBottom: 0 }}>
-    <View style={{ flex: 1, paddingLeft: 8 }}><Field label={right} width={130} /></View>
+  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 0 }}>
     <View style={{ flex: 1 }}><Field label={left} width={130} /></View>
+    <View style={{ width: 16 }} />
+    <View style={{ flex: 1 }}><Field label={right} width={130} /></View>
   </View>
 )
 
 const Check = ({ label, score }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 8, width: '100%' }}>
-    <View style={{ width: 12, height: 12, borderWidth: 1.5, borderColor: '#1A1A1A', flexShrink: 0 }} />
-    <View style={{ width: 8 }} />
-    <Text style={{ fontSize: 10, textAlign: 'right', flexShrink: 1, flexGrow: 1 }}>{label}</Text>
+  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 }}>
     {score !== undefined && (
-      <Text style={{ fontSize: 9, color: '#5A5A5A', flexShrink: 0, marginLeft: 4 }}>({score} נק׳)</Text>
+      <Text style={{ fontSize: 9, color: '#5A5A5A', marginRight: 4 }}>({score} נק׳)</Text>
     )}
+    <Text style={{ fontSize: 10, marginRight: 8 }}>{label}</Text>
+    <View style={{ width: 12, height: 12, borderWidth: 1.5, borderColor: '#1A1A1A', flexShrink: 0 }} />
   </View>
 )
 
@@ -229,11 +228,14 @@ const BlankDocument = () => (
       </View>
 
       {/* שיעור הנכסים */}
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
-        <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, marginLeft: 14 }}>שיעור הנכסים המועבר לטיפול GREEN:</Text>
-        <View style={{ marginLeft: 16 }}><Check label="עד 35%" /></View>
-        <View style={{ marginLeft: 16 }}><Check label="35%–70%" /></View>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginTop: 6 }}>
         <Check label="מעל 70%" />
+        <View style={{ width: 16 }} />
+        <Check label="35%–70%" />
+        <View style={{ width: 16 }} />
+        <Check label="עד 35%" />
+        <View style={{ width: 16 }} />
+        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#1B3A2F' }}>:שיעור הנכסים המועבר לטיפול GREEN</Text>
       </View>
     </Page>
 
