@@ -290,7 +290,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
           </Text>
         </View>
 
-        {/* Identity row */}
+        {/* Identity row 1 */}
         <View style={{
           flexDirection: 'row-reverse',
           borderLeftWidth: s ? 0.5 : 1,
@@ -302,9 +302,24 @@ const MeetingSummaryDoc = ({ data, styled }) => {
           backgroundColor: s ? C.surface : C.white,
         }}>
           <IdCell label="שם לקוח" value={d.clientName} styled={s} />
-          <IdCell label="ת.ז" value={d.clientId} styled={s} borderLeft />
+          <IdCell label="ת.ז לקוח" value={d.clientId} styled={s} borderLeft />
           <IdCell label="שם משווק" value={d.advisorName} styled={s} borderLeft />
           <IdCell label="תאריך" value={s ? fmtDateAuto() : null} styled={s} borderLeft />
+        </View>
+        {/* Identity row 2 — advisor details */}
+        <View style={{
+          flexDirection: 'row-reverse',
+          borderLeftWidth: s ? 0.5 : 1,
+          borderRightWidth: s ? 0.5 : 1,
+          borderBottomWidth: s ? 0.5 : 1,
+          borderLeftColor: s ? C.border : C.black,
+          borderRightColor: s ? C.border : C.black,
+          borderBottomColor: s ? C.border : C.black,
+          backgroundColor: s ? C.surface : C.white,
+        }}>
+          <IdCell label="ת.ז משווק" value={d.advisorId} styled={s} />
+          <IdCell label="מס׳ רישיון" value={d.advisorLicense} styled={s} borderLeft />
+          <View style={{ width: '50%' }} />
         </View>
 
         {/* 2. Contact details update */}
