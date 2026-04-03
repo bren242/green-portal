@@ -110,6 +110,7 @@ See docs/DESIGN.md for complete design system.
 - Colors: per DESIGN.md
 - Separate signature blocks for single / couple
 - `generateBlankPDF.jsx` — טופס ידני להדפסה ✅ מאושר ומוכן
+- גיבוי: `generateBlankPDF.BASE.jsx`
 
 ---
 
@@ -121,6 +122,10 @@ See docs/DESIGN.md for complete design system.
 - Separate PDF output
 - `generateMarketingAgreement(clientData)` — print version (B&W)
 - `generateMarketingAgreementStyled(clientData)` — styled version (GREEN colors + auto dates)
+- `generateMarketingAgreementBlank()` — blank manual fill version (B&W, no client data)
+- All 3 versions live in `generateMarketingAgreement.jsx` ✅ מאושר
+- גיבוי: `generateMarketingAgreement.BASE.jsx`
+- טקסט משפטי = AS IS, אסור לשנות מילה
 
 ---
 
