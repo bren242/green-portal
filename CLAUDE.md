@@ -113,11 +113,14 @@ See docs/DESIGN.md for complete design system.
 
 ---
 
-## Module 2: הסכם שיווק השקעות (FUTURE)
+## Module 2: הסכם שיווק השקעות ✅
+- `generateMarketingAgreement.jsx` — גרסת הדפסה + גרסת ממשק
 - Legal text is fixed (AS IS — legally approved)
 - Dynamic fields: client details (from session) + date + advisor details
 - Always paired with KYC for new clients
 - Separate PDF output
+- `generateMarketingAgreement(clientData)` — print version (B&W)
+- `generateMarketingAgreementStyled(clientData)` — styled version (GREEN colors + auto dates)
 
 ---
 
@@ -153,6 +156,12 @@ Font: Assistant (Google Fonts)
 - צבעים: primary #1B3A2F, gold #B8975A
 - פונט: Assistant (Regular + Bold)
 - RTL: תמיד row-reverse לבלוקים זה לצד זה
+
+## חוקי טפסים
+- גרסת הדפסה = שחור-לבן, קווים נקיים, ללא רקעים
+- גרסת ממשק = צבעי GREEN מלאים (ירוק #1B3A2F, זהב #B8975A) + תאריכים אוטומטיים
+- פורמט תאריך אוטומטי = DD/MM/YYYY מ-new Date()
+- טקסט משפטי = AS IS, אסור לשנות מילה
 
 ## Key Files
 - docs/FLOW.md — KYC wizard flow (complete)

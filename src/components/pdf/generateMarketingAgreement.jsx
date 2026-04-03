@@ -2,6 +2,8 @@
 // GREEN Portal — הסכם שיווק השקעות PDF Generator
 // מקור: הסכם שיווק השקעות- 2025 תקין (003).pdf
 // טקסט משפטי מאושר — אסור לשנות מילה
+// גרסת הדפסה = שחור-לבן, קווים נקיים
+// גרסת ממשק = צבעי GREEN + תאריכים אוטומטיים
 // ═══════════════════════════════════════════════════
 
 import React from 'react'
@@ -28,9 +30,17 @@ const C = {
   white: '#FFFFFF',
   border: '#DDD5BF',
   surface: '#F6F5F1',
+  cream: '#F8F5EE',
+  offWhite: '#F4F3EF',
 }
 
-// ── Page style ────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────
+const fmtDateAuto = () => {
+  const d = new Date()
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
+}
+
+// ── Page Styles ───────────────────────────────────────────────
 const pageStyle = {
   fontFamily: 'Assistant',
   paddingTop: 28,
@@ -40,23 +50,32 @@ const pageStyle = {
   color: C.black,
 }
 
-// ── Reusable Components ───────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+//  REUSABLE COMPONENTS
+// ═══════════════════════════════════════════════════════════════
 
-const PageHeader = () => (
+// ── Page Header ───────────────────────────────────────────────
+const PageHeader = ({ styled }) => (
   <View fixed style={{ marginBottom: 8 }}>
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
       paddingBottom: 8,
-      borderBottomWidth: 1.5,
+      borderBottomWidth: styled ? 2 : 1.5,
       borderBottomColor: C.gold,
     }}>
       <Image src={logoPng} style={{ height: 36, width: 'auto' }} />
-      <View style={{ flex: 1 }} />
+      {styled && (
+        <View style={{ flex: 1, alignItems: 'flex-end' }}>
+          <Text style={{ fontSize: 9, color: C.primary, fontWeight: 'bold' }}>הסכם שיווק השקעות</Text>
+        </View>
+      )}
+      {!styled && <View style={{ flex: 1 }} />}
     </View>
   </View>
 )
 
+// ── Page Footer ───────────────────────────────────────────────
 const PageFooter = () => (
   <View fixed style={{
     position: 'absolute',
@@ -70,74 +89,78 @@ const PageFooter = () => (
     borderTopColor: C.border,
     paddingTop: 6,
   }}>
-    <Text style={{ fontSize: 7, color: C.muted }}>INFO@GREENWM.CO.IL :מייל</Text>
-    <Text style={{ fontSize: 7, color: C.muted }}>03-6456005/6 :'טל</Text>
-    <Text style={{ fontSize: 7, color: C.muted }}>ז׳בוטינסקי 7, מגדל משה אביב, רמת גן.</Text>
-    <Text style={{ fontSize: 7, color: C.muted }}>WWW.GREENWM.CO.IL</Text>
+    <Text style={{ fontSize: 7, color: C.muted, direction: 'ltr', textAlign: 'left' }}>INFO@GREENWM.CO.IL</Text>
+    <Text style={{ fontSize: 7, color: C.muted, direction: 'ltr', textAlign: 'left' }}>03-6456005/6</Text>
+    <Text style={{ fontSize: 7, color: C.muted }}>ז׳בוטינסקי 7, מגדל משה אביב, רמת גן</Text>
+    <Text style={{ fontSize: 7, color: C.muted, direction: 'ltr', textAlign: 'left' }}>WWW.GREENWM.CO.IL</Text>
   </View>
 )
 
-const SectionTitle = ({ children }) => (
-  <Text style={{ fontSize: 12, fontWeight: 'bold', color: C.primary, textAlign: 'center', marginBottom: 14, marginTop: 6 }}>
-    {children}
-  </Text>
-)
+// ── Section Title ─────────────────────────────────────────────
+const SectionTitle = ({ children, styled }) => {
+  if (styled) {
+    return (
+      <View style={{ backgroundColor: C.primary, borderRadius: 3, paddingVertical: 6, paddingHorizontal: 12, marginBottom: 14, marginTop: 6 }}>
+        <Text style={{ fontSize: 12, fontWeight: 'bold', color: C.goldLight, textAlign: 'center' }}>
+          {children}
+        </Text>
+      </View>
+    )
+  }
+  return (
+    <Text style={{ fontSize: 12, fontWeight: 'bold', color: C.primary, textAlign: 'center', marginBottom: 14, marginTop: 6, textDecoration: 'underline' }}>
+      {children}
+    </Text>
+  )
+}
 
-const Para = ({ children, bold, indent, style }) => (
+// ── Paragraph ─────────────────────────────────────────────────
+const Para = ({ children, bold, style }) => (
   <Text style={[{
     fontSize: 10,
     textAlign: 'right',
     lineHeight: 1.6,
     marginBottom: 6,
     color: C.black,
-  }, bold && { fontWeight: 'bold' }, indent && { paddingRight: 16 }, style]}>
+  }, bold && { fontWeight: 'bold' }, style]}>
     {children}
   </Text>
 )
 
-const Clause = ({ num, children, bold }) => (
-  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 6 }} wrap={false}>
-    <View style={{ flex: 1 }}>
-      <Text style={[{ fontSize: 10, textAlign: 'right', lineHeight: 1.6, color: C.black }, bold && { fontWeight: 'bold' }]}>
-        {children}
-      </Text>
-    </View>
-    <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.black, marginLeft: 6, minWidth: 24, textAlign: 'left' }}>
-      {num}
-    </Text>
-  </View>
+// ── LTR Text (emails, URLs, phones) ───────────────────────────
+const LTR = ({ children, style }) => (
+  <Text style={[{ direction: 'ltr' }, style]}>{children}</Text>
 )
 
-const SubClause = ({ num, children, bold }) => (
-  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 4, paddingRight: 16 }} wrap={false}>
-    <View style={{ flex: 1 }}>
-      <Text style={[{ fontSize: 10, textAlign: 'right', lineHeight: 1.6, color: C.black }, bold && { fontWeight: 'bold' }]}>
-        {children}
-      </Text>
-    </View>
-    <Text style={{ fontSize: 10, color: C.black, marginLeft: 6, minWidth: 30, textAlign: 'left' }}>
-      {num}
-    </Text>
-  </View>
-)
-
-const SignLine = ({ label }) => (
-  <View style={{ alignItems: 'center', marginTop: 16 }}>
-    <Text style={{ fontSize: 14, fontWeight: 'bold', color: C.black }}>X</Text>
-    <View style={{ width: 180, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-    <Text style={{ fontSize: 9, color: C.muted }}>{label}</Text>
-  </View>
-)
-
-const DateField = () => (
-  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'flex-end', marginTop: 6 }}>
-    <View style={{ width: 120, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-    <Text style={{ fontSize: 10, marginLeft: 6 }}>:תאריך</Text>
-  </View>
-)
-
+// ── Dynamic Field ─────────────────────────────────────────────
 const DynField = ({ value }) => (
   <Text style={{ fontWeight: 'bold', color: C.primary }}>{value || '____________'}</Text>
+)
+
+// ── Signature Block ───────────────────────────────────────────
+const SignBlock = ({ label, dateValue }) => (
+  <View style={{ alignItems: 'center', width: 160 }}>
+    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
+    <View style={{ width: 160, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 3 }} />
+    <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center' }}>{label}</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 6, width: 160 }}>
+      {dateValue ? (
+        <Text style={{ fontSize: 8, color: C.black, flex: 1, textAlign: 'center' }}>{dateValue}</Text>
+      ) : (
+        <View style={{ flex: 1, borderBottomWidth: 1, borderBottomColor: C.black, height: 12 }} />
+      )}
+      <Text style={{ fontSize: 8, marginLeft: 4 }}>:תאריך</Text>
+    </View>
+  </View>
+)
+
+// ── Signature Row (multiple signers) ──────────────────────────
+const SignRow = ({ signers, dateValue }) => (
+  <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20, marginBottom: 8 }}>
+    {signers.map((s, i) => (
+      <SignBlock key={i} label={s} dateValue={dateValue} />
+    ))}
+  </View>
 )
 
 // ── Table Row for גילוי נאות ──────────────────────────────────
@@ -157,26 +180,35 @@ const TwoColRow = ({ left, right, even }) => (
   </View>
 )
 
-// ── Client details table row ──────────────────────────────────
-const DetailRow = ({ cells }) => (
-  <View style={{
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: C.primary,
-  }}>
-    {cells.map((cell, i) => (
-      <View key={i} style={{
-        flex: cell.flex || 1,
-        borderLeftWidth: i > 0 ? 1 : 0,
-        borderLeftColor: C.primary,
-        paddingVertical: 4,
-        paddingHorizontal: 6,
-      }}>
-        <Text style={{ fontSize: 9, textAlign: 'right', color: cell.bold ? C.primary : C.black, fontWeight: cell.bold ? 'bold' : 'normal' }}>
-          {cell.text}
-        </Text>
+// ── Client Info Table ─────────────────────────────────────────
+const ClientTable = ({ name, id, address, phone, email, idLabel, styled }) => (
+  <View style={{ borderWidth: 1, borderColor: styled ? C.gold : C.primary, marginBottom: 4 }}>
+    {/* Row 1: name, id, address */}
+    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: styled ? C.gold : C.primary }}>
+      <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: styled ? C.gold : C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>כתובת</Text>
+        <Text style={{ fontSize: 9, textAlign: 'right' }}>{address || ''}</Text>
       </View>
-    ))}
+      <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: styled ? C.gold : C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>{idLabel || 'ת.ז /ח.פ'}</Text>
+        <Text style={{ fontSize: 9, textAlign: 'right', direction: 'ltr' }}>{id || ''}</Text>
+      </View>
+      <View style={{ flex: 1.5, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>שם הלקוח</Text>
+        <Text style={{ fontSize: 9, textAlign: 'right', fontWeight: 'bold' }}>{name || ''}</Text>
+      </View>
+    </View>
+    {/* Row 2: phone, email */}
+    <View style={{ flexDirection: 'row' }}>
+      <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: styled ? C.gold : C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>דואר אלקטרוני</Text>
+        <Text style={{ fontSize: 9, textAlign: 'left', direction: 'ltr' }}>{email || ''}</Text>
+      </View>
+      <View style={{ flex: 1, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>טלפון</Text>
+        <Text style={{ fontSize: 9, textAlign: 'left', direction: 'ltr' }}>{phone || ''}</Text>
+      </View>
+    </View>
   </View>
 )
 
@@ -212,18 +244,18 @@ const DISCLOSURE_ENTITIES = [
 ]
 
 // ════════════════════════════════════════════════════════════════
-//  MAIN DOCUMENT
+//  MAIN DOCUMENT — supports both print and styled modes
 // ════════════════════════════════════════════════════════════════
-const MarketingAgreementDoc = ({ data }) => {
+const MarketingAgreementDoc = ({ data, styled }) => {
   const d = data
-  const hasClientB = !!(d.clientBName && d.clientBName.trim())
+  const dateVal = styled ? fmtDateAuto() : null
 
   return (
     <Document>
 
       {/* ═══════════════════ PAGE 1: COVER + PARTIES ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
         {/* Company header info */}
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 6, marginTop: 4 }}>
@@ -247,27 +279,26 @@ const MarketingAgreementDoc = ({ data }) => {
         <View style={{
           flexDirection: 'row',
           borderWidth: 1,
-          borderColor: C.primary,
+          borderColor: styled ? C.gold : C.primary,
           marginBottom: 14,
+          ...(styled ? { backgroundColor: C.offWhite } : {}),
         }}>
-          <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
-            <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>מס רישיון</Text>
+          <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: styled ? C.gold : C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted }}>מס רישיון</Text>
             <Text style={{ fontSize: 10, textAlign: 'right', fontWeight: 'bold' }}>{d.advisorLicense || ''}</Text>
           </View>
-          <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
-            <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>ת.ז</Text>
-            <Text style={{ fontSize: 10, textAlign: 'right', fontWeight: 'bold' }}>{d.advisorId || ''}</Text>
+          <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: styled ? C.gold : C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted }}>ת.ז</Text>
+            <Text style={{ fontSize: 10, textAlign: 'left', direction: 'ltr', fontWeight: 'bold' }}>{d.advisorId || ''}</Text>
           </View>
           <View style={{ flex: 2, paddingVertical: 4, paddingHorizontal: 6 }}>
-            <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>שם המשווק</Text>
+            <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted }}>שם המשווק</Text>
             <Text style={{ fontSize: 10, textAlign: 'right', fontWeight: 'bold' }}>{d.advisorName || ''}</Text>
           </View>
         </View>
 
         {/* Title */}
-        <Text style={{ fontSize: 14, fontWeight: 'bold', color: C.primary, textAlign: 'center', marginBottom: 8 }}>
-          הסכם שיווק השקעות
-        </Text>
+        <SectionTitle styled={styled}>הסכם שיווק השקעות</SectionTitle>
         <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 16, color: C.black }}>
           שנערך ונחתם ב<DynField value={d.city} /> ביום {d.date || '__ בחודש___ 2025'}
         </Text>
@@ -285,9 +316,10 @@ const MarketingAgreementDoc = ({ data }) => {
         <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 2 }}>
           ממגדל משה אביב, רחוב ז'בוטניסקי 7 רמת גן
         </Text>
-        <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 2 }}>
-          דוא"ל INFO@GREENWM.CO.IL
-        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 2 }}>
+          <Text style={{ fontSize: 10, direction: 'ltr', textAlign: 'left' }}>INFO@GREENWM.CO.IL</Text>
+          <Text style={{ fontSize: 10, marginLeft: 4 }}> דוא"ל</Text>
+        </View>
         <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 2 }}>
           (להלן – "גרין")
         </Text>
@@ -298,57 +330,20 @@ const MarketingAgreementDoc = ({ data }) => {
         {/* לבין */}
         <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 }}>לבין</Text>
 
-        {/* Client A table */}
-        <View style={{ borderWidth: 1, borderColor: C.primary, marginBottom: 4 }}>
-          <DetailRow cells={[
-            { text: d.clientAAddress || '', flex: 1 },
-            { text: d.clientAId || '', flex: 1 },
-            { text: d.clientAName || '', flex: 1.5 },
-          ]} />
-          <View style={{ flexDirection: 'row', borderBottomWidth: 0 }}>
-            <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
-              <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>דואר אלקטרוני</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right' }}>{d.clientAEmail || ''}</Text>
-            </View>
-            <View style={{ flex: 1, paddingVertical: 4, paddingHorizontal: 6 }}>
-              <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>טלפון</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right' }}>{d.clientAPhone || ''}</Text>
-            </View>
-          </View>
-        </View>
-        {/* Table headers for client A */}
-        <View style={{ flexDirection: 'row', marginBottom: 2, paddingHorizontal: 2 }}>
-          <Text style={{ flex: 1, fontSize: 8, textAlign: 'center', color: C.muted }}>כתובת</Text>
-          <Text style={{ flex: 1, fontSize: 8, textAlign: 'center', color: C.muted }}>ת.ז /ח.פ</Text>
-          <Text style={{ flex: 1.5, fontSize: 8, textAlign: 'center', color: C.muted }}>שם הלקוח</Text>
-        </View>
+        {/* Client A */}
+        <ClientTable
+          name={d.clientAName} id={d.clientAId} address={d.clientAAddress}
+          phone={d.clientAPhone} email={d.clientAEmail} idLabel="ת.ז /ח.פ" styled={styled}
+        />
         <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 10 }}>
           (להלן – "לקוח א'")
         </Text>
 
-        {/* Client B table */}
-        <View style={{ borderWidth: 1, borderColor: C.primary, marginBottom: 4 }}>
-          <DetailRow cells={[
-            { text: d.clientBAddress || '', flex: 1 },
-            { text: d.clientBId || '', flex: 1 },
-            { text: d.clientBName || '', flex: 1.5 },
-          ]} />
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
-              <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>דואר אלקטרוני</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right' }}>{d.clientBEmail || ''}</Text>
-            </View>
-            <View style={{ flex: 1, paddingVertical: 4, paddingHorizontal: 6 }}>
-              <Text style={{ fontSize: 9, textAlign: 'right', color: C.muted }}>טלפון</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right' }}>{d.clientBPhone || ''}</Text>
-            </View>
-          </View>
-        </View>
-        <View style={{ flexDirection: 'row', marginBottom: 2, paddingHorizontal: 2 }}>
-          <Text style={{ flex: 1, fontSize: 8, textAlign: 'center', color: C.muted }}>כתובת</Text>
-          <Text style={{ flex: 1, fontSize: 8, textAlign: 'center', color: C.muted }}>ת.ז</Text>
-          <Text style={{ flex: 1.5, fontSize: 8, textAlign: 'center', color: C.muted }}>שם הלקוח</Text>
-        </View>
+        {/* Client B */}
+        <ClientTable
+          name={d.clientBName} id={d.clientBId} address={d.clientBAddress}
+          phone={d.clientBPhone} email={d.clientBEmail} idLabel="ת.ז" styled={styled}
+        />
         <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 4 }}>
           (להלן – "לקוח ב')
         </Text>
@@ -371,7 +366,7 @@ const MarketingAgreementDoc = ({ data }) => {
 
       {/* ═══════════════════ PAGE 2: CLAUSES 1-4 ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
         <Para>
           {'בהתאם להוראות חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיק השקעות, תשנ"ה-1995 (להלן- "חוק ההשקעות");'}
@@ -390,166 +385,145 @@ const MarketingAgreementDoc = ({ data }) => {
           {'לפיכך, הוצהר, הותנה והוסכם בין הצדדים כדלקמן:'}
         </Para>
 
-        {/* Clause 1 */}
-        <Clause num=".1">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>1. </Text>
           {'המבוא להסכם זה ונספחיו מהווים חלק בלתי נפרד הימנו.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 2 */}
-        <Clause num=".2">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>2. </Text>
           {'גרין מתחייבת:'}
-        </Clause>
+        </Para>
 
-        <SubClause num="2.1">
+        <Para style={{ paddingRight: 16 }}>
+          <Text style={{ fontWeight: 'bold' }}>2.1 </Text>
           {'להעניק ללקוח את השירותים בהתאם להוראות כל דין, ובפרט להוראת חוק ההשקעות, באמצעות בעל רישיון משווק השקעות מטעמה.'}
-        </SubClause>
+        </Para>
 
-        <SubClause num="2.2">
+        <Para style={{ paddingRight: 16 }}>
+          <Text style={{ fontWeight: 'bold' }}>2.2 </Text>
           {'לפעול לטובת הלקוח, באמונה ובשקידה, ולא להעדיף את ענייניה האישיים או ענייניו של אחר על פני טובת הלקוח, ולא להעדיף את ענינו של לקוח על פני לקוח אחר, בכפוף לאמור בגילוי הנאות לעניין זיקה.'}
-        </SubClause>
+        </Para>
 
-        <SubClause num="2.3">
+        <Para style={{ paddingRight: 16 }}>
+          <Text style={{ fontWeight: 'bold' }}>2.3 </Text>
           {'מצורף כנספח "א" להסכם זה גילוי נאות מצד גרין.'}
-        </SubClause>
+        </Para>
 
-        {/* Clause 3 */}
-        <Clause num=".3">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>3. </Text>
           {'גרין תפעל, ככל הניתן, על מנת להתאים את שיווק ההשקעות, במסגרת השירותים, לצרכים ולהנחיות של הלקוח, כפי שיימסרו לגרין, בקשר עם הנתונים כמפורט בנספח "ב" להסכם זה. יודגש, כי אי מסירת פרטים מלאים בעניין נתוני הלקוח וצרכיו, עלולה לפגוע בשירות הניתן ללקוח, וללקוח לא תהא כל טענה כלפי גרין במקרה של אי התאמת השירות הנובעת מהעברת פרטים מלאים כאמור'}
-        </Clause>
+        </Para>
 
-        {/* Clause 4 */}
-        <Clause num=".4">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>4. </Text>
           {'אלא אם ייקבע במפורש אחרת, השירותים לא יכללו בכל מקרה ביצוע פעולות על ידי גרין עבור הלקוח, וכל פעולה בהמשך לשירותים תבוצע על ידי הלקוח עצמו מול היצרנים הרלוונטיים, ובאחריות הלקוח לוודא ביצוע הפעולה לשביעות רצונו. בכל מקרה גרין אינה אחראית לפעילותו של יצרן כלשהו. למען הסר ספק, בכל מקרה כל החלטת השקעה תהא על פי שיקול דעת הלקוח בלבד, וגרין לא תבצע כל פעולת השקעה על פי שיקול דעתה.'}
-        </Clause>
+        </Para>
 
         <PageFooter />
       </Page>
 
       {/* ═══════════════════ PAGE 3: CLAUSES 5-12 ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
-        {/* Clause 5 */}
-        <Clause num=".5">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>5. </Text>
           {'יודגש, כי הסכם זה חל על שירותי שיווק השקעות המפוקחים על ידי רשות ניירות ערך, וחובותיה של גרין לפי חוק ההשקעות '}
           <Text style={{ fontWeight: 'bold' }}>אינן חלות</Text>
           {' על שירותים של הפניית לקוחות לקבלת שירות מצדדים שלישיים, או מתן מידע על ידי גרין, שאינו כולל חיווי דעה או המלצה מקצועית בעניין כדאיות ההשקעה בניירות ערך ו/או בנכסים פיננסיים, שאינו עולה כדי שיווק השקעות.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 6 */}
-        <Clause num=".6">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>6. </Text>
           {'לשם מתן השירותים מעניק הלקוח לגרין ו/או למי מטעמה, ייפוי כוח לשם פניה ליצרנים כמפורט '}
           <Text style={{ fontWeight: 'bold' }}>בנספח "ג"</Text>
           {' להסכם זה. הלקוח מסכים לחתום על ייפוי כוח מתאים לצורך קבלת מידע מכל רלוונטי, וכפי שיידרש מעת לעת.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 7 */}
-        <Clause num=".7">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>7. </Text>
           {'שירותי השיווק יינתנו במשרדי גרין, בימי העבודה המקובלים במשק ובין השעות 9:00 עד 16:00 או במועדים אחרים כפי שיקבעו בין הצדדים, על אף האמור לעיל, מוסכם בין הצדדים כי '}
           <Text style={{ textDecoration: 'underline' }}>ניתן</Text>
           {' להעניק את השירותים גם באמצעות הטלפון ו/או אמצעי היוועדות חזותית, והכל לפי שיקול דעתה של גרין.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 8 */}
-        <Clause num=".8">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>8. </Text>
           {'התגמול לגרין יהיה, כמפורט '}
           <Text style={{ fontWeight: 'bold' }}>בנספח "ד"</Text>
           {' להסכם זה.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 9 */}
-        <Clause num=".9">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>9. </Text>
           {'הסכם זה ייכנס לתוקף במועד חתימתו ויעמוד בתוקף למשך תקופה בלתי קצובה. הלקוח רשאי לבטל, בכל עת, את ההתקשרות עם גרין לעניין שירותי שיווק ההשקעות לפי הסכם זה. גרין תהא רשאית לבטל את ההתקשרות עם הלקוח לעניין שירותי שיווק ההשקעות לפי הסכם זה, בהודעה של 14 ימים מראש מוסכם על הצדדים, כי משיכת מלוא הכספים בגינם ניתנים השירותים לפי הסכם זה, תיחשב, לכל דבר ועניין כהודעת סיום ההסכם על ידי הלקוח, אלא אם יוסכם בין הצדדים אחרת.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 10 */}
-        <Clause num=".10">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>10. </Text>
           {'יובהר ויודגש, כי גרין תעניק את השירותים על פי הסכם זה, ברמה נאותה, אך אין במתן השירותים כדי להוות הבטחה או אחריות מכל סוג שהוא לתוצאות ההשקעה או כדאיותה, וגרין אינה אחראית בכל צורה ואופן לפעילותם של צדדים שלישיים.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 11 */}
-        <Clause num=".11">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>11. </Text>
           {'ידוע ללקוח, כי מידע שיימסר על ידו במסגרת השירותים ו/או שיתקבל לגביו אגב השירותים יישמר במאגרי המידע של גרין וכן של חברות נוספות מקבוצת אגם, וזאת לצורך שירות לקוחות לרבות מתן הצעות שיווקיות המיועדות ללקוחות קבוצת אגם, ובכלל זה ישמש לדיוור ישיר ו/או שירותי דיוור ישיר. מובהר, כי אין חלה על הלקוח חובה על פי דין למסור מידע לגרין, וכל מידע יימסר בהסכמתו ומרצונו החופשי של הלקוח.'}
-        </Clause>
+        </Para>
 
-        {/* Clause 12 */}
-        <Clause num=".12">
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>12. </Text>
           {'הלקוח מאשר בזאת לגרין ו/או לחברות אחרות בקבוצת אגם, לפנות אליו בפניות שיווקיות בתחומי הביטוח והפיננסיים ו/או הטבות המיועדות ללקוחות הקבוצה גם באמצעים דיגיטליים (דוא"ל, מסרונים, מערכות שיחה אוטומטיות, פקס וכו\').'}
-        </Clause>
+        </Para>
 
-        <View style={{ marginTop: 8 }}>
-          <SignLine label="X" />
-        </View>
+        <SignRow signers={['X']} dateValue={dateVal} />
 
         <PageFooter />
       </Page>
 
       {/* ═══════════════════ PAGE 4: CLAUSES 13-15 + SIGNATURES ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
-        {/* Clause 13 */}
-        <Clause num=".13">
-          {'יובהר, כי הלקוח יהיה רשאי להסיר עצמו, בכל עת, מרשימות דיוור שיווקיות באמצעות הודעה למייל info@greenwm.co.il. גם אם הלקוח לא חתם על סעיף 12 לעיל ו/או יסיר עצמו מהודעות שיווקיות כאמור, הרי שכל עוד הוא לקוח של גרין, גרין תמשיך לשלוח ללקוח הודעות באמצעים דיגיטליים בעניינים הנוגעים ישירות לשירותים (לרבות עדכונים מקצועיים) ו/או כמתחייב על פי דין, ובחתימתו בשולי הסכם זה הלקוח נותן הסכמתו לכך.'}
-        </Clause>
-
-        {/* Clause 14 */}
-        <Clause num=".14">
-          {'גרין מתחייבת לשמור באופן סודי כל מידע שהביא הלקוח לידיעתה, לרבות מסמכים שהועברו לרשותה ותוכנם, וכל פרט אחר המתייחס לפעולות לגביהן עסקה בשיווק כלפי הלקוח, למעט אם יוסכם אחרת בכתב ו/או במקרה בו תידרש גרין למסור ידיעות על פי כל דין.'}
-        </Clause>
-
-        {/* Clause 15 */}
-        <Clause num=".15" bold>
-          {'שונות'}
-        </Clause>
-
-        <SubClause num="15.1">
-          {'הסכם זה ממצה את המוסכם בין הצדדים לעניינים המוסדרים בו, והכל בכפוף להוראות חוק ההשקעות. לא יחול כל שינוי בהסכם זה, אלא אם ייערך בכתב וייחתם על ידי שני הצדדים.'}
-        </SubClause>
-
-        <SubClause num="15.2">
-          {'רישומי גרין ייחשבו, בכל הנוגע להסכם זה והשירותים לפיו כראיה מכרעת לעניין המופיע בהם.'}
-        </SubClause>
-
-        <SubClause num="15.3">
-          {'כל הודעה שנשלחה בין הצדדים לפי הכתובות בכותרת הסכם זה, תיחשב כאילו הגיעה ליעדה, בתוך 3 ימי עסקים ממועד המשלוח באמצעת דואר רשום ו/או בתוך יום עסקים אחד לאחר שנשלחה בדוא"ל או נמסרה במסירה ידנית. לעניין הלקוח, אלא אם נקבע אחרת, מסירה לכל אחד מיחידי הלקוח תיחשב כמסירה למשנהו.'}
-        </SubClause>
-
-        <Para bold style={{ marginTop: 12, marginBottom: 20 }}>
-          {'ולראיה באו הצדדים על החתום:'}
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>13. </Text>
+          {'יובהר, כי הלקוח יהיה רשאי להסיר עצמו, בכל עת, מרשימות דיוור שיווקיות באמצעות הודעה למייל '}
+          <LTR>info@greenwm.co.il</LTR>
+          {'. גם אם הלקוח לא חתם על סעיף 12 לעיל ו/או יסיר עצמו מהודעות שיווקיות כאמור, הרי שכל עוד הוא לקוח של גרין, גרין תמשיך לשלוח ללקוח הודעות באמצעים דיגיטליים בעניינים הנוגעים ישירות לשירותים (לרבות עדכונים מקצועיים) ו/או כמתחייב על פי דין, ובחתימתו בשולי הסכם זה הלקוח נותן הסכמתו לכך.'}
         </Para>
 
-        {/* Signatures */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-          {/* Right side: GREEN */}
-          <View style={{ alignItems: 'center', width: '45%' }}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-            <View style={{ width: 180, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-            <Text style={{ fontSize: 9, color: C.muted, textAlign: 'center' }}>גרין סוכנות לביטוח פנסיוני ושיווק השקעות בעמ</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 8 }}>
-              <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-              <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
-            </View>
-          </View>
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>14. </Text>
+          {'גרין מתחייבת לשמור באופן סודי כל מידע שהביא הלקוח לידיעתה, לרבות מסמכים שהועברו לרשותה ותוכנם, וכל פרט אחר המתייחס לפעולות לגביהן עסקה בשיווק כלפי הלקוח, למעט אם יוסכם אחרת בכתב ו/או במקרה בו תידרש גרין למסור ידיעות על פי כל דין.'}
+        </Para>
 
-          {/* Left side: Client A */}
-          <View style={{ alignItems: 'center', width: '45%' }}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-            <View style={{ width: 180, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-            <Text style={{ fontSize: 9, color: C.muted }}>לקוח א'</Text>
-          </View>
-        </View>
+        <Para>
+          <Text style={{ fontWeight: 'bold', textDecoration: 'underline' }}>15. שונות</Text>
+        </Para>
 
-        {/* Client B */}
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-          <View style={{ width: 180, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-          <Text style={{ fontSize: 9, color: C.muted }}>לקוח ב'</Text>
-        </View>
+        <Para style={{ paddingRight: 16 }}>
+          <Text style={{ fontWeight: 'bold' }}>15.1 </Text>
+          {'הסכם זה ממצה את המוסכם בין הצדדים לעניינים המוסדרים בו, והכל בכפוף להוראות חוק ההשקעות. לא יחול כל שינוי בהסכם זה, אלא אם ייערך בכתב וייחתם על ידי שני הצדדים.'}
+        </Para>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
-          <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-          <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
+        <Para style={{ paddingRight: 16 }}>
+          <Text style={{ fontWeight: 'bold' }}>15.2 </Text>
+          {'רישומי גרין ייחשבו, בכל הנוגע להסכם זה והשירותים לפיו כראיה מכרעת לעניין המופיע בהם.'}
+        </Para>
+
+        <Para style={{ paddingRight: 16 }}>
+          <Text style={{ fontWeight: 'bold' }}>15.3 </Text>
+          {'כל הודעה שנשלחה בין הצדדים לפי הכתובות בכותרת הסכם זה, תיחשב כאילו הגיעה ליעדה, בתוך 3 ימי עסקים ממועד המשלוח באמצעת דואר רשום ו/או בתוך יום עסקים אחד לאחר שנשלחה בדוא"ל או נמסרה במסירה ידנית. לעניין הלקוח, אלא אם נקבע אחרת, מסירה לכל אחד מיחידי הלקוח תיחשב כמסירה למשנהו.'}
+        </Para>
+
+        <Para bold style={{ marginTop: 12, marginBottom: 8 }}>
+          ולראיה באו הצדדים על החתום:
+        </Para>
+
+        {/* 3 signatures side by side */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+          <SignBlock label="לקוח ב'" dateValue={dateVal} />
+          <SignBlock label="לקוח א'" dateValue={dateVal} />
+          <SignBlock label={'גרין סוכנות לביטוח פנסיוני\nושיווק השקעות בע"מ'} dateValue={dateVal} />
         </View>
 
         <PageFooter />
@@ -557,9 +531,9 @@ const MarketingAgreementDoc = ({ data }) => {
 
       {/* ═══════════════════ PAGE 5: נספח א׳ — גילוי נאות ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
-        <SectionTitle>נספח "א"- גילוי נאות</SectionTitle>
+        <SectionTitle styled={styled}>נספח "א"- גילוי נאות</SectionTitle>
 
         <Para>
           {'בהתאם לסעיף 16א לחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות, ובניהול תיקי השקעות, תשנ"ה-1995 (להלן – "החוק") גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ (להלן – "החברה") חברה בעלת רישיון '}
@@ -572,7 +546,7 @@ const MarketingAgreementDoc = ({ data }) => {
         </Para>
 
         {/* Entity table */}
-        <View style={{ borderWidth: 1, borderColor: C.primary, borderRadius: 2, marginTop: 6 }}>
+        <View style={{ borderWidth: 1, borderColor: styled ? C.gold : C.primary, borderRadius: 2, marginTop: 6 }}>
           {DISCLOSURE_ENTITIES.map(([right, left], i) => (
             <TwoColRow key={i} right={right} left={left} even={i % 2 === 0} />
           ))}
@@ -583,29 +557,21 @@ const MarketingAgreementDoc = ({ data }) => {
 
       {/* ═══════════════════ PAGE 6: המשך נספח א׳ + חתימה ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
         <Para>
           {'במסגרת עיסוקה בשיווק השקעות , רשאית החברה להעדיף נכס פיננסי שיש לה זיקה אליו על פני נכס אחר, הדומה מבחינת התאמתו ללקוח שאין לה זיקה אליו, ובלבד שעמדה בדרישות הגילוי לפי דין. זיקה כאמור לא תיחשב כניגוד עניינים בין החברה לבין הלקוח.'}
         </Para>
 
         <Para>
-          {'בהתאם מודיעה החברה, כי יש לה זיקה לנכסים הפיננסיים המנוהלים ו/או משווקים ו/או מוצעים על ידי גופים בעלי זיקה, כפי שיתעדכן מעת לעת באתר האינטרנט של החברה www.greenwm.co.il וכי היא עשויה לקבלת טובת הנאה בקשר עם ביצוע עסקה בנכסים פיננסיים אליהם יש לה זיקה, לרבות שיווקם ו/או המשך החזקה בהם.'}
+          {'בהתאם מודיעה החברה, כי יש לה זיקה לנכסים הפיננסיים המנוהלים ו/או משווקים ו/או מוצעים על ידי גופים בעלי זיקה, כפי שיתעדכן מעת לעת באתר האינטרנט של החברה '}
+          <LTR>www.greenwm.co.il</LTR>
+          {' וכי היא עשויה לקבלת טובת הנאה בקשר עם ביצוע עסקה בנכסים פיננסיים אליהם יש לה זיקה, לרבות שיווקם ו/או המשך החזקה בהם.'}
         </Para>
 
         {/* Signature */}
-        <View style={{ marginTop: 60 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-              <View style={{ width: 160, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-              <Text style={{ fontSize: 9, color: C.muted }}>חתימת הלקוח</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-              <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
-            </View>
-          </View>
+        <View style={{ marginTop: 60, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
         </View>
 
         <PageFooter />
@@ -613,99 +579,52 @@ const MarketingAgreementDoc = ({ data }) => {
 
       {/* ═══════════════════ PAGE 7: נספח ד׳ — תגמול ═══════════════════ */}
       <Page size="A4" style={pageStyle}>
-        <PageHeader />
+        <PageHeader styled={styled} />
 
-        <SectionTitle>נספח "ד"- נספח תגמול</SectionTitle>
+        <SectionTitle styled={styled}>נספח "ד"- נספח תגמול</SectionTitle>
 
         <Para bold style={{ marginBottom: 10, textAlign: 'center' }}>
-          {'תגמול בעל הרישיון יהיה לפי אחת האפשרויות להלן:'}
+          תגמול בעל הרישיון יהיה לפי אחת האפשרויות להלן:
         </Para>
 
         {/* Option i */}
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 6 }}>
-          <View style={{ flex: 1 }}>
-            <Para>
-              {'כנגד קבלת השירותים, יהא זכאי בעל הרישיון לגבות עמלה מגופים פיננסיים שונים להם יש לו זיקה, בגין הפניית הלקוח לגופים הפיננסיים בשיעורים שייקבעו בין בעל הרישיון לבין הגופים הפיננסיים השונים מעת לעת.'}
-            </Para>
-          </View>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', marginLeft: 8, minWidth: 14, textAlign: 'left' }}>
-            .i
-          </Text>
-        </View>
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>i. </Text>
+          {'כנגד קבלת השירותים, יהא זכאי בעל הרישיון לגבות עמלה מגופים פיננסיים שונים להם יש לו זיקה, בגין הפניית הלקוח לגופים הפיננסיים בשיעורים שייקבעו בין בעל הרישיון לבין הגופים הפיננסיים השונים מעת לעת.'}
+        </Para>
 
         {/* Signature after option i */}
         {d.compensationModel === 'i' && (
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 6, marginBottom: 12 }}>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-              <View style={{ width: 140, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-              <Text style={{ fontSize: 9, color: C.muted }}>חתימת הלקוח</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-              <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
-            </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 6, marginBottom: 12 }}>
+            <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
           </View>
         )}
 
         <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', marginVertical: 10 }}>או</Text>
 
         {/* Option ii */}
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 4 }}>
-          <View style={{ flex: 1 }}>
-            <Para>
-              {'כנגד קבלת השירותים, ישלם הלקוח לבעל הרישיון דמי טיפול בשיעור שנתי כולל של %'}
-              <DynField value={d.compensationPercent} />
-              {' (בתוספת מע"מ) מסך שווי הנכסים המשוערך של הלקוח אשר ביחס אליהם מוענקים שירותים ("נכסי הלקוח") או לחילופין שכר טירחה בגובה '}
-              <DynField value={d.compensationAmount} />
-              {' ₪ כפי שהוסכם בין הצדדים .'}
-            </Para>
-          </View>
-          <Text style={{ fontSize: 10, fontWeight: 'bold', marginLeft: 8, minWidth: 14, textAlign: 'left' }}>
-            .ii
-          </Text>
-        </View>
+        <Para>
+          <Text style={{ fontWeight: 'bold' }}>ii. </Text>
+          {'כנגד קבלת השירותים, ישלם הלקוח לבעל הרישיון דמי טיפול בשיעור שנתי כולל של %'}
+          <DynField value={d.compensationPercent} />
+          {' (בתוספת מע"מ) מסך שווי הנכסים המשוערך של הלקוח אשר ביחס אליהם מוענקים שירותים ("נכסי הלקוח") או לחילופין שכר טירחה בגובה '}
+          <DynField value={d.compensationAmount} />
+          {' ₪ כפי שהוסכם בין הצדדים .'}
+        </Para>
 
-        {/* Sub-clauses of ii */}
-        <View style={{ paddingRight: 24 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 4 }}>
-            <View style={{ flex: 1 }}>
-              <Para>
-                {'התמורה תשולם באופן רבעוני (או חלקו היחסי - לפי העניין), כנגד חשבונית, בתחילת כל רבעון קלנדארי, עבור הרבעון שקדם לו, בהתבסס על שווי נכסי הלקוח המשוערך לתום הרבעון הקלנדארי הקודם.'}
-              </Para>
-            </View>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', marginLeft: 6, minWidth: 14, textAlign: 'left' }}>
-              .א
-            </Text>
-          </View>
+        <Para style={{ paddingRight: 24 }}>
+          <Text style={{ fontWeight: 'bold' }}>א. </Text>
+          {'התמורה תשולם באופן רבעוני (או חלקו היחסי - לפי העניין), כנגד חשבונית, בתחילת כל רבעון קלנדארי, עבור הרבעון שקדם לו, בהתבסס על שווי נכסי הלקוח המשוערך לתום הרבעון הקלנדארי הקודם.'}
+        </Para>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 4 }}>
-            <View style={{ flex: 1 }}>
-              <Para>
-                {'ככל שחלופה זו נבחרה - במידה ויתקבלו בידי בעל הרישיון תקבולים שוטפים מגופים פיננסיים שונים בגין הפניית הלקוח לקבלת שירותים מהם, אזי שכל התקבולים כאמור יוחזרו במלואם ללקוח על ידי הקטנת תשלום הרבעוני.'}
-              </Para>
-            </View>
-            <Text style={{ fontSize: 10, fontWeight: 'bold', marginLeft: 6, minWidth: 14, textAlign: 'left' }}>
-              .ב
-            </Text>
-          </View>
-        </View>
+        <Para style={{ paddingRight: 24 }}>
+          <Text style={{ fontWeight: 'bold' }}>ב. </Text>
+          {'ככל שחלופה זו נבחרה - במידה ויתקבלו בידי בעל הרישיון תקבולים שוטפים מגופים פיננסיים שונים בגין הפניית הלקוח לקבלת שירותים מהם, אזי שכל התקבולים כאמור יוחזרו במלואם ללקוח על ידי הקטנת תשלום הרבעוני.'}
+        </Para>
 
         {/* Signature after option ii */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 16 }}>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-            <View style={{ width: 140, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-            <Text style={{ fontSize: 9, color: C.muted }}>חתימת הלקוח</Text>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-            <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-            <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-            <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-            <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
-          </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
         </View>
 
         <PageFooter />
@@ -714,17 +633,15 @@ const MarketingAgreementDoc = ({ data }) => {
       {/* ═══════════════════ PAGE 8: השקעות בסיכון מיוחד (conditional) ═══════════════════ */}
       {d.isEligible && (
         <Page size="A4" style={pageStyle}>
-          <PageHeader />
+          <PageHeader styled={styled} />
 
-          <SectionTitle>השקעות בסיכון מיוחד</SectionTitle>
+          <SectionTitle styled={styled}>השקעות בסיכון מיוחד</SectionTitle>
 
           <Para>
             {'הלקוח מבקש מבעל הרישיון לקבל שרותים ביחס לעסקאות שכרוכה בהן סיכון מיוחד כמשמעות מונח זה בחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות, תשנ"ה – 1995, כפי שיעודכן מעת לעת ('}
             <Text style={{ fontWeight: 'bold' }}>"עסקה בסיכון מיוחד"</Text>
             {').'}
           </Para>
-
-          {/* Footnote reference marker handled inline */}
 
           <Para>
             {'הלקוח, מבקש מבעל רישיון שעניין אותו בהשקעה במוצרים מובנים (ניירות ערך ו/או פיקדונות ו/או השקעות אחרות, שהתשואה עליהם או הסיכון הכרוך בהם נקבעים על פי נוסחה המבוססת על שינוי במדד כלשהו, במחיר נייר ערך כלשהו, במחיר סחורה כלשהי, במחיר אופציה או חוזה עתידי כלשהו, בריבית או בהפרשים בין ריביות שונות, בשער חליפין או בהפרשים בין שערי חליפין כלשהם).'}
@@ -739,16 +656,8 @@ const MarketingAgreementDoc = ({ data }) => {
           </Para>
 
           {/* Signature */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 16 }}>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-              <View style={{ width: 140, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 4 }} />
-              <Text style={{ fontSize: 9, color: C.muted }}>חתימת הלקוח</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-              <View style={{ width: 100, borderBottomWidth: 1, borderBottomColor: C.black, height: 14 }} />
-              <Text style={{ fontSize: 9, marginLeft: 4 }}>:תאריך</Text>
-            </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+            <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
           </View>
 
           {/* Footnote */}
@@ -769,16 +678,34 @@ const MarketingAgreementDoc = ({ data }) => {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  EXPORT
+//  EXPORTS
 // ══════════════════════════════════════════════════════════════
+
+/** גרסת הדפסה — שחור-לבן, קווים נקיים, ללא רקעים */
 export async function generateMarketingAgreement(clientData) {
-  const blob = await pdf(<MarketingAgreementDoc data={clientData} />).toBlob()
+  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'
   const safeName = clientName.replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]
   const fileName = `הסכם_שיווק_${dateStr}_${safeName}.pdf`
+
+  const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const previewUrl = URL.createObjectURL(previewBlob)
+
+  return { url: previewUrl, fileName, pdfBytes }
+}
+
+/** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
+export async function generateMarketingAgreementStyled(clientData) {
+  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  const pdfBytes = await blob.arrayBuffer()
+
+  const clientName = clientData.clientAName || 'client'
+  const safeName = clientName.replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
+  const dateStr = new Date().toISOString().split('T')[0]
+  const fileName = `הסכם_שיווק_styled_${dateStr}_${safeName}.pdf`
 
   const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
   const previewUrl = URL.createObjectURL(previewBlob)

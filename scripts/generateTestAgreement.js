@@ -1,5 +1,5 @@
 /**
- * Generate a test marketing agreement PDF
+ * Generate test marketing agreement PDFs (print + styled)
  * Usage: npx tsx scripts/generateTestAgreement.js
  */
 import fs from 'fs'
@@ -23,7 +23,7 @@ Font.register = (descriptor) => {
   _origRegister(descriptor)
 }
 
-const { generateMarketingAgreement } = await import('../src/components/pdf/generateMarketingAgreement.jsx')
+const { generateMarketingAgreement, generateMarketingAgreementStyled } = await import('../src/components/pdf/generateMarketingAgreement.jsx')
 
 // Restore and register with filesystem paths
 Font.register = _origRegister
@@ -59,34 +59,38 @@ const testData = {
   isEligible: true,
 }
 
-// ── Generate ──────────────────────────────────────────────────
-console.log('Generating marketing agreement PDF...')
+// ── Helper ────────────────────────────────────────────────────
+async function writeResult(result, outPath, label) {
+  try {
+    fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
+  } catch (e) {
+    if (e.code === 'EBUSY') {
+      outPath = outPath.replace('.pdf', `_${Date.now()}.pdf`)
+      fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
+    } else throw e
+  }
+  const buf = fs.readFileSync(outPath)
+  const pages = (buf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length
+  const kb = Math.round(fs.statSync(outPath).size / 1024)
+  console.log(`[${label}] ${outPath} — ${pages} pages, ${kb}KB`)
+}
+
+// ── Generate Both ─────────────────────────────────────────────
+console.log('Generating marketing agreement PDFs...')
 const start = Date.now()
 
 try {
-  const result = await generateMarketingAgreement(testData)
-  let outPath = path.join(projectRoot, 'agreement_output.pdf')
-  try {
-    fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
-  } catch (writeErr) {
-    if (writeErr.code === 'EBUSY') {
-      outPath = path.join(projectRoot, `agreement_output_${Date.now()}.pdf`)
-      fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
-    } else throw writeErr
-  }
+  const [print, styled] = await Promise.all([
+    generateMarketingAgreement(testData),
+    generateMarketingAgreementStyled(testData),
+  ])
 
-  const sizeKB = Math.round(fs.statSync(outPath).size / 1024)
-  const elapsed = Date.now() - start
+  fs.mkdirSync(path.join(projectRoot, 'טפסים_ידניים'), { recursive: true })
 
-  // Count pages
-  const buf = fs.readFileSync(outPath)
-  const pageCount = (buf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length
+  await writeResult(print, path.join(projectRoot, 'agreement_print.pdf'), 'PRINT')
+  await writeResult(styled, path.join(projectRoot, 'agreement_styled.pdf'), 'STYLED')
 
-  console.log(`Done in ${elapsed}ms`)
-  console.log(`File: ${outPath}`)
-  console.log(`Size: ${sizeKB}KB`)
-  console.log(`Pages: ${pageCount}`)
-  console.log(`Name: ${result.fileName}`)
+  console.log(`Done in ${Date.now() - start}ms`)
 } catch (err) {
   console.error('Agreement PDF generation failed:', err)
   process.exit(1)
