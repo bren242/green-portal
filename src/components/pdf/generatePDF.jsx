@@ -17,7 +17,7 @@ const goalLabels = {
   preserve: 'שמירת ערך', income: 'הכנסה שוטפת', growth: 'צמיחה לטווח ארוך',
   pension: 'חיסכון לפנסיה', education: 'חינוך ילדים', intergenerational: 'העברה בין-דורית', other: 'אחר',
 }
-const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': 'שנתיים עד 5', '5_to_10': 'שנים 5–10', over_10: 'מעל 10 שנים' }
+const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': 'שנתיים עד 5', '5_to_10': '5–10 שנים', over_10: 'מעל 10 שנים' }
 const timelineLabels  = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
 const next3Labels     = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
 const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
@@ -190,8 +190,8 @@ const KYCDocument = ({ formData, user }) => {
           {isCouple ? (
             <View style={{ marginTop: 16, flexDirection: 'row', gap: 8 }}>
               {[
-                { client: formData.clientB, title: 'לקוח ב׳' },
                 { client: formData.clientA, title: 'לקוח א׳' },
+                { client: formData.clientB, title: 'לקוח ב׳' },
               ].map(({ client, title }, i) => (
                 <View key={i} style={{
                   flex: 1,
