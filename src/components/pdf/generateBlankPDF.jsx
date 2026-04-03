@@ -45,18 +45,9 @@ const pageStyle = {
 //  LOCAL COMPONENTS
 // ══════════════════════════════════════════════════════════════
 
-// תוקן: row-reverse לסדר לוגו שמאל, טקסט ימין
 const SimpleHeader = () => (
-  <View style={{
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1.5,
-    borderBottomColor: C.gold,
-  }}>
-    <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary }}>GREEN Wealth Management</Text>
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingBottom: 8, borderBottomWidth: 1.5, borderBottomColor: '#B8975A' }}>
+    <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#1B3A2F' }}>GREEN Wealth Management</Text>
     <Image src={logoPng} style={{ height: 30 }} />
   </View>
 )
@@ -70,11 +61,11 @@ const SecTitle = ({ children }) => (
   }}>{children}</Text>
 )
 
-// תוקן: שדה כתיבה — תווית ימין, קו כתיבה שמאלה
 const Field = ({ label, width = 160 }) => (
   <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 12 }}>
-    <Text style={{ fontSize: 10, color: C.muted, marginLeft: 6, textAlign: 'right', minWidth: 80 }}>{label}</Text>
-    <View style={{ width, borderBottomWidth: 1, borderBottomColor: C.black, height: 18 }} />
+    <Text style={{ fontSize: 10, color: '#5A5A5A', flexShrink: 0 }}>{label}</Text>
+    <View style={{ width: 6 }} />
+    <View style={{ width, borderBottomWidth: 1, borderBottomColor: '#1A1A1A', height: 18 }} />
   </View>
 )
 
@@ -85,17 +76,13 @@ const FieldRow2 = ({ right, left }) => (
   </View>
 )
 
-// תוקן: ריבוע צ'קבוקס עם גודל קבוע, לא flex
 const Check = ({ label, score }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 8 }}>
-    <View style={{
-      width: 12, height: 12,
-      borderWidth: 1.5, borderColor: C.black,
-      marginLeft: 7, flexShrink: 0,
-    }} />
-    <Text style={{ fontSize: 10, color: C.black, textAlign: 'right', flex: 1 }}>{label}</Text>
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 8, width: '100%' }}>
+    <View style={{ width: 12, height: 12, borderWidth: 1.5, borderColor: '#1A1A1A', flexShrink: 0 }} />
+    <View style={{ width: 8 }} />
+    <Text style={{ fontSize: 10, textAlign: 'right', flexShrink: 1, flexGrow: 1 }}>{label}</Text>
     {score !== undefined && (
-      <Text style={{ fontSize: 9, color: C.muted, marginRight: 4 }}>({score} נק׳)</Text>
+      <Text style={{ fontSize: 9, color: '#5A5A5A', flexShrink: 0, marginLeft: 4 }}>({score} נק׳)</Text>
     )}
   </View>
 )
