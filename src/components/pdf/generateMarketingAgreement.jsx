@@ -307,7 +307,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         {/* Title */}
         <SectionTitle styled={styled}>הסכם שיווק השקעות</SectionTitle>
         <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 16, color: C.black }}>
-          שנערך ונחתם ב{styled ? '____________' : <DynField value={d.city} />} ביום {styled ? fmtDateHebrew() : '__ בחודש___ 2025'}
+          שנערך ונחתם ב{styled ? <DynField value={d.city} /> : <DynField value={d.city} />} ביום {styled ? fmtDateHebrew() : '__ בחודש___ 2025'}
         </Text>
 
         {/* בין */}

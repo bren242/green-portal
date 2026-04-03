@@ -139,6 +139,18 @@ export default function ClientDetailsStep({ session, onUpdate, onNext, onBack })
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-text-primary mb-1">כתובת</label>
+              <input
+                type="text"
+                value={client.address}
+                onChange={(e) => updateClient(clientKey, 'address', e.target.value)}
+                autoComplete="off"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+                placeholder="רחוב, עיר"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-text-primary mb-1">עיסוק</label>

@@ -6,6 +6,7 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onCo
   const [generating, setGenerating] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [city, setCity] = useState('רמת גן')
 
   // Build clientData for the agreement PDF
   const buildAgreementData = () => ({
@@ -16,14 +17,13 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onCo
     clientAId: session.clientA?.idNumber || '',
     clientAPhone: session.clientA?.phone || '',
     clientAEmail: session.clientA?.email || '',
-    clientAAddress: '',
+    clientAAddress: session.clientA?.address || '',
     clientBName: session.signerType === 'couple' ? (session.clientB?.fullName || '') : '',
     clientBId: session.signerType === 'couple' ? (session.clientB?.idNumber || '') : '',
     clientBPhone: session.signerType === 'couple' ? (session.clientB?.phone || '') : '',
     clientBEmail: session.signerType === 'couple' ? (session.clientB?.email || '') : '',
-    clientBAddress: '',
-    city: 'רמת גן',
-    date: null, // auto-filled by styled version
+    clientBAddress: session.signerType === 'couple' ? (session.clientB?.address || '') : '',
+    city: city,
   })
 
   const handleGenerate = async () => {
@@ -94,6 +94,19 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onCo
                 <span className="font-semibold text-text-primary">{session.clientA?.idNumber}</span>
               </div>
             </div>
+          </div>
+
+          {/* City field */}
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-text-primary mb-1">מקום החתימה</label>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              autoComplete="off"
+              placeholder="רמת גן"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+            />
           </div>
 
           {error && (

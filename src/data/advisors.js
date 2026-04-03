@@ -60,6 +60,7 @@ function createEmptyClientDetails() {
     maritalStatus: '',
     phone: '',
     email: '',
+    address: '',
     occupation: '',
     dependents: '',
   }
