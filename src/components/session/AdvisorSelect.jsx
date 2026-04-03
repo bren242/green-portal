@@ -1,6 +1,8 @@
-import { ADVISORS } from '../../data/advisors'
+import { getAdvisors } from '../../data/users'
 
 export default function AdvisorSelect({ onSelect }) {
+  const advisors = getAdvisors()
+
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="w-full max-w-md">
@@ -12,7 +14,7 @@ export default function AdvisorSelect({ onSelect }) {
         </p>
 
         <div className="space-y-3">
-          {ADVISORS.map((advisor) => (
+          {advisors.map((advisor) => (
             <button
               key={advisor.id}
               onClick={() => onSelect(advisor)}

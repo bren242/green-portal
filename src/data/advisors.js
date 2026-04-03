@@ -1,26 +1,5 @@
-// Advisor details for session selection
-// Each advisor has name, ID number, and ISA license number
-
-export const ADVISORS = [
-  {
-    id: 'eyal',
-    name: 'אייל ברנר',
-    idNumber: '',
-    license: '',
-  },
-  {
-    id: 'yuval_lerer',
-    name: 'יובל לרר',
-    idNumber: '',
-    license: '',
-  },
-  {
-    id: 'yuval_koren',
-    name: 'יובל קורן',
-    idNumber: '',
-    license: '',
-  },
-]
+// Session config — paths, modules, blank forms
+// Advisor list is managed in users.js (persisted in localStorage)
 
 // Path definitions — which modules are required per client path
 export const PATH_MODULES = {
