@@ -1,23 +1,22 @@
 import { useState, useEffect, useCallback } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/auth/Login'
-import Wizard from './components/wizard/Wizard'
 import AdminPanel from './components/admin/AdminPanel'
+import SessionFlow from './components/session/SessionFlow'
 import PDFPreviewPage from './components/pdf/PDFPreviewPage'
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000 // 10 minutes
 
 function App() {
   const [user, setUser] = useState(null)
-  const [view, setView] = useState('wizard') // 'wizard' | 'admin'
+  const [view, setView] = useState('session') // 'session' | 'admin'
   const [lastActivity, setLastActivity] = useState(Date.now())
 
   const handleLogout = useCallback(() => {
     setUser(null)
-    setView('wizard')
+    setView('session')
   }, [])
 
-  // Inactivity timeout
+  // Inactivity timeout — resets ALL state back to login
   useEffect(() => {
     if (!user) return
 
@@ -52,25 +51,15 @@ function App() {
   }
 
   if (view === 'admin' && user.role === 'admin') {
-    return <AdminPanel onBack={() => setView('wizard')} />
+    return <AdminPanel onBack={() => setView('session')} />
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Wizard
-              user={user}
-              onLogout={handleLogout}
-              onAdmin={user.role === 'admin' ? () => setView('admin') : null}
-            />
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <SessionFlow
+      user={user}
+      onLogout={handleLogout}
+      onAdmin={user.role === 'admin' ? () => setView('admin') : null}
+    />
   )
 }
 

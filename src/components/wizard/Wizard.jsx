@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createEmptyForm, WIZARD_STEPS, validateStep } from '../../data/formSchema'
 import WizardHeader from './WizardHeader'
 import WizardProgress from './WizardProgress'
@@ -10,9 +10,30 @@ import LiquidityStep from './steps/LiquidityStep'
 import RiskStep from './steps/RiskStep'
 import AdvisorStep from './steps/AdvisorStep'
 
-export default function Wizard({ user, onLogout, onAdmin }) {
+export default function Wizard({ user, onLogout, onAdmin, clientData, onComplete, onBack }) {
+  // When clientData is passed from session, pre-fill and skip gate+personal steps
+  const hasSessionData = !!clientData
+
+  const initialForm = useMemo(() => {
+    const form = createEmptyForm()
+    if (clientData) {
+      form.signerType = clientData.signerType || ''
+      if (clientData.clientA) form.clientA = { ...form.clientA, ...clientData.clientA }
+      if (clientData.clientB) form.clientB = { ...form.clientB, ...clientData.clientB }
+    }
+    return form
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // If session data provided, skip gate and personal steps (already filled)
+  const activeSteps = useMemo(() => {
+    if (hasSessionData) {
+      return WIZARD_STEPS.filter((s) => s.id !== 'gate' && s.id !== 'personal')
+    }
+    return WIZARD_STEPS
+  }, [hasSessionData])
+
   const [currentStep, setCurrentStep] = useState(0)
-  const [formData, setFormData] = useState(createEmptyForm())
+  const [formData, setFormData] = useState(initialForm)
   const [validationErrors, setValidationErrors] = useState([])
 
   const updateForm = (updates) => {
@@ -34,7 +55,7 @@ export default function Wizard({ user, onLogout, onAdmin }) {
   const isRefused = (field) => formData.refusals.some((r) => r.field === field)
 
   const nextStep = () => {
-    const stepId = WIZARD_STEPS[currentStep].id
+    const stepId = activeSteps[currentStep].id
     const errors = validateStep(stepId, formData)
     if (errors.length > 0) {
       setValidationErrors(errors)
@@ -42,7 +63,7 @@ export default function Wizard({ user, onLogout, onAdmin }) {
       return
     }
     setValidationErrors([])
-    if (currentStep < WIZARD_STEPS.length - 1) {
+    if (currentStep < activeSteps.length - 1) {
       setCurrentStep((s) => s + 1)
       window.scrollTo(0, 0)
     }
@@ -71,7 +92,7 @@ export default function Wizard({ user, onLogout, onAdmin }) {
   }
 
   const renderStep = () => {
-    switch (WIZARD_STEPS[currentStep].id) {
+    switch (activeSteps[currentStep].id) {
       case 'gate': return <GateStep {...stepProps} />
       case 'personal': return <PersonalStep {...stepProps} />
       case 'financial': return <FinancialStep {...stepProps} />
@@ -87,8 +108,18 @@ export default function Wizard({ user, onLogout, onAdmin }) {
     <div className="min-h-screen bg-surface-offwhite">
       <WizardHeader user={user} onLogout={onLogout} onAdmin={onAdmin} />
       <div className="max-w-3xl mx-auto px-4 py-5">
+        {/* Back to modules button (when inside session flow) */}
+        {hasSessionData && (
+          <button
+            onClick={onBack}
+            className="text-sm text-text-muted hover:text-green-primary transition-colors mb-3"
+          >
+            ← חזרה למודולים
+          </button>
+        )}
+
         <WizardProgress
-          steps={WIZARD_STEPS}
+          steps={activeSteps}
           currentStep={currentStep}
           onStepClick={goToStep}
         />
@@ -109,10 +140,10 @@ export default function Wizard({ user, onLogout, onAdmin }) {
         <div className="bg-white rounded-card shadow-card border border-border/50 p-6 md:p-8 mt-4">
           <div className="mb-6">
             <h2 className="text-lg font-extrabold text-green-primary">
-              {WIZARD_STEPS[currentStep].title}
+              {activeSteps[currentStep].title}
             </h2>
             <p className="text-sm text-text-muted mt-0.5">
-              {WIZARD_STEPS[currentStep].subtitle}
+              {activeSteps[currentStep].subtitle}
             </p>
             <div className="h-[2px] bg-gold/30 mt-3 rounded-full" />
           </div>
@@ -122,13 +153,13 @@ export default function Wizard({ user, onLogout, onAdmin }) {
         {/* Navigation */}
         <div className="flex justify-between mt-5">
           <button
-            onClick={prevStep}
-            disabled={currentStep === 0}
+            onClick={currentStep === 0 && hasSessionData ? onBack : prevStep}
+            disabled={currentStep === 0 && !hasSessionData}
             className="px-6 py-2.5 border border-border rounded-card text-sm font-semibold text-text-primary hover:bg-surface-light transition-colors disabled:opacity-30 disabled:cursor-not-allowed shadow-sm"
           >
             הקודם
           </button>
-          {currentStep < WIZARD_STEPS.length - 1 ? (
+          {currentStep < activeSteps.length - 1 ? (
             <button
               onClick={nextStep}
               className="px-8 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
