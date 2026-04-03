@@ -17,7 +17,7 @@ const goalLabels = {
   preserve: 'שמירת ערך', income: 'הכנסה שוטפת', growth: 'צמיחה לטווח ארוך',
   pension: 'חיסכון לפנסיה', education: 'חינוך ילדים', intergenerational: 'העברה בין-דורית', other: 'אחר',
 }
-const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', '5_to_10': 'שנים 10-5', over_10: 'מעל 10 שנים' }
+const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': 'שנתיים עד 5', '5_to_10': 'שנים 5–10', over_10: 'מעל 10 שנים' }
 const timelineLabels  = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
 const next3Labels     = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
 const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
@@ -39,8 +39,17 @@ const REG_TEXTS = [
 // ════════════════════════════════════════════════════════════════
 const KYCDocument = ({ formData, user }) => {
   const date = fmtDate()
-  const clientName = formData.clientA.fullName || '---'
   const isCouple = formData.signerType === 'couple'
+  const getDisplayName = () => {
+    if (!isCouple) return formData.clientA.fullName || '---'
+    const [aFirst, ...aLast] = (formData.clientA.fullName || '').split(' ')
+    const [bFirst, ...bLast] = (formData.clientB.fullName || '').split(' ')
+    if (aLast.join(' ') === bLast.join(' ') && aLast.length > 0) {
+      return `${aFirst} ו${bFirst} ${aLast.join(' ')}`
+    }
+    return `${formData.clientA.fullName} ו${formData.clientB.fullName}`
+  }
+  const clientName = getDisplayName()
 
   // ── Financial Calculations ───────────────────────────────────
   let totalAssets = 0, totalLiabilities = 0
@@ -100,12 +109,14 @@ const KYCDocument = ({ formData, user }) => {
   if (formData.liabilities.mortgage.has) {
     totalLiabilities += parseAmount(formData.liabilities.mortgage.total)
     totalMonthlyExpenses += parseAmount(formData.liabilities.mortgage.monthly)
-    liabRows.push(['משכנתא', `חודשי: ${fmtMoney(formData.liabilities.mortgage.monthly)} | יתרה: ${fmtMoney(formData.liabilities.mortgage.total)}`])
+    liabRows.push(['משכנתא', fmtMoney(formData.liabilities.mortgage.total)])
+    liabRows.push(['   חודשי', fmtMoney(formData.liabilities.mortgage.monthly)])
   }
   if (formData.liabilities.loans.has) {
     totalLiabilities += parseAmount(formData.liabilities.loans.total)
     totalMonthlyExpenses += parseAmount(formData.liabilities.loans.monthly)
-    liabRows.push(['הלוואות', `חודשי: ${fmtMoney(formData.liabilities.loans.monthly)} | יתרה: ${fmtMoney(formData.liabilities.loans.total)}`])
+    liabRows.push(['הלוואות', fmtMoney(formData.liabilities.loans.total)])
+    liabRows.push(['   חודשי', fmtMoney(formData.liabilities.loans.monthly)])
   }
   if (formData.liabilities.monthlyExpenses) {
     totalMonthlyExpenses += parseAmount(formData.liabilities.monthlyExpenses)
@@ -234,8 +245,8 @@ const KYCDocument = ({ formData, user }) => {
         <SectionTitle>פרטים מזהים</SectionTitle>
         {isCouple ? (
           <View style={{ flexDirection: 'row', gap: 6 }}>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
             <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
+            <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
           </View>
         ) : (
           <View style={{ width: '100%' }}>
