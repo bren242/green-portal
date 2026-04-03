@@ -10,7 +10,7 @@ import LiquidityStep from './steps/LiquidityStep'
 import RiskStep from './steps/RiskStep'
 import AdvisorStep from './steps/AdvisorStep'
 
-export default function Wizard({ user, onLogout, onAdmin, clientData, onComplete, onBack }) {
+export default function Wizard({ user, onLogout, onAdmin, clientData, onSavePDF, onComplete, onBack }) {
   // When clientData is passed from session, pre-fill and skip gate+personal steps
   const hasSessionData = !!clientData
 
@@ -94,6 +94,7 @@ export default function Wizard({ user, onLogout, onAdmin, clientData, onComplete
     toggleRefusal,
     isRefused,
     user: effectiveUser,
+    onSavePDF,
     onComplete,
   }
 

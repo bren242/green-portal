@@ -49,6 +49,17 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
     setActiveModule(moduleId)
   }
 
+  // Module: save PDF to session (called before complete)
+  const handleSavePDF = (moduleId, pdfBytes, fileName) => {
+    setSession((prev) => ({
+      ...prev,
+      completedPDFs: [
+        ...prev.completedPDFs.filter((p) => p.moduleId !== moduleId),
+        { moduleId, pdfBytes, fileName },
+      ],
+    }))
+  }
+
   // Module: completed, return to module selection
   const handleModuleComplete = (moduleId) => {
     setSession((prev) => ({
@@ -90,6 +101,7 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
           onLogout={onLogout}
           onAdmin={onAdmin}
           clientData={buildClientData()}
+          onSavePDF={(pdfBytes, fileName) => handleSavePDF('kyc', pdfBytes, fileName)}
           onComplete={() => handleModuleComplete('kyc')}
           onBack={handleModuleBack}
         />
@@ -103,6 +115,7 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
           session={session}
           onLogout={onLogout}
           onAdmin={onAdmin}
+          onSavePDF={(pdfBytes, fileName) => handleSavePDF('agreement', pdfBytes, fileName)}
           onComplete={() => handleModuleComplete('agreement')}
           onBack={handleModuleBack}
         />

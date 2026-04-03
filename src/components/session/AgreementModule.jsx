@@ -2,7 +2,7 @@ import { useState } from 'react'
 import WizardHeader from '../wizard/WizardHeader'
 import { generateMarketingAgreementStyled } from '../pdf/generateMarketingAgreement'
 
-export default function AgreementModule({ user, session, onLogout, onAdmin, onComplete, onBack }) {
+export default function AgreementModule({ user, session, onLogout, onAdmin, onSavePDF, onComplete, onBack }) {
   const [generating, setGenerating] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -48,7 +48,15 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onCo
     a.click()
   }
 
-  const handleDone = () => {
+  const handleDownloadAndContinue = () => {
+    handleDownload()
+    if (onSavePDF && result) onSavePDF(result.pdfBytes, result.fileName)
+    if (result?.url) URL.revokeObjectURL(result.url)
+    onComplete()
+  }
+
+  const handleContinueWithout = () => {
+    if (onSavePDF && result) onSavePDF(result.pdfBytes, result.fileName)
     if (result?.url) URL.revokeObjectURL(result.url)
     onComplete()
   }
@@ -136,16 +144,16 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onCo
 
               <div className="flex gap-3">
                 <button
-                  onClick={handleDownload}
+                  onClick={handleDownloadAndContinue}
                   className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
                 >
-                  הורד PDF
+                  הורד עכשיו
                 </button>
                 <button
-                  onClick={handleDone}
+                  onClick={handleContinueWithout}
                   className="flex-1 py-2.5 border border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
                 >
-                  סיום ← חזרה למודולים
+                  המשך בלי להוריד
                 </button>
               </div>
             </div>

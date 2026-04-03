@@ -49,6 +49,7 @@ export function createEmptySession() {
     clientB: createEmptyClientDetails(),
     modules: [],          // populated from PATH_MODULES based on path
     completedModules: [], // IDs of completed modules
+    completedPDFs: [],    // { moduleId, pdfBytes, fileName }
   }
 }
 

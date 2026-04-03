@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ALL_MODULES, BLANK_FORMS } from '../../data/advisors'
 import { generateBlankPDF } from '../pdf/generateBlankPDF'
 import { generateMarketingAgreementBlank } from '../pdf/generateMarketingAgreement'
+import { mergeSessionPDFs, pathSupportsKit, getKitModuleOrder } from '../../utils/mergePDFs'
 
 const MODULE_ICONS = {
   agreement: (
@@ -34,8 +35,9 @@ const BLANK_GENERATORS = {
 export default function ModuleSelection({ session, onModuleStart, onUpdateModules, onEndSession }) {
   const [showAddModule, setShowAddModule] = useState(false)
   const [downloading, setDownloading] = useState(null)
+  const [mergingKit, setMergingKit] = useState(false)
 
-  const { modules, completedModules } = session
+  const { modules, completedModules, completedPDFs } = session
 
   // Modules not yet in the session list
   const availableToAdd = ALL_MODULES.filter(
@@ -67,7 +69,43 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
     setDownloading(null)
   }
 
+  const handleModulePDFDownload = (moduleId) => {
+    const entry = completedPDFs.find((p) => p.moduleId === moduleId)
+    if (!entry) return
+    const blob = new Blob([entry.pdfBytes], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = entry.fileName
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDownloadKit = async () => {
+    setMergingKit(true)
+    try {
+      const result = await mergeSessionPDFs(completedPDFs, session.path, session.clientA.fullName)
+      const a = document.createElement('a')
+      a.href = result.url
+      a.download = result.fileName
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(result.url)
+    } catch (err) {
+      console.error('Error merging PDFs:', err)
+    }
+    setMergingKit(false)
+  }
+
   const allCompleted = modules.length > 0 && modules.every((m) => completedModules.includes(m.id))
+
+  // Kit availability: path supports it + all kit modules are completed with PDFs
+  const supportsKit = pathSupportsKit(session.path)
+  const kitModules = getKitModuleOrder(session.path)
+  const kitReady = supportsKit && kitModules.every((id) => completedPDFs.some((p) => p.moduleId === id))
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -140,19 +178,31 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
                   </button>
                 )}
                 {isCompleted && isAvailable && (
-                  <button
-                    onClick={() => onModuleStart(mod.id)}
-                    className="px-4 py-1.5 border border-green-primary text-green-primary rounded-card text-xs font-semibold hover:bg-green-primary/5 transition-colors"
-                  >
-                    ערוך מחדש
-                  </button>
+                  <>
+                    {completedPDFs.some((p) => p.moduleId === mod.id) && (
+                      <button
+                        onClick={() => handleModulePDFDownload(mod.id)}
+                        className="w-8 h-8 flex items-center justify-center text-green-primary hover:bg-green-primary/10 rounded-full transition-colors"
+                        title="הורד PDF"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onModuleStart(mod.id)}
+                      className="px-4 py-1.5 border border-green-primary text-green-primary rounded-card text-xs font-semibold hover:bg-green-primary/5 transition-colors"
+                    >
+                      ערוך מחדש
+                    </button>
+                  </>
                 )}
                 {isFuture && (
                   <span className="px-3 py-1.5 bg-surface-light text-text-muted rounded-card text-xs font-medium border border-border/50">
                     בקרוב
                   </span>
                 )}
-                {/* Remove button for manually added modules */}
                 {!completedModules.includes(mod.id) && (
                   <button
                     onClick={() => handleRemoveModule(mod.id)}
@@ -205,6 +255,18 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
             </div>
           )}
         </div>
+      )}
+
+      {/* Full kit download */}
+      {kitReady && (
+        <button
+          onClick={handleDownloadKit}
+          disabled={mergingKit}
+          className="w-full py-3.5 rounded-card text-sm font-bold transition-colors shadow-card mb-6 disabled:opacity-50"
+          style={{ backgroundColor: '#B8975A', color: '#fff' }}
+        >
+          {mergingKit ? 'ממזג מסמכים...' : 'הורד קיט מלא'}
+        </button>
       )}
 
       {/* Divider */}

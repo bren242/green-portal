@@ -4,7 +4,7 @@ import { calculateRiskScore, RISK_LEVELS } from '../../../data/formSchema'
 import { generatePDF } from '../../pdf/generatePDF.jsx'
 import PDFPreview from '../../pdf/PDFPreview'
 
-export default function AdvisorStep({ formData, updateForm, user, onComplete }) {
+export default function AdvisorStep({ formData, updateForm, user, onSavePDF, onComplete }) {
   const [generating, setGenerating] = useState(false)
   const [pdfData, setPdfData] = useState(null)
   const riskResult = calculateRiskScore(formData)
@@ -36,6 +36,17 @@ export default function AdvisorStep({ formData, updateForm, user, onComplete }) 
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const handleDownloadAndContinue = () => {
+    handleDownload()
+    if (onSavePDF && pdfData) onSavePDF(pdfData.pdfBytes, pdfData.fileName)
+    if (onComplete) onComplete()
+  }
+
+  const handleContinueWithout = () => {
+    if (onSavePDF && pdfData) onSavePDF(pdfData.pdfBytes, pdfData.fileName)
+    if (onComplete) onComplete()
   }
 
   return (
@@ -190,12 +201,28 @@ export default function AdvisorStep({ formData, updateForm, user, onComplete }) 
             onDownload={handleDownload}
           />
           {onComplete && (
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={handleDownloadAndContinue}
+                className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
+              >
+                הורד עכשיו
+              </button>
+              <button
+                onClick={handleContinueWithout}
+                className="flex-1 py-2.5 border border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
+              >
+                המשך בלי להוריד
+              </button>
+            </div>
+          )}
+          {!onComplete && (
             <div className="mt-4 text-center">
               <button
-                onClick={onComplete}
-                className="px-8 py-2.5 border border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
+                onClick={handleDownload}
+                className="px-8 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
               >
-                סיום ← חזרה למודולים
+                הורד PDF
               </button>
             </div>
           )}
