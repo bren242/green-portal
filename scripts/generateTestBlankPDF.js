@@ -9,6 +9,8 @@ import { Font } from '@react-pdf/renderer'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
+// When bundled by esbuild, __dirname changes — fallback to cwd
+const projectRoot = fs.existsSync(path.join(root, 'public/fonts/Assistant-Regular.ttf')) ? root : process.cwd()
 
 // Polyfill URL.createObjectURL for Node
 if (typeof URL.createObjectURL !== 'function') {
@@ -30,8 +32,8 @@ Font.register = _origRegister
 Font.register({
   family: 'Assistant',
   fonts: [
-    { src: path.join(root, 'public/fonts/Assistant-Regular.ttf'), fontWeight: 'normal' },
-    { src: path.join(root, 'public/fonts/Assistant-Bold.ttf'), fontWeight: 'bold' },
+    { src: path.join(projectRoot, 'public/fonts/Assistant-Regular.ttf'), fontWeight: 'normal' },
+    { src: path.join(projectRoot, 'public/fonts/Assistant-Bold.ttf'), fontWeight: 'bold' },
   ],
 })
 Font.registerHyphenationCallback((word) => [word])
@@ -42,12 +44,12 @@ const start = Date.now()
 
 try {
   const result = await generateBlankPDF()
-  let outPath = path.join(root, 'blank_output.pdf')
+  let outPath = path.join(projectRoot, 'blank_output.pdf')
   try {
     fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
   } catch (writeErr) {
     if (writeErr.code === 'EBUSY') {
-      outPath = path.join(root, `blank_output_${Date.now()}.pdf`)
+      outPath = path.join(projectRoot, `blank_output_${Date.now()}.pdf`)
       fs.writeFileSync(outPath, Buffer.from(result.pdfBytes))
     } else throw writeErr
   }

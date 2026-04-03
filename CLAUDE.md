@@ -109,6 +109,7 @@ See docs/DESIGN.md for complete design system.
 - RTL Hebrew, font: Assistant
 - Colors: per DESIGN.md
 - Separate signature blocks for single / couple
+- `generateBlankPDF.jsx` — טופס ידני להדפסה ✅ מאושר ומוכן
 
 ---
 
