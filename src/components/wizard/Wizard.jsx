@@ -83,12 +83,18 @@ export default function Wizard({ user, onLogout, onAdmin, clientData, onComplete
     window.scrollTo(0, 0)
   }
 
+  // When session provides advisor data, use it for PDF generation instead of login user
+  const effectiveUser = hasSessionData && clientData.advisor
+    ? { ...user, name: clientData.advisor.name, idNumber: clientData.advisor.idNumber, license: clientData.advisor.license }
+    : user
+
   const stepProps = {
     formData,
     updateForm,
     toggleRefusal,
     isRefused,
-    user,
+    user: effectiveUser,
+    onComplete,
   }
 
   const renderStep = () => {

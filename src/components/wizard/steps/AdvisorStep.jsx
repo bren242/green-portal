@@ -4,7 +4,7 @@ import { calculateRiskScore, RISK_LEVELS } from '../../../data/formSchema'
 import { generatePDF } from '../../pdf/generatePDF.jsx'
 import PDFPreview from '../../pdf/PDFPreview'
 
-export default function AdvisorStep({ formData, updateForm, user }) {
+export default function AdvisorStep({ formData, updateForm, user, onComplete }) {
   const [generating, setGenerating] = useState(false)
   const [pdfData, setPdfData] = useState(null)
   const riskResult = calculateRiskScore(formData)
@@ -182,12 +182,24 @@ export default function AdvisorStep({ formData, updateForm, user }) {
       </div>
 
       {pdfData && (
-        <PDFPreview
-          pdfUrl={pdfData.url}
-          fileName={pdfData.fileName}
-          onClose={() => setPdfData(null)}
-          onDownload={handleDownload}
-        />
+        <>
+          <PDFPreview
+            pdfUrl={pdfData.url}
+            fileName={pdfData.fileName}
+            onClose={() => setPdfData(null)}
+            onDownload={handleDownload}
+          />
+          {onComplete && (
+            <div className="mt-4 text-center">
+              <button
+                onClick={onComplete}
+                className="px-8 py-2.5 border border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
+              >
+                סיום ← חזרה למודולים
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

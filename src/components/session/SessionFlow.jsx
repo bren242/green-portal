@@ -6,6 +6,7 @@ import ClientTypeStep from './ClientTypeStep'
 import ClientDetailsStep from './ClientDetailsStep'
 import ModuleSelection from './ModuleSelection'
 import Wizard from '../wizard/Wizard'
+import AgreementModule from './AgreementModule'
 
 // Session steps: advisor → clientType → clientDetails → modules → (module work)
 const STEPS = ['advisor', 'clientType', 'clientDetails', 'modules']
@@ -90,6 +91,19 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
           onAdmin={onAdmin}
           clientData={buildClientData()}
           onComplete={() => handleModuleComplete('kyc')}
+          onBack={handleModuleBack}
+        />
+      )
+    }
+
+    if (activeModule === 'agreement') {
+      return (
+        <AgreementModule
+          user={user}
+          session={session}
+          onLogout={onLogout}
+          onAdmin={onAdmin}
+          onComplete={() => handleModuleComplete('agreement')}
           onBack={handleModuleBack}
         />
       )

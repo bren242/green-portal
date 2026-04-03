@@ -469,7 +469,7 @@ const KYCDocument = ({ formData, user }) => {
         <View>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הצהרת הלקוח</Text>
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
-            {`אני הח"מ ${clientName} מצהיר בזאת כי המידע המופיע לעיל הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים. כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי עותק של מסמך זה.`}
+            {`אני הח"מ ${clientName} מצהיר בזאת כי המידע המופיע לעיל, הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים וכן כי אי מסירת פרטים או מסירת פרטים חלקיים עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לח"מ. כמו כן, כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו ואני מוותר בזאת על כל טענה ו/או תביעה ו/או זכות כלשהי אודות שימוש שלא ייעשה במידע זה. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי העתק בכתב/בדוא״ל של מסמך זה.`}
           </Text>
 
           {/* Signature lines */}
@@ -527,7 +527,9 @@ const KYCDocument = ({ formData, user }) => {
 // ── Export ──────────────────────────────────────────────────────
 export async function generatePDF(formData, user) {
   if (!user) throw new Error('משתמש לא מחובר')
-  const freshUser = getUserById(user.id) || user
+  // Use user as-is when advisor data is injected from session (name already overridden)
+  // Only fetch fresh from DB when using login user directly
+  const freshUser = user.name && user.idNumber ? user : (getUserById(user.id) || user)
 
   const blob = await pdf(<KYCDocument formData={formData} user={freshUser} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
