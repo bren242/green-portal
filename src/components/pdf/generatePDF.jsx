@@ -188,7 +188,7 @@ const KYCDocument = ({ formData, user }) => {
 
           {/* Client blocks */}
           {isCouple ? (
-            <View style={{ marginTop: 16, flexDirection: 'row', gap: 8 }}>
+            <View style={{ marginTop: 16, flexDirection: 'row-reverse', gap: 8 }}>
               {[
                 { client: formData.clientA, title: 'לקוח א׳' },
                 { client: formData.clientB, title: 'לקוח ב׳' },
@@ -244,9 +244,9 @@ const KYCDocument = ({ formData, user }) => {
         {/* ── Personal Details ────────────────────────────── */}
         <SectionTitle>פרטים מזהים</SectionTitle>
         {isCouple ? (
-          <View style={{ flexDirection: 'row', gap: 6 }}>
-            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
+          <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
             <View style={{ width: '49%' }}><ClientCard client={formData.clientA} title="לקוח א׳" full /></View>
+            <View style={{ width: '49%' }}><ClientCard client={formData.clientB} title="לקוח ב׳" full /></View>
           </View>
         ) : (
           <View style={{ width: '100%' }}>
