@@ -17,7 +17,7 @@ const goalLabels = {
   preserve: 'שמירת ערך', income: 'הכנסה שוטפת', growth: 'צמיחה לטווח ארוך',
   pension: 'חיסכון לפנסיה', education: 'חינוך ילדים', intergenerational: 'העברה בין-דורית', other: 'אחר',
 }
-const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', '5_to_10': '5-10 שנים', over_10: 'מעל 10 שנים' }
+const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', '5_to_10': 'שנים 10-5', over_10: 'מעל 10 שנים' }
 const timelineLabels  = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
 const next3Labels     = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
 const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
@@ -221,7 +221,13 @@ const KYCDocument = ({ formData, user }) => {
 
       {/* ═══════════════════ PAGE 2+: CONTENT (continuous) ═══════════════════ */}
       <Page size="A4" style={contentPageStyle}>
-        <PageHeader clientName={clientName} date={date} docTitle={clientName} />
+        <PageHeader
+          clientName={clientName}
+          date={date}
+          docTitle={isCouple
+            ? `${formData.clientA.fullName} ו${formData.clientB.fullName}`
+            : clientName}
+        />
         <PageFooter />
 
         {/* ── Personal Details ────────────────────────────── */}
@@ -338,7 +344,7 @@ const KYCDocument = ({ formData, user }) => {
           </View>
         )}
         {formData.investmentGoalOther && <LabelValue label="פירוט" value={formData.investmentGoalOther} />}
-        <LabelValue label="אופק השקעה" value={horizonLabels[formData.investmentHorizon] ? `\u202A${horizonLabels[formData.investmentHorizon]}\u202C` : '---'} even />
+        <LabelValue label="אופק השקעה" value={horizonLabels[formData.investmentHorizon] || '---'} even />
 
         {/* ── Liquidity ───────────────────────────────────── */}
         <SectionGap />
