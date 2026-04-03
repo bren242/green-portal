@@ -405,7 +405,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             <Text style={{ fontSize: s ? 9 : 7.5, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.recommendation}</Text>
           </View>
         ) : (
-          <WritingLines count={s ? 4 : 2} compact={!s} />
+          <WritingLines count={s ? 4 : 4} compact={!s} />
         )}
 
         {/* Conflict of interest checkbox */}
@@ -420,7 +420,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             <Text style={{ fontSize: s ? 9 : 7.5, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.decision}</Text>
           </View>
         ) : (
-          <WritingLines count={s ? 2 : 1} compact={!s} />
+          <WritingLines count={s ? 2 : 2} compact={!s} />
         )}
 
         {/* 9. Tasks */}
@@ -430,7 +430,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             <Text style={{ fontSize: s ? 9 : 7.5, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.tasks}</Text>
           </View>
         ) : (
-          <WritingLines count={s ? 2 : 1} compact={!s} />
+          <WritingLines count={s ? 2 : 2} compact={!s} />
         )}
 
         {/* 10. Client declaration */}
@@ -438,6 +438,9 @@ const MeetingSummaryDoc = ({ data, styled }) => {
           <Text style={{ fontSize: s ? 8 : 7, fontWeight: 'bold', color: C.black, textAlign: 'right', marginBottom: 2 }}>{'\u05D4\u05E6\u05D4\u05E8\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7:'}</Text>
           <Text style={{ fontSize: s ? 7.5 : 7, color: C.black, textAlign: 'right', lineHeight: 1.4 }}>{DECLARATION_TEXT}</Text>
         </View>
+
+        {/* Spacer to push signatures to bottom */}
+        {!s && <View style={{ flex: 1 }} />}
 
         {/* Signatures: 50% each, symmetric, label below line */}
         <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 24 : 4 }}>
