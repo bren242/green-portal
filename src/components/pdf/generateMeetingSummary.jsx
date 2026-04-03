@@ -119,29 +119,33 @@ const CB = ({ checked, label, compact }) => (
   </View>
 )
 
-// ── Radio group (inline) ─────────────────────────────────────
-const RadioRow = ({ label, options, value, compact }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: compact ? 3 : 4, flexWrap: 'wrap', gap: compact ? 6 : undefined }}>
-    <Text style={{ fontSize: compact ? 7.5 : 9, fontWeight: 'bold', color: C.black, textAlign: 'right', ...(compact ? {} : { marginLeft: 6 }) }}>{label}:</Text>
-    {options.map((opt, i) => (
-      <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', ...(compact ? {} : { marginLeft: 10 }) }}>
-        <View style={{
-          width: compact ? 9 : 12, height: compact ? 9 : 12,
-          borderWidth: 1,
-          borderColor: C.black,
-          borderRadius: compact ? 4.5 : 6,
-          marginLeft: compact ? 2 : 3,
-          flexShrink: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-          {value === opt.value && (
-            <View style={{ width: compact ? 4.5 : 6, height: compact ? 4.5 : 6, borderRadius: 3, backgroundColor: C.black }} />
-          )}
+// ── Radio group (inline, fixed columns for alignment) ────────
+const RadioRow = ({ label, options, value, compact, maxCols = 4 }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: compact ? 3 : 4 }}>
+    <Text style={{ fontSize: compact ? 7.5 : 9, fontWeight: 'bold', color: C.black, textAlign: 'right', width: compact ? 75 : 90, flexShrink: 0 }}>{label}:</Text>
+    {Array.from({ length: maxCols }).map((_, i) => {
+      const opt = options[i];
+      if (!opt) return <View key={i} style={{ width: `${100 / maxCols}%` }} />;
+      return (
+        <View key={i} style={{ width: `${100 / maxCols}%`, flexDirection: 'row-reverse', alignItems: 'center' }}>
+          <View style={{
+            width: compact ? 9 : 12, height: compact ? 9 : 12,
+            borderWidth: 1,
+            borderColor: C.black,
+            borderRadius: compact ? 4.5 : 6,
+            marginLeft: compact ? 2 : 3,
+            flexShrink: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            {value === opt.value && (
+              <View style={{ width: compact ? 4.5 : 6, height: compact ? 4.5 : 6, borderRadius: 3, backgroundColor: C.black }} />
+            )}
+          </View>
+          <Text style={{ fontSize: compact ? 7.5 : 9, color: C.black, textAlign: 'right', lineHeight: compact ? 1 : undefined }}>{opt.label}</Text>
         </View>
-        <Text style={{ fontSize: compact ? 7.5 : 9, color: C.black, textAlign: 'right', lineHeight: compact ? 1 : undefined }}>{opt.label}</Text>
-      </View>
-    ))}
+      );
+    })}
   </View>
 )
 
