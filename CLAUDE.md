@@ -144,6 +144,15 @@ Logo: public/logo.png
 Direction: RTL (Hebrew)
 Font: Assistant (Google Fonts)
 
+## GREEN Portal PDF Template
+- טמפלט מאושר: src/components/pdf/PDFTemplate.jsx
+- גיבוי: src/components/pdf/PDFTemplate.BASE.jsx
+- כל מודול PDF חדש חייב לייבא מ-PDFTemplate.jsx
+- אסור לשנות את הטמפלט בלי אישור מפורש
+- צבעים: primary #1B3A2F, gold #B8975A
+- פונט: Assistant (Regular + Bold)
+- RTL: תמיד row-reverse לבלוקים זה לצד זה
+
 ## Key Files
 - docs/FLOW.md — KYC wizard flow (complete)
 - docs/QUESTIONS.md — risk calculator questions + scoring

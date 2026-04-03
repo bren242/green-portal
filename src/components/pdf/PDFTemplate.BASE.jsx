@@ -1,12 +1,3 @@
-// ═══════════════════════════════════════════════════
-// GREEN Portal — PDF Base Template v1.0
-// אושר: 03.04.2026
-// עיצוב: Header לבן + קו זהב, לוגו שמאל
-// קומפוננטים: PageHeader, SectorCard, ClientCard,
-//   BalanceBox, SignatureLine, RiskGauge, PolicyCube
-// שימוש: ייבא מקובץ זה בכל מודול PDF חדש
-// ═══════════════════════════════════════════════════
-
 import React from 'react'
 import { Text, View, Image, Font, StyleSheet } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
