@@ -35,6 +35,7 @@ export const ALL_MODULES = [
 export const BLANK_FORMS = [
   { id: 'kyc_blank', name: 'איפיון צרכים (ידני)', generator: 'generateBlankPDF' },
   { id: 'agreement_blank', name: 'הסכם שיווק (ידני)', generator: 'generateMarketingAgreementBlank' },
+  { id: 'meeting_blank', name: 'סיכום פגישה (ידני)', generator: 'generateMeetingSummaryBlank' },
 ]
 
 // Session data factory

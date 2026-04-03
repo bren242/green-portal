@@ -7,6 +7,7 @@ import ClientDetailsStep from './ClientDetailsStep'
 import ModuleSelection from './ModuleSelection'
 import Wizard from '../wizard/Wizard'
 import AgreementModule from './AgreementModule'
+import MeetingSummaryModule from './MeetingSummaryModule'
 
 // Session steps: advisor → clientType → clientDetails → modules → (module work)
 const STEPS = ['advisor', 'clientType', 'clientDetails', 'modules']
@@ -117,6 +118,20 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
           onAdmin={onAdmin}
           onSavePDF={(pdfBytes, fileName) => handleSavePDF('agreement', pdfBytes, fileName)}
           onComplete={() => handleModuleComplete('agreement')}
+          onBack={handleModuleBack}
+        />
+      )
+    }
+
+    if (activeModule === 'meeting') {
+      return (
+        <MeetingSummaryModule
+          user={user}
+          session={session}
+          onLogout={onLogout}
+          onAdmin={onAdmin}
+          onSavePDF={(pdfBytes, fileName) => handleSavePDF('meeting', pdfBytes, fileName)}
+          onComplete={() => handleModuleComplete('meeting')}
           onBack={handleModuleBack}
         />
       )

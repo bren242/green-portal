@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ALL_MODULES, BLANK_FORMS } from '../../data/advisors'
 import { generateBlankPDF } from '../pdf/generateBlankPDF'
 import { generateMarketingAgreementBlank } from '../pdf/generateMarketingAgreement'
+import { generateMeetingSummaryBlank } from '../pdf/generateMeetingSummary'
 import { mergeSessionPDFs, pathSupportsKit, getKitModuleOrder } from '../../utils/mergePDFs'
 
 const MODULE_ICONS = {
@@ -30,6 +31,7 @@ const MODULE_ICONS = {
 const BLANK_GENERATORS = {
   generateBlankPDF,
   generateMarketingAgreementBlank,
+  generateMeetingSummaryBlank,
 }
 
 export default function ModuleSelection({ session, onModuleStart, onUpdateModules, onEndSession }) {
@@ -139,7 +141,7 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
       <div className="space-y-3 mb-6">
         {modules.map((mod) => {
           const isCompleted = completedModules.includes(mod.id)
-          const isAvailable = mod.id === 'kyc' || mod.id === 'agreement' // currently built modules
+          const isAvailable = mod.id === 'kyc' || mod.id === 'agreement' || mod.id === 'meeting'
           const isFuture = !isAvailable
 
           return (
