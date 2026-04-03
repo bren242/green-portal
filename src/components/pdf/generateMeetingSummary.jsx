@@ -96,8 +96,8 @@ const SectionTitle = ({ children, styled }) => {
     )
   }
   return (
-    <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, paddingBottom: 3, marginTop: 12, marginBottom: 6 }}>
-      <Text style={{ fontSize: 11, fontWeight: 'bold', color: C.black, textAlign: 'right' }}>{children}</Text>
+    <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, paddingBottom: 2, marginTop: 6, marginBottom: 3 }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.black, textAlign: 'right' }}>{children}</Text>
     </View>
   )
 }
@@ -120,35 +120,35 @@ const CB = ({ checked, label }) => (
 )
 
 // ── Radio group (inline) ─────────────────────────────────────
-const RadioRow = ({ label, options, value }) => (
-  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
-    <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, textAlign: 'right', marginLeft: 8 }}>{label}:</Text>
+const RadioRow = ({ label, options, value, compact }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: compact ? 2 : 4, flexWrap: 'wrap' }}>
+    <Text style={{ fontSize: compact ? 8 : 9, fontWeight: 'bold', color: C.black, textAlign: 'right', marginLeft: 6 }}>{label}:</Text>
     {options.map((opt, i) => (
-      <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginLeft: 10 }}>
+      <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginLeft: compact ? 8 : 10 }}>
         <View style={{
-          width: 12, height: 12,
+          width: compact ? 10 : 12, height: compact ? 10 : 12,
           borderWidth: 1,
           borderColor: C.black,
-          borderRadius: 6,
-          marginLeft: 4,
+          borderRadius: compact ? 5 : 6,
+          marginLeft: 3,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
           {value === opt.value && (
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.black }} />
+            <View style={{ width: compact ? 5 : 6, height: compact ? 5 : 6, borderRadius: 3, backgroundColor: C.black }} />
           )}
         </View>
-        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>{opt.label}</Text>
+        <Text style={{ fontSize: compact ? 8 : 9, color: C.black, textAlign: 'right' }}>{opt.label}</Text>
       </View>
     ))}
   </View>
 )
 
 // ── Writing lines ────────────────────────────────────────────
-const WritingLines = ({ count }) => (
+const WritingLines = ({ count, compact }) => (
   <View>
     {Array.from({ length: count }).map((_, i) => (
-      <View key={i} style={{ borderBottomWidth: 1, borderBottomColor: C.black, height: 22, width: '100%' }} />
+      <View key={i} style={{ borderBottomWidth: 1, borderBottomColor: C.black, height: compact ? 18 : 22, width: '100%' }} />
     ))}
   </View>
 )
@@ -248,7 +248,7 @@ const TopicsTable = ({ data, styled: s }) => {
 // ── Signature block (fix #5 — 50% width, symmetric, label below) ─
 const SignBlock = ({ label, styled: s }) => (
   <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
-    <View style={{ borderBottomWidth: 1, borderBottomColor: s ? C.primary : C.black, width: '100%', height: 40, marginBottom: 4 }} />
+    <View style={{ borderBottomWidth: 1, borderBottomColor: s ? C.primary : C.black, width: '100%', height: s ? 40 : 30, marginBottom: 3 }} />
     <Text style={{ fontSize: 9, color: C.black, textAlign: 'center', fontWeight: 'bold' }}>{label}</Text>
   </View>
 )
@@ -300,19 +300,22 @@ const MeetingSummaryDoc = ({ data, styled }) => {
           </Text>
         </View>
 
-        {/* fix #1 — Identity table: 2 rows, 4 equal columns, unified borders */}
+        {/* Identity table row 1 */}
         <View style={idTableRowStyle}>
           <IdCell label={'\u05E9\u05DD \u05DC\u05E7\u05D5\u05D7'} value={d.clientName} styled={s} />
           <IdCell label={'\u05EA.\u05D6 \u05DC\u05E7\u05D5\u05D7'} value={d.clientId} styled={s} borderLeft />
           <IdCell label={'\u05E9\u05DD \u05DE\u05E9\u05D5\u05D5\u05E7'} value={d.advisorName} styled={s} borderLeft />
           <IdCell label={'\u05EA\u05D0\u05E8\u05D9\u05DA'} value={s ? fmtDateAuto() : null} styled={s} borderLeft />
         </View>
-        <View style={idTableRowStyle}>
-          <IdCell label={'\u05EA.\u05D6 \u05DE\u05E9\u05D5\u05D5\u05E7'} value={d.advisorId} styled={s} />
-          <IdCell label={'\u05DE\u05E1\u05F3 \u05E8\u05D9\u05E9\u05D9\u05D5\u05DF'} value={d.advisorLicense} styled={s} borderLeft />
-          <IdCell label="" value="" styled={s} borderLeft />
-          <IdCell label="" value="" styled={s} borderLeft />
-        </View>
+        {/* Identity row 2 — styled only (advisor ID + license) */}
+        {s && (
+          <View style={idTableRowStyle}>
+            <IdCell label={'\u05EA.\u05D6 \u05DE\u05E9\u05D5\u05D5\u05E7'} value={d.advisorId} styled={s} />
+            <IdCell label={'\u05DE\u05E1\u05F3 \u05E8\u05D9\u05E9\u05D9\u05D5\u05DF'} value={d.advisorLicense} styled={s} borderLeft />
+            <IdCell label="" value="" styled={s} borderLeft />
+            <IdCell label="" value="" styled={s} borderLeft />
+          </View>
+        )}
 
         {/* 2. Contact details update */}
         <SectionTitle styled={s}>{'\u05E2\u05D3\u05DB\u05D5\u05DF \u05E4\u05E8\u05D8\u05D9 \u05D4\u05EA\u05E7\u05E9\u05E8\u05D5\u05EA'}</SectionTitle>
@@ -339,6 +342,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
               { value: 'other', label: '\u05D0\u05D7\u05E8' },
             ]}
             value={d.meetingReason}
+            compact={!s}
           />
           <RadioRow
             label={'\u05D0\u05D5\u05E4\u05DF \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4'}
@@ -348,6 +352,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
               { value: 'video', label: '\u05D5\u05D9\u05D3\u05D0\u05D5' },
             ]}
             value={d.meetingType}
+            compact={!s}
           />
           <RadioRow
             label={'\u05D9\u05D5\u05D6\u05DD \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4'}
@@ -357,17 +362,18 @@ const MeetingSummaryDoc = ({ data, styled }) => {
               { value: 'other', label: '\u05D0\u05D7\u05E8' },
             ]}
             value={d.meetingInitiator}
+            compact={!s}
           />
           {d.meetingInitiator === 'other' && d.initiatorOther && (
-            <View style={{ flexDirection: 'row-reverse', marginBottom: 4, paddingRight: 4 }}>
-              <Text style={{ fontSize: 9, color: C.muted }}>{'\u05E4\u05D9\u05E8\u05D5\u05D8: '}</Text>
-              <Text style={{ fontSize: 9, color: C.black }}>{d.initiatorOther}</Text>
+            <View style={{ flexDirection: 'row-reverse', marginBottom: 2, paddingRight: 4 }}>
+              <Text style={{ fontSize: 8, color: C.muted }}>{'\u05E4\u05D9\u05E8\u05D5\u05D8: '}</Text>
+              <Text style={{ fontSize: 8, color: C.black }}>{d.initiatorOther}</Text>
             </View>
           )}
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 4 }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, textAlign: 'right', marginLeft: 8 }}>{'\u05DE\u05E9\u05DA \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4:'}</Text>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: s ? 4 : 2 }}>
+            <Text style={{ fontSize: s ? 9 : 8, fontWeight: 'bold', color: C.black, textAlign: 'right', marginLeft: 6 }}>{'\u05DE\u05E9\u05DA \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4:'}</Text>
             {d.meetingDuration ? (
-              <Text style={{ fontSize: 9, color: C.black }}>{d.meetingDuration} {'\u05D3\u05E7\u05D5\u05EA'}</Text>
+              <Text style={{ fontSize: s ? 9 : 8, color: C.black }}>{d.meetingDuration} {'\u05D3\u05E7\u05D5\u05EA'}</Text>
             ) : (
               <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: 80, height: 14 }} />
             )}
@@ -375,31 +381,31 @@ const MeetingSummaryDoc = ({ data, styled }) => {
         </View>
 
         {/* 4. Topics table */}
-        <SectionTitle styled={s}>{'\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E9\u05E0\u05D3\u05D5\u05E0\u05D5 \u05D1\u05E4\u05D2\u05D9\u05E9\u05D4'}</SectionTitle>
+        <SectionTitle styled={s}>{s ? '\u05E0\u05D5\u05E9\u05D0\u05D9\u05DD \u05E9\u05E0\u05D3\u05D5\u05E0\u05D5 \u05D1\u05E4\u05D2\u05D9\u05E9\u05D4' : '\u05E2\u05D3\u05DB\u05D5\u05DF \u05E4\u05E8\u05D8\u05D9\u05DD/\u05E6\u05E8\u05DB\u05D9\u05DD'}</SectionTitle>
         <TopicsTable data={d.topics} styled={s} />
 
         {/* 5. Meeting summary */}
         <SectionTitle styled={s}>{'\u05E1\u05D9\u05DB\u05D5\u05DD \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4'}</SectionTitle>
         {d.summary ? (
-          <View style={{ paddingHorizontal: 4, minHeight: 80 }}>
+          <View style={{ paddingHorizontal: 4, minHeight: s ? 80 : 50 }}>
             <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.summary}</Text>
           </View>
         ) : (
-          <WritingLines count={6} />
+          <WritingLines count={s ? 6 : 4} compact={!s} />
         )}
 
         {/* 6. Advisor recommendation */}
         <SectionTitle styled={s}>{'\u05D4\u05DE\u05DC\u05E6\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'}</SectionTitle>
         {d.recommendation ? (
-          <View style={{ paddingHorizontal: 4, minHeight: 55 }}>
+          <View style={{ paddingHorizontal: 4, minHeight: s ? 55 : 40 }}>
             <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.recommendation}</Text>
           </View>
         ) : (
-          <WritingLines count={4} />
+          <WritingLines count={s ? 4 : 3} compact={!s} />
         )}
 
-        {/* fix #4 — Conflict of interest checkbox with proper alignment */}
-        <View style={{ marginTop: 10, paddingHorizontal: 4 }}>
+        {/* Conflict of interest checkbox */}
+        <View style={{ marginTop: s ? 10 : 4, paddingHorizontal: 4 }}>
           <CB checked={d.conflictOfInterest} label={CONFLICT_LABEL} />
         </View>
 
@@ -410,7 +416,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.decision}</Text>
           </View>
         ) : (
-          <WritingLines count={2} />
+          <WritingLines count={2} compact={!s} />
         )}
 
         {/* 9. Tasks */}
@@ -420,17 +426,17 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>{d.tasks}</Text>
           </View>
         ) : (
-          <WritingLines count={2} />
+          <WritingLines count={2} compact={!s} />
         )}
 
         {/* 10. Client declaration */}
-        <View style={{ marginTop: 14, paddingHorizontal: 4 }}>
-          <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.black, textAlign: 'right', marginBottom: 4 }}>{'\u05D4\u05E6\u05D4\u05E8\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7:'}</Text>
-          <Text style={{ fontSize: 8, color: C.black, textAlign: 'right', lineHeight: 1.5 }}>{DECLARATION_TEXT}</Text>
+        <View style={{ marginTop: s ? 14 : 6, paddingHorizontal: 4 }}>
+          <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.black, textAlign: 'right', marginBottom: 3 }}>{'\u05D4\u05E6\u05D4\u05E8\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7:'}</Text>
+          <Text style={{ fontSize: 7.5, color: C.black, textAlign: 'right', lineHeight: 1.4 }}>{DECLARATION_TEXT}</Text>
         </View>
 
-        {/* fix #5 — Signatures: 50% each, symmetric, label below line */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 24 }}>
+        {/* Signatures: 50% each, symmetric, label below line */}
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 24 : 12 }}>
           <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7'} styled={s} />
           <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'} styled={s} />
         </View>
