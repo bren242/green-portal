@@ -247,6 +247,12 @@ const DISCLOSURE_ENTITIES = [
 // ════════════════════════════════════════════════════════════════
 //  MAIN DOCUMENT — supports both print and styled modes
 // ════════════════════════════════════════════════════════════════
+const fmtDateHebrew = () => {
+  const d = new Date()
+  const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']
+  return `${d.getDate()} בחודש ${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
 const MarketingAgreementDoc = ({ data, styled }) => {
   const d = data
   const dateVal = styled ? fmtDateAuto() : null
@@ -301,7 +307,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         {/* Title */}
         <SectionTitle styled={styled}>הסכם שיווק השקעות</SectionTitle>
         <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 16, color: C.black }}>
-          שנערך ונחתם ב<DynField value={d.city} /> ביום {d.date || '__ בחודש___ 2025'}
+          שנערך ונחתם ב{styled ? '____________' : <DynField value={d.city} />} ביום {styled ? fmtDateHebrew() : '__ בחודש___ 2025'}
         </Text>
 
         {/* בין */}
