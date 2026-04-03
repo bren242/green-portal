@@ -661,6 +661,491 @@ const MarketingAgreementDoc = ({ data, styled }) => {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  BLANK VERSION — טופס ידני להדפסה ומילוי ביד
+// ══════════════════════════════════════════════════════════════
+
+const BL = '____________' // short blank
+const BLL = '________________________' // long blank
+const BLLL = '____________________________________' // extra long
+
+// ── Blank Signature Block — 170pt, uniform ────────────────────
+const BlankSign = ({ label }) => (
+  <View style={{ alignItems: 'center', width: 170 }}>
+    <View style={{ width: 170, borderBottomWidth: 1, borderBottomColor: C.black, height: 20 }} />
+    <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center', direction: 'rtl', marginTop: 3 }}>{label}</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 8, width: 170 }}>
+      <View style={{ flex: 1, borderBottomWidth: 1, borderBottomColor: C.black, height: 12 }} />
+      <Text style={{ fontSize: 8, marginLeft: 4, direction: 'rtl' }}>:תאריך</Text>
+    </View>
+  </View>
+)
+
+// ── Blank Client Table — all fields empty ─────────────────────
+const BlankClientTable = ({ idLabel }) => (
+  <View style={{ borderWidth: 1, borderColor: C.primary, marginBottom: 4 }}>
+    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: C.primary }}>
+      <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', direction: 'rtl' }}>כתובת</Text>
+        <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+      </View>
+      <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', direction: 'rtl' }}>{idLabel || 'ת.ז /ח.פ'}</Text>
+        <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+      </View>
+      <View style={{ flex: 1.5, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', direction: 'rtl' }}>שם הלקוח</Text>
+        <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+      </View>
+    </View>
+    <View style={{ flexDirection: 'row' }}>
+      <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', direction: 'rtl' }}>דואר אלקטרוני</Text>
+        <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+      </View>
+      <View style={{ flex: 1, paddingVertical: 4, paddingHorizontal: 6 }}>
+        <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', direction: 'rtl' }}>טלפון</Text>
+        <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+      </View>
+    </View>
+  </View>
+)
+
+// ── Blank Paragraph (no bold on body) ─────────────────────────
+const BPara = ({ children, style }) => (
+  <Text style={[{
+    fontSize: 10,
+    textAlign: 'right',
+    lineHeight: 1.6,
+    marginBottom: 6,
+    color: C.black,
+    direction: 'rtl',
+  }, style]}>
+    {children}
+  </Text>
+)
+
+// ── Blank Section Title ───────────────────────────────────────
+const BlankTitle = ({ children }) => (
+  <Text style={{ fontSize: 12, fontWeight: 'bold', color: C.primary, textAlign: 'center', marginBottom: 14, marginTop: 6, textDecoration: 'underline', direction: 'rtl' }}>
+    {children}
+  </Text>
+)
+
+// ── Blank Header (no styled variant) ──────────────────────────
+const BlankHeader = () => (
+  <View fixed style={{ marginBottom: 8 }}>
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingBottom: 8,
+      borderBottomWidth: 1.5,
+      borderBottomColor: C.gold,
+    }}>
+      <Image src={logoPng} style={{ height: 36, width: 'auto' }} />
+      <View style={{ flex: 1 }} />
+    </View>
+  </View>
+)
+
+const BlankMarketingAgreementDoc = () => (
+  <Document>
+
+    {/* ═══════════════════ PAGE 1: COVER + PARTIES ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      {/* Company header info */}
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 6, marginTop: 4 }}>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+            גרין סוכנות לביטוח פנסיוני
+          </Text>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+            ושיווק השקעות (2024) בע"מ,
+          </Text>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+            מקבוצת אגם לידרים והפניקס
+          </Text>
+          <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', direction: 'rtl' }}>
+            חברה לביטוח
+          </Text>
+        </View>
+      </View>
+
+      {/* Advisor row — blank */}
+      <View style={{
+        flexDirection: 'row',
+        borderWidth: 1,
+        borderColor: C.primary,
+        marginBottom: 14,
+      }}>
+        <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+          <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted, direction: 'rtl' }}>מס רישיון</Text>
+          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+        </View>
+        <View style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+          <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted, direction: 'rtl' }}>ת.ז</Text>
+          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+        </View>
+        <View style={{ flex: 2, paddingVertical: 4, paddingHorizontal: 6 }}>
+          <Text style={{ fontSize: 8, textAlign: 'right', color: C.muted, direction: 'rtl' }}>שם המשווק</Text>
+          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.black, height: 14, marginTop: 2 }} />
+        </View>
+      </View>
+
+      {/* Title */}
+      <BlankTitle>הסכם שיווק השקעות</BlankTitle>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 16, color: C.black }}>
+        {'שנערך ונחתם ב'}{BL}{' ביום '}{BLL}
+      </Text>
+
+      {/* בין */}
+      <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>בין</Text>
+
+      {/* GREEN details */}
+      <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+        גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ
+      </Text>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+        ח.פ 516415361 מס' רישיון 852
+      </Text>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+        ממגדל משה אביב, רחוב ז'בוטניסקי 7 רמת גן
+      </Text>
+      <Text style={{ fontSize: 10, textAlign: 'right', direction: 'rtl', marginBottom: 2 }}>
+        דוא"ל
+      </Text>
+      <Text style={{ fontSize: 10, direction: 'ltr', textAlign: 'left', marginBottom: 2 }}>
+        INFO@GREENWM.CO.IL
+      </Text>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 2 }}>
+        (להלן – "גרין")
+      </Text>
+      <Text style={{ fontSize: 10, textAlign: 'right', direction: 'rtl', marginBottom: 10 }}>
+        מצד אחד;
+      </Text>
+
+      {/* לבין */}
+      <Text style={{ fontSize: 11, fontWeight: 'bold', textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>לבין</Text>
+
+      {/* Client A */}
+      <BlankClientTable idLabel="ת.ז /ח.פ" />
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 10 }}>
+        (להלן – "לקוח א'")
+      </Text>
+
+      {/* Client B */}
+      <BlankClientTable idLabel="ת.ז" />
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 4 }}>
+        (להלן – "לקוח ב')
+      </Text>
+      <Text style={{ fontSize: 10, textAlign: 'center', direction: 'rtl', marginBottom: 8 }}>
+        (להלן לקוח א' ולקוח ב', אלא אם נקבע במפורש אחרת – "הלקוח")
+      </Text>
+
+      <Text style={{ fontSize: 10, textAlign: 'right', direction: 'rtl', marginBottom: 10 }}>
+        מצד שני;
+      </Text>
+
+      {/* הואיל opening */}
+      <BPara>
+        <Text style={{ fontWeight: 'bold' }}>הואיל </Text>
+        {'וגרין היא סוכנות ביטוח בעלת רישיון סוכן ביטוח בענף הביטוח הפנסיוני בהתאם להוראות חוק הפיקוח על שירותים פיננסיים (ביטוח), תשמ"א-1981 (להלן -"חוק הביטוח") ורישיון משווק השקעות'}
+      </BPara>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 2: CLAUSES 1-4 ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BPara>
+        {'בהתאם להוראות חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיק השקעות, תשנ"ה-1995 (להלן- "חוק ההשקעות");'}
+      </BPara>
+
+      <BPara style={{ marginTop: 6 }}>
+        <Text style={{ fontWeight: 'bold' }}>והואיל </Text>
+        {'והלקוח מעוניין לקבל מגרין שירותי שיווק השקעות כהגדרתם בחוק ההשקעות (להלן- "השירותים"), לאחר שהובהר לו, כי השירותים הם שירותים נפרדים משירותי השיווק הפנסיוני, ואינם מתייחסים למוצרי ביטוח ו/או מוצרים פנסיוניים המנוהלים על ידי הגופים המוסדיים, ואינם מפוקחים על ידי רשות שוק ההון, ביטוח וחיסכון;'}
+      </BPara>
+
+      <BPara>
+        {'והואיל והצדדים מתקשרים ביניהם בהסכם בעניין השירותים, בהתאם לתנאים ולהוראות שלהלן;'}
+      </BPara>
+
+      <BPara style={{ marginTop: 8, marginBottom: 12, fontWeight: 'bold' }}>
+        {'לפיכך, הוצהר, הותנה והוסכם בין הצדדים כדלקמן:'}
+      </BPara>
+
+      <BPara>
+        {'1. המבוא להסכם זה ונספחיו מהווים חלק בלתי נפרד הימנו.'}
+      </BPara>
+
+      <BPara>
+        {'2. גרין מתחייבת:'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 16 }}>
+        {'2.1 להעניק ללקוח את השירותים בהתאם להוראות כל דין, ובפרט להוראת חוק ההשקעות, באמצעות בעל רישיון משווק השקעות מטעמה.'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 16 }}>
+        {'2.2 לפעול לטובת הלקוח, באמונה ובשקידה, ולא להעדיף את ענייניה האישיים או ענייניו של אחר על פני טובת הלקוח, ולא להעדיף את ענינו של לקוח על פני לקוח אחר, בכפוף לאמור בגילוי הנאות לעניין זיקה.'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 16 }}>
+        {'2.3 מצורף כנספח "א" להסכם זה גילוי נאות מצד גרין.'}
+      </BPara>
+
+      <BPara>
+        {'3. גרין תפעל, ככל הניתן, על מנת להתאים את שיווק ההשקעות, במסגרת השירותים, לצרכים ולהנחיות של הלקוח, כפי שיימסרו לגרין, בקשר עם הנתונים כמפורט '}
+        <Text style={{ fontWeight: 'bold' }}>בנספח "ב"</Text>
+        {' להסכם זה. יודגש, כי אי '}
+        <Text style={{ fontWeight: 'bold' }}>מסירת פרטים מלאים</Text>
+        {' בעניין נתוני הלקוח וצרכיו, עלולה לפגוע בשירות הניתן ללקוח, וללקוח לא תהא כל טענה כלפי גרין במקרה של אי התאמת השירות הנובעת מהעברת פרטים מלאים כאמור'}
+      </BPara>
+
+      <BPara>
+        {'4. אלא אם ייקבע במפורש אחרת, השירותים לא יכללו בכל מקרה ביצוע פעולות על ידי גרין עבור הלקוח, וכל פעולה בהמשך לשירותים תבוצע על ידי הלקוח עצמו מול היצרנים הרלוונטיים, ובאחריות הלקוח לוודא ביצוע הפעולה לשביעות רצונו. בכל מקרה גרין אינה אחראית לפעילותו של יצרן כלשהו. למען הסר ספק, בכל מקרה כל החלטת השקעה תהא על פי שיקול דעת הלקוח בלבד, וגרין לא תבצע כל פעולת השקעה על פי שיקול דעתה.'}
+      </BPara>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 3: CLAUSES 5-12 ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BPara>
+        {'5. יודגש, כי הסכם זה חל על שירותי שיווק השקעות המפוקחים על ידי רשות ניירות ערך, וחובותיה של גרין לפי חוק ההשקעות '}
+        <Text style={{ fontWeight: 'bold' }}>אינן חלות</Text>
+        {' על שירותים של הפניית לקוחות לקבלת שירות מצדדים שלישיים, או מתן מידע על ידי גרין, שאינו כולל חיווי דעה או המלצה מקצועית בעניין כדאיות ההשקעה בניירות ערך ו/או בנכסים פיננסיים, שאינו עולה כדי שיווק השקעות.'}
+      </BPara>
+
+      <BPara>
+        {'6. לשם מתן השירותים מעניק הלקוח לגרין ו/או למי מטעמה, ייפוי כוח לשם פניה ליצרנים כמפורט '}
+        <Text style={{ fontWeight: 'bold' }}>בנספח "ג"</Text>
+        {' להסכם זה. הלקוח מסכים לחתום על ייפוי כוח מתאים לצורך קבלת מידע מכל רלוונטי, וכפי שיידרש מעת לעת.'}
+      </BPara>
+
+      <BPara>
+        {'7. שירותי השיווק יינתנו במשרדי גרין, בימי העבודה המקובלים במשק ובין השעות 9:00 עד 16:00 או במועדים אחרים כפי שיקבעו בין הצדדים, על אף האמור לעיל, מוסכם בין הצדדים כי '}
+        <Text style={{ textDecoration: 'underline' }}>ניתן</Text>
+        {' להעניק את השירותים גם באמצעות הטלפון ו/או אמצעי היוועדות חזותית, והכל לפי שיקול דעתה של גרין.'}
+      </BPara>
+
+      <BPara>
+        {'8. התגמול לגרין יהיה, כמפורט '}
+        <Text style={{ fontWeight: 'bold' }}>בנספח "ד"</Text>
+        {' להסכם זה.'}
+      </BPara>
+
+      <BPara>
+        {'9. הסכם זה ייכנס לתוקף במועד חתימתו ויעמוד בתוקף למשך תקופה בלתי קצובה. הלקוח רשאי לבטל, בכל עת, את ההתקשרות עם גרין לעניין שירותי שיווק ההשקעות לפי הסכם זה. גרין תהא רשאית לבטל את ההתקשרות עם הלקוח לעניין שירותי שיווק ההשקעות לפי הסכם זה, בהודעה של 14 ימים מראש מוסכם על הצדדים, כי משיכת מלוא הכספים בגינם ניתנים השירותים לפי הסכם זה, תיחשב, לכל דבר ועניין כהודעת סיום ההסכם על ידי הלקוח, אלא אם יוסכם בין הצדדים אחרת.'}
+      </BPara>
+
+      <BPara>
+        {'10. יובהר ויודגש, כי גרין תעניק את השירותים על פי הסכם זה, ברמה נאותה, אך '}
+        <Text style={{ fontWeight: 'bold' }}>אין במתן השירותים</Text>
+        {' כדי להוות הבטחה או אחריות מכל סוג שהוא לתוצאות ההשקעה או כדאיותה, וגרין אינה אחראית בכל צורה ואופן לפעילותם של צדדים שלישיים.'}
+      </BPara>
+
+      <BPara>
+        {'11. ידוע ללקוח, כי מידע שיימסר על ידו במסגרת השירותים ו/או שיתקבל לגביו אגב השירותים יישמר במאגרי המידע של גרין וכן של חברות נוספות מקבוצת אגם, וזאת לצורך שירות לקוחות לרבות מתן הצעות שיווקיות המיועדות ללקוחות קבוצת אגם, ובכלל זה ישמש לדיוור ישיר ו/או שירותי דיוור ישיר. מובהר, כי אין חלה על הלקוח חובה על פי דין למסור מידע לגרין, וכל מידע יימסר בהסכמתו ומרצונו החופשי של הלקוח.'}
+      </BPara>
+
+      <BPara>
+        {'12. הלקוח מאשר בזאת לגרין ו/או לחברות אחרות בקבוצת אגם, לפנות אליו בפניות שיווקיות בתחומי הביטוח והפיננסיים ו/או הטבות המיועדות ללקוחות הקבוצה גם באמצעים דיגיטליים (דוא"ל, מסרונים, מערכות שיחה אוטומטיות, פקס וכו\').'}
+      </BPara>
+
+      {/* Signature for clause 12 */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20, marginBottom: 8 }}>
+        <BlankSign label="חתימת הלקוח" />
+      </View>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 4: CLAUSES 13-15 + SIGNATURES ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BPara>
+        {'13. יובהר, כי הלקוח יהיה רשאי להסיר עצמו, בכל עת, מרשימות דיוור שיווקיות באמצעות הודעה למייל '}
+        <LTR>info@greenwm.co.il</LTR>
+        {'. גם אם הלקוח לא חתם על סעיף 12 לעיל ו/או יסיר עצמו מהודעות שיווקיות כאמור, הרי שכל עוד הוא לקוח של גרין, גרין תמשיך לשלוח ללקוח הודעות באמצעים דיגיטליים בעניינים הנוגעים ישירות לשירותים (לרבות עדכונים מקצועיים) ו/או כמתחייב על פי דין, ובחתימתו בשולי הסכם זה הלקוח נותן הסכמתו לכך.'}
+      </BPara>
+
+      <BPara>
+        {'14. גרין מתחייבת לשמור באופן סודי כל מידע שהביא הלקוח לידיעתה, לרבות מסמכים שהועברו לרשותה ותוכנם, וכל פרט אחר המתייחס לפעולות לגביהן עסקה בשיווק כלפי הלקוח, למעט אם יוסכם אחרת בכתב ו/או במקרה בו תידרש גרין למסור ידיעות על פי כל דין.'}
+      </BPara>
+
+      <BPara>
+        <Text style={{ fontWeight: 'bold', textDecoration: 'underline' }}>15. שונות</Text>
+      </BPara>
+
+      <BPara style={{ paddingRight: 16 }}>
+        {'15.1 הסכם זה ממצה את המוסכם בין הצדדים לעניינים המוסדרים בו, והכל בכפוף להוראות חוק ההשקעות. לא יחול כל שינוי בהסכם זה, אלא אם ייערך בכתב וייחתם על ידי שני הצדדים.'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 16 }}>
+        {'15.2 רישומי גרין ייחשבו, בכל הנוגע להסכם זה והשירותים לפיו כראיה מכרעת לעניין המופיע בהם.'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 16 }}>
+        {'15.3 כל הודעה שנשלחה בין הצדדים לפי הכתובות בכותרת הסכם זה, תיחשב כאילו הגיעה ליעדה, בתוך 3 ימי עסקים ממועד המשלוח באמצעת דואר רשום ו/או בתוך יום עסקים אחד לאחר שנשלחה בדוא"ל או נמסרה במסירה ידנית. לעניין הלקוח, אלא אם נקבע אחרת, מסירה לכל אחד מיחידי הלקוח תיחשב כמסירה למשנהו.'}
+      </BPara>
+
+      <BPara style={{ marginTop: 12, marginBottom: 8, fontWeight: 'bold' }}>
+        ולראיה באו הצדדים על החתום:
+      </BPara>
+
+      {/* 3 signatures side by side — 170pt each */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+        <BlankSign label="לקוח ב'" />
+        <BlankSign label="לקוח א'" />
+        <BlankSign label={'גרין סוכנות לביטוח פנסיוני\nושיווק השקעות בע"מ'} />
+      </View>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 5: נספח א׳ — גילוי נאות ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BlankTitle>נספח "א"- גילוי נאות</BlankTitle>
+
+      <BPara>
+        {'בהתאם לסעיף 16א לחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות, ובניהול תיקי השקעות, תשנ"ה-1995 (להלן – "החוק") גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ (להלן – "החברה") חברה בעלת רישיון '}
+        <Text style={{ fontWeight: 'bold' }}>משווק השקעות ולא יועץ השקעות</Text>
+        {', מקבוצת אגם לידרים (ישראל) סוכנות לביטוח (2003) בע"מ, והפניקס אחזקות בע"מ (להלן – "קבוצת הפניקס").'}
+      </BPara>
+
+      <BPara>
+        {'החברה היא חברה קשורה לגופים מוסדיים, משווקי השקעות ומנהלי תיקים, והיא בעלת זיקה לגופים ולנכסים פיננסיים כמפורט בטבלה שלהלן (להלן – "גופים בעלי זיקה")'}
+      </BPara>
+
+      {/* Entity table */}
+      <View style={{ borderWidth: 1, borderColor: C.primary, borderRadius: 2, marginTop: 6 }}>
+        {DISCLOSURE_ENTITIES.map(([right, left], i) => (
+          <TwoColRow key={i} right={right} left={left} even={i % 2 === 0} />
+        ))}
+      </View>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 6: המשך נספח א׳ + חתימה ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BPara>
+        {'במסגרת עיסוקה בשיווק השקעות , רשאית החברה להעדיף נכס פיננסי שיש לה זיקה אליו על פני נכס אחר, הדומה מבחינת התאמתו ללקוח שאין לה זיקה אליו, ובלבד שעמדה בדרישות הגילוי לפי דין. זיקה כאמור לא תיחשב כניגוד עניינים בין החברה לבין הלקוח.'}
+      </BPara>
+
+      <BPara>
+        {'בהתאם מודיעה החברה, כי יש לה זיקה לנכסים הפיננסיים המנוהלים ו/או משווקים ו/או מוצעים על ידי גופים בעלי זיקה, כפי שיתעדכן מעת לעת באתר האינטרנט של החברה '}
+        <LTR>www.greenwm.co.il</LTR>
+        {' וכי היא עשויה לקבלת טובת הנאה בקשר עם ביצוע עסקה בנכסים פיננסיים אליהם יש לה זיקה, לרבות שיווקם ו/או המשך החזקה בהם.'}
+      </BPara>
+
+      {/* Signature */}
+      <View style={{ marginTop: 60, flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <BlankSign label="חתימת הלקוח" />
+      </View>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 7: נספח ד׳ — תגמול ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BlankTitle>נספח "ד"- נספח תגמול</BlankTitle>
+
+      <BPara style={{ marginBottom: 10, textAlign: 'center', fontWeight: 'bold' }}>
+        תגמול בעל הרישיון יהיה לפי אחת האפשרויות להלן:
+      </BPara>
+
+      {/* Option i — blank */}
+      <BPara>
+        {'i. כנגד קבלת השירותים, יהא זכאי בעל הרישיון לגבות עמלה מגופים פיננסיים שונים להם יש לו זיקה, בגין הפניית הלקוח לגופים הפיננסיים בשיעורים שייקבעו בין בעל הרישיון לבין הגופים הפיננסיים השונים מעת לעת.'}
+      </BPara>
+
+      {/* Signature block for option i */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 10, marginBottom: 16 }}>
+        <BlankSign label="חתימת הלקוח" />
+      </View>
+
+      <Text style={{ fontSize: 11, textAlign: 'center', direction: 'rtl', marginVertical: 10 }}>או</Text>
+
+      {/* Option ii — blank fields */}
+      <BPara>
+        {'ii. כנגד קבלת השירותים, ישלם הלקוח לבעל הרישיון דמי טיפול בשיעור שנתי כולל של %'}{BL}{' (בתוספת מע"מ) מסך שווי הנכסים המשוערך של הלקוח אשר ביחס אליהם מוענקים שירותים ("נכסי הלקוח") או לחילופין שכר טירחה בגובה '}{BL}{' ₪ כפי שהוסכם בין הצדדים .'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 24 }}>
+        {'א. התמורה תשולם באופן רבעוני (או חלקו היחסי - לפי העניין), כנגד חשבונית, בתחילת כל רבעון קלנדארי, עבור הרבעון שקדם לו, בהתבסס על שווי נכסי הלקוח המשוערך לתום הרבעון הקלנדארי הקודם.'}
+      </BPara>
+
+      <BPara style={{ paddingRight: 24 }}>
+        {'ב. ככל שחלופה זו נבחרה - במידה ויתקבלו בידי בעל הרישיון תקבולים שוטפים מגופים פיננסיים שונים בגין הפניית הלקוח לקבלת שירותים מהם, אזי שכל התקבולים כאמור יוחזרו במלואם ללקוח על ידי הקטנת תשלום הרבעוני.'}
+      </BPara>
+
+      {/* Signature block for option ii */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+        <BlankSign label="חתימת הלקוח" />
+      </View>
+
+      <PageFooter />
+    </Page>
+
+    {/* ═══════════════════ PAGE 8: השקעות בסיכון מיוחד ═══════════════════ */}
+    <Page size="A4" style={pageStyle}>
+      <BlankHeader />
+
+      <BlankTitle>השקעות בסיכון מיוחד</BlankTitle>
+
+      <BPara>
+        {'הלקוח מבקש מבעל הרישיון לקבל שרותים ביחס לעסקאות שכרוכה בהן סיכון מיוחד כמשמעות מונח זה בחוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות, תשנ"ה – 1995, כפי שיעודכן מעת לעת ('}
+        <Text style={{ fontWeight: 'bold' }}>"עסקה בסיכון מיוחד"</Text>
+        {').'}
+      </BPara>
+
+      <BPara>
+        {'הלקוח, מבקש מבעל רישיון שעניין אותו בהשקעה במוצרים מובנים (ניירות ערך ו/או פיקדונות ו/או השקעות אחרות, שהתשואה עליהם או הסיכון הכרוך בהם נקבעים על פי נוסחה המבוססת על שינוי במדד כלשהו, במחיר נייר ערך כלשהו, במחיר סחורה כלשהי, במחיר אופציה או חוזה עתידי כלשהו, בריבית או בהפרשים בין ריביות שונות, בשער חליפין או בהפרשים בין שערי חליפין כלשהם).'}
+      </BPara>
+
+      <BPara>
+        {'הלקוח מצהיר כי ידוע לו, כי: (א) מוצרים מובנים הם מוצרים בעלי סיכון גבוה, אשר עשויים לא להניב תשואה כלשהי למשקיע בהם; (ב) אם יתרחש אירוע, המפורט בתנאי מוצר מובנה כלשהו, הוא עשוי שלא להניב ריבית או תשואה כלשהי; (ג) במידה והמוצר המובנה אינו סחיר, ניתן יהיה לפדות ו/או למכור אותו לפני שחלפה התקופה, הקבועה בתנאיו, רק בכפוף לתשלום קנס, באופן שהסכום שיתקבל עשוי להיות נמוך משמעותית מסכום הקרן, או אף, ללא אפשרות לפדות את המוצר בכלל.'}
+      </BPara>
+
+      <BPara>
+        {'הלקוח מבקש מבעל רישיון לקבל מידע ביחס לקרנות גידור וקרנות השקעה בישראל ומחוצה לה בכפוף למגבלות הקבועות בכל דין. הלקוח מצהיר כי ידוע לו כי: (א) קרנות גידור וקרנות השקעה הינם מכשירים פיננסיים שעל פי רוב אינם סחירים; (ב) לעתים, ישנה תקופת נעילה בקרנות גידור במהלכה לא ניתן לפדות את כספי הלקוח או לחלופין ניתן לפדות כנגד תשלום קנסות גבוהים; (ג) קרנות הגידור על פי רוב אינן מפוקחות על ידי רשות פיקוח מוסמכת וכפועל יוצא, הן מתנהלות בשקיפות דלה יחסית; (ד) מבנה התגמול בקרנות גידור מבוסס על פי רוב על דמי ניהול קבועים מהיקף הנכסים ודמי הצלחה הנגבים משיעור עליית ערך נכסי התיק המנוהל; (ה) קרנות גידור נוטות למנף את ההשקעה הכלולה בהן תוך הגברת הסיכון לשחיקת הקרן – עד כדי אובדן ההשקעה כליל; (ו) הצטרפות לקרן גידור כוללת בתוכה על פי רוב תניית שיפוט ייחודית למדינה זרה; (ז) היבטי המס הקשורים להשקעה בקרנות גידור אינם ברורים. בעל הרישיון אינו מומחה מס ואינו רשאי ליתן מצג ביחס להיבטי המס הכרוכים בהשקעה בקרן גידור ועל הלקוח לקבל ייעוץ עצמאי בעניין זה; (ח) תנאי הערבות הניתנים על קרן ההשקעה במועד פדיון ההשקעה כפי שקבוע בתשקיף קרן הגידור, כפופים ותלויים בנסיבות פרטניות הכלולות באותם תשקיפים ומותנים בקיומם של נסיבות כמפורט באותם התשקיפים'}
+      </BPara>
+
+      {/* Signature */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+        <BlankSign label="חתימת הלקוח" />
+      </View>
+
+      {/* Footnote */}
+      <View style={{ position: 'absolute', bottom: 50, left: 40, right: 40 }}>
+        <View style={{ borderTopWidth: 0.5, borderTopColor: C.muted, paddingTop: 4 }}>
+          <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', direction: 'rtl', lineHeight: 1.5 }}>
+            {'1 עסקאות המפורטות להלן, הינן עסקאות שביצוען כרוך בסיכון מיוחד: (1) עסקה בנייר ערך אשר בתשקיף צויין כי ההשקעה בו כרוכה בסיכון מיוחד, כל עוד לא חלפו שנתיים מתאריך התשקיף, זולת אם הסיכון אשר צויין כאמור אינו קיים עוד; (2)עסקה שכרוכה בה מכירה בחסר, כמשמעותה בסעיף 63 לחוק השקעות משותפות בנאמנות, תשנ"ד-1994 והשאלת ניירות ערך לצורך ביצוע עסקה כאמור; (3) עסקה בחוזה עתידי, באופציה או במוצר מובנה; (3)עסקה בחוזה עתידי עתידי, באופציה או במוצר מובנה;(4)עסקה אחרת שקבע לענין זה שר האוצר, בהתייעצות עם הרשות ובאישור ועדת הכספים של הכנסת.'}
+          </Text>
+        </View>
+      </View>
+
+      <PageFooter />
+    </Page>
+
+  </Document>
+)
+
+// ══════════════════════════════════════════════════════════════
 //  EXPORTS
 // ══════════════════════════════════════════════════════════════
 
@@ -689,6 +1174,19 @@ export async function generateMarketingAgreementStyled(clientData) {
   const safeName = clientName.replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]
   const fileName = `הסכם_שיווק_styled_${dateStr}_${safeName}.pdf`
+
+  const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
+  const previewUrl = URL.createObjectURL(previewBlob)
+
+  return { url: previewUrl, fileName, pdfBytes }
+}
+
+/** גרסה ידנית — טופס ריק להדפסה ומילוי ביד */
+export async function generateMarketingAgreementBlank() {
+  const blob = await pdf(<BlankMarketingAgreementDoc />).toBlob()
+  const pdfBytes = await blob.arrayBuffer()
+
+  const fileName = 'הסכם_שיווק_ידני.pdf'
 
   const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
   const previewUrl = URL.createObjectURL(previewBlob)

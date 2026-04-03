@@ -23,7 +23,7 @@ Font.register = (descriptor) => {
   _origRegister(descriptor)
 }
 
-const { generateMarketingAgreement, generateMarketingAgreementStyled } = await import('../src/components/pdf/generateMarketingAgreement.jsx')
+const { generateMarketingAgreement, generateMarketingAgreementStyled, generateMarketingAgreementBlank } = await import('../src/components/pdf/generateMarketingAgreement.jsx')
 
 // Restore and register with filesystem paths
 Font.register = _origRegister
@@ -80,15 +80,17 @@ console.log('Generating marketing agreement PDFs...')
 const start = Date.now()
 
 try {
-  const [print, styled] = await Promise.all([
+  const [print, styled, blank] = await Promise.all([
     generateMarketingAgreement(testData),
     generateMarketingAgreementStyled(testData),
+    generateMarketingAgreementBlank(),
   ])
 
   fs.mkdirSync(path.join(projectRoot, 'טפסים_ידניים'), { recursive: true })
 
   await writeResult(print, path.join(projectRoot, 'agreement_print.pdf'), 'PRINT')
   await writeResult(styled, path.join(projectRoot, 'agreement_styled.pdf'), 'STYLED')
+  await writeResult(blank, path.join(projectRoot, 'agreement_blank.pdf'), 'BLANK')
 
   console.log(`Done in ${Date.now() - start}ms`)
 } catch (err) {
