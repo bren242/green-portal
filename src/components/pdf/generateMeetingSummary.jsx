@@ -3,7 +3,7 @@
 // גרסת הדפסה = שחור-לבן, קווים נקיים
 
 import React from 'react'
-import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 
 // ── Font ──────────────────────────────────────────────────────
@@ -113,7 +113,7 @@ const CB = ({ checked, label, compact }) => (
       alignItems: 'center',
       flexShrink: 0,
     }}>
-      {checked && <Text style={{ fontSize: compact ? 7 : 8, color: C.black, lineHeight: 1 }}>{'\u2713'}</Text>}
+      {checked && <Svg viewBox="0 0 24 24" width={compact ? 7 : 9} height={compact ? 7 : 9}><Path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill={C.black} /></Svg>}
     </View>
     <Text style={{ fontSize: compact ? 7.5 : 9, color: C.black, textAlign: 'right', flex: 1 }}>{label}</Text>
   </View>
@@ -238,12 +238,12 @@ const TopicsTable = ({ data, styled: s }) => {
             <Text style={{ width: '55%', fontSize: s ? 7 : 6, color: C.muted, textAlign: 'right', paddingHorizontal: 4 }}>{t.examples}</Text>
             <View style={{ width: '12.5%', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: cbSize, height: cbSize, borderWidth: 1, borderColor: C.black, justifyContent: 'center', alignItems: 'center' }}>
-                {val === 'yes' && <Text style={{ fontSize: s ? 8 : 7, lineHeight: 1 }}>{'\u2713'}</Text>}
+                {val === 'yes' && <Svg viewBox="0 0 24 24" width={s ? 9 : 7} height={s ? 9 : 7}><Path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill={C.black} /></Svg>}
               </View>
             </View>
             <View style={{ width: '12.5%', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: cbSize, height: cbSize, borderWidth: 1, borderColor: C.black, justifyContent: 'center', alignItems: 'center' }}>
-                {val === 'no' && <Text style={{ fontSize: s ? 8 : 7, lineHeight: 1 }}>{'\u2713'}</Text>}
+                {val === 'no' && <Svg viewBox="0 0 24 24" width={s ? 9 : 7} height={s ? 9 : 7}><Path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill={C.black} /></Svg>}
               </View>
             </View>
           </View>

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { getUsersFull, addUser, updateUser, deleteUser } from '../../data/users'
+import { getQualifiedAmounts, saveQualifiedAmounts, DEFAULT_QUALIFIED_AMOUNTS } from '../../data/qualifiedAmounts'
 
 export default function AdminPanel({ onBack }) {
   const [activeTab, setActiveTab] = useState('users')
 
   const tabs = [
     { id: 'users', label: 'משתמשים' },
+    { id: 'qualified', label: 'סכומי כשיר' },
     { id: 'scoring', label: 'טבלת ניקוד' },
     { id: 'questions', label: 'שאלות סיכון' },
   ]
@@ -50,6 +52,7 @@ export default function AdminPanel({ onBack }) {
 
         <div className="bg-white rounded-card shadow-card p-6">
           {activeTab === 'users' && <UsersTab />}
+          {activeTab === 'qualified' && <QualifiedAmountsTab />}
           {activeTab === 'scoring' && <ScoringTab />}
           {activeTab === 'questions' && <QuestionsTab />}
         </div>
@@ -192,6 +195,81 @@ function UsersTab() {
             )}
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function QualifiedAmountsTab() {
+  const [amounts, setAmounts] = useState(getQualifiedAmounts())
+  const [saved, setSaved] = useState(false)
+
+  const handleChange = (key, value) => {
+    setAmounts((prev) => ({ ...prev, [key]: value }))
+    setSaved(false)
+  }
+
+  const handleSave = () => {
+    saveQualifiedAmounts(amounts)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleReset = () => {
+    setAmounts({ ...DEFAULT_QUALIFIED_AMOUNTS })
+    setSaved(false)
+  }
+
+  const fieldClass = "w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary text-right"
+
+  const fields = [
+    { key: 'amount1', label: 'תנאי 1: נכסים נזילים', desc: 'מיליון ש"ח' },
+    { key: 'amount2', label: 'תנאי 2: הכנסה אישית', desc: 'מיליון ש"ח' },
+    { key: 'amount3', label: 'תנאי 2: הכנסת תא משפחתי', desc: 'מיליון ש"ח' },
+    { key: 'amount4', label: 'תנאי 3: נכסים נזילים (משולב)', desc: 'מיליון ש"ח' },
+    { key: 'amount5', label: 'תנאי 3: הכנסה אישית (משולב)', desc: 'ש"ח' },
+    { key: 'amount6', label: 'תנאי 3: הכנסת תא משפחתי (משולב)', desc: 'מיליון ש"ח' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-green-primary">סכומי לקוח כשיר</h2>
+        <span className="text-xs text-text-muted">מתעדכנים שנתית לפי רגולציה</span>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {fields.map((f) => (
+          <div key={f.key}>
+            <label className="text-xs font-semibold text-text-primary block mb-1">{f.label}</label>
+            <div className="flex items-center gap-2">
+              <input
+                className={fieldClass}
+                value={amounts[f.key]}
+                onChange={(e) => handleChange(f.key, e.target.value)}
+              />
+              <span className="text-xs text-text-muted whitespace-nowrap">{f.desc}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={handleSave}
+          className="px-6 py-2 bg-green-primary text-white rounded-lg text-sm font-semibold hover:bg-green-secondary transition-colors"
+        >
+          שמור
+        </button>
+        <button
+          onClick={handleReset}
+          className="px-4 py-2 border border-border rounded-lg text-sm text-text-muted hover:bg-surface-light transition-colors"
+        >
+          אפס לברירת מחדל
+        </button>
+        {saved && (
+          <span className="text-sm text-positive font-semibold">✓ נשמר</span>
+        )}
       </div>
     </div>
   )
