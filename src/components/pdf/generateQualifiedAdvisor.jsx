@@ -77,6 +77,18 @@ const CB = ({ checked, size = 11 }) => (
   </View>
 )
 
+// ── Numbered paragraph — number in separate column for proper RTL ──
+const NumPara = ({ num, children, bold, size = 9, mb = 4, indent = 20 }) => (
+  <View style={{ flexDirection: 'row-reverse', marginBottom: mb }}>
+    <Text style={{ fontSize: size, fontWeight: bold ? 'bold' : 'normal', color: C.black, textAlign: 'right', width: indent, flexShrink: 0 }}>
+      {num}
+    </Text>
+    <View style={{ flex: 1 }}>
+      {children}
+    </View>
+  </View>
+)
+
 // ── Signature line ────────────────────────────────────────────
 const SignLine = ({ label, value, width = '45%' }) => (
   <View style={{ width, alignItems: 'center' }}>
@@ -133,6 +145,17 @@ const T = ({ children, bold, size = 9, mb = 0, mt = 0, lh = 1.6 }) => (
   }}>{children}</Text>
 )
 
+// ── Radio option row — radio on right, text left ──────────────
+const RadioOption = ({ num, label, checked, extra }) => (
+  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 5, paddingRight: 15 }}>
+    <Radio checked={checked} />
+    <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginRight: 6 }}>
+      {num + '  ' + label}
+    </Text>
+    {extra || null}
+  </View>
+)
+
 // ══════════════════════════════════════════════════════════════
 // PAGE 1 — הסכמת לקוח כשיר
 // ══════════════════════════════════════════════════════════════
@@ -172,35 +195,37 @@ const Page1 = ({ data: d, styled: s }) => {
         <InlineField value={d.clientName} width={150} />
         <Text style={{ fontSize: 10, color: C.black }}>{'\u05EA.\u05D6.'}</Text>
         <InlineField value={d.clientId} width={100} />
-        <Text style={{ fontSize: 10, color: C.black }}>{' (\u05DC\u05D4\u05DC\u05DF: "\u05D4\u05DC\u05E7\u05D5\u05D7") \u05DE\u05E6\u05D4\u05D9\u05E8, \u05DE\u05D0\u05E9\u05E8 \u05D5\u05DE\u05E1\u05DB\u05D9\u05DD'}</Text>
+        <Text style={{ fontSize: 10, color: C.black }}>{' ("\u05D4\u05DC\u05E7\u05D5\u05D7") \u05DE\u05E6\u05D4\u05D9\u05E8, \u05DE\u05D0\u05E9\u05E8 \u05D5\u05DE\u05E1\u05DB\u05D9\u05DD'}</Text>
       </View>
 
       {/* Intro paragraph — AS IS */}
-      <T size={9} mb={4}>
+      <T size={9} mb={3}>
         {'\u05D1\u05D6\u05D0\u05EA, \u05DC\u05D0\u05D7\u05E8 \u05E9\u05D4\u05D5\u05D1\u05D0\u05D5 \u05DC\u05D9\u05D3\u05D9\u05E2\u05EA\u05D9 \u05D4\u05D5\u05E8\u05D0\u05D5\u05EA \u05D7\u05D5\u05E7 \u05D4\u05E1\u05D3\u05E8\u05EA \u05D4\u05E2\u05D9\u05E1\u05D5\u05E7 \u05D1\u05D9\u05D9\u05E2\u05D5\u05E5 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA, \u05E9\u05D9\u05D5\u05D5\u05E7 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D9\u05E7\u05D9 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA,'}
       </T>
-      <T size={9} mb={4}>
-        {'\u05D4\u05EA\u05E9\u05E0"\u05D4-1995 (\u05DC\u05D4\u05DC\u05DF: "\u05D7\u05D5\u05E7 \u05D4\u05D9\u05E2\u05D5\u05E5"), \u05DC\u05E8\u05D1\u05D5\u05EA \u05D4\u05EA\u05D5\u05E1\u05E4\u05EA \u05D4\u05E8\u05D0\u05E9\u05D5\u05E0\u05D4 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5, \u05DB\u05D9 \u05DE\u05EA\u05E7\u05D9\u05D9\u05DE\u05D9\u05DD \u05D1\u05D9\u05D7\u05E1 \u05D0\u05DC\u05D9\u05D9 2 \u05DE\u05D1\u05D9\u05DF 3'}
+      <T size={9} mb={3}>
+        {'\u05D4\u05EA\u05E9\u05E0"\u05D4-1995 ("\u05D7\u05D5\u05E7 \u05D4\u05D9\u05E2\u05D5\u05E5"), \u05DC\u05E8\u05D1\u05D5\u05EA \u05D4\u05EA\u05D5\u05E1\u05E4\u05EA \u05D4\u05E8\u05D0\u05E9\u05D5\u05E0\u05D4 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5, \u05DB\u05D9 \u05DE\u05EA\u05E7\u05D9\u05D9\u05DE\u05D9\u05DD \u05D1\u05D9\u05D7\u05E1 \u05D0\u05DC\u05D9\u05D9 2 \u05DE\u05D1\u05D9\u05DF 3'}
       </T>
-      <T size={9} mb={4}>
+      <T size={9} mb={3}>
         {'\u05D4\u05EA\u05E0\u05D0\u05D9\u05DD \u05D4\u05DE\u05E4\u05D5\u05E8\u05D8\u05D9\u05DD \u05D1\u05EA\u05D5\u05E1\u05E4\u05EA \u05D4\u05E8\u05D0\u05E9\u05D5\u05E0\u05D4 \u05DC\u05E2\u05E0\u05D9\u05D9\u05DF \u05D4\u05D9\u05D5\u05EA\u05D9 \u05DC\u05E7\u05D5\u05D7 \u05DB\u05E9\u05D9\u05E8, \u05D5\u05DC\u05E4\u05D9\u05DB\u05DA \u05D4\u05E0\u05E0\u05D9 \u05DE\u05D0\u05E9\u05E8, \u05DE\u05E6\u05D4\u05D9\u05E8 \u05D5\u05DE\u05E1\u05DB\u05D9\u05DD "\u05DC\u05E7\u05D5\u05D7 \u05DB\u05E9\u05D9\u05E8"'}
       </T>
       <T size={9} mb={8}>
         {'\u05DB\u05D4\u05D2\u05D3\u05E8\u05EA\u05D5 \u05D1\u05EA\u05D5\u05E1\u05E4\u05EA \u05D4\u05E8\u05D0\u05E9\u05D5\u05E0\u05D4 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5.'}
       </T>
 
-      {/* Instructions line — bold + underline */}
+      {/* Instructions line — bold */}
       <T size={9} bold mb={10}>
         {'\u05DC\u05D4\u05DC\u05DF \u05D4\u05EA\u05E0\u05D0\u05D9\u05DD \u05DB\u05E4\u05D9 \u05E9\u05DE\u05E4\u05D5\u05E8\u05D8\u05D9\u05DD \u05D1\u05EA\u05D5\u05E1\u05E4\u05EA \u05E8\u05D0\u05E9\u05D5\u05E0\u05D4 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5 (\u05D9\u05E9 \u05DC\u05D7\u05EA\u05D5\u05DD \u05D1\u05E6\u05D3 \u05D4\u05EA\u05E0\u05D0\u05D9\u05DD \u05D4\u05DE\u05EA\u05E7\u05D9\u05D9\u05DE\u05D9\u05DD):'}
       </T>
 
-      {/* ── Condition (1) ── */}
-      <T size={9} mb={4}>
-        {'(1) \u05D4\u05E9\u05D5\u05D5\u05D9 \u05D4\u05DB\u05D5\u05DC\u05DC \u05E9\u05DC \u05D4\u05DE\u05D6\u05D5\u05DE\u05E0\u05D9\u05DD, \u05E4\u05D9\u05E7\u05D3\u05D5\u05E0\u05D5\u05EA, \u05E0\u05DB\u05E1\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD \u05D5\u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA \u05DB\u05D4\u05D2\u05D3\u05E8\u05EA\u05DD \u05D1\u05E1\u05E2\u05D9\u05E3 52 \u05DC\u05D7\u05D5\u05E7 \u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA, \u05D4\u05EA\u05E9\u05DB"\u05D7-1968'}
-      </T>
-      <T size={9} bold mb={6}>
-        {'\u05E9\u05D1\u05D1\u05E2\u05DC\u05D5\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7 \u05E2\u05D5\u05DC\u05D4 \u05E2\u05DC ' + amountAdvisor + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05E7\u05DC\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD;'}
-      </T>
+      {/* ── Condition (1) — number in separate column ── */}
+      <NumPara num="(1)" mb={2}>
+        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+          {'\u05D4\u05E9\u05D5\u05D5\u05D9 \u05D4\u05DB\u05D5\u05DC\u05DC \u05E9\u05DC \u05D4\u05DE\u05D6\u05D5\u05DE\u05E0\u05D9\u05DD, \u05E4\u05D9\u05E7\u05D3\u05D5\u05E0\u05D5\u05EA, \u05E0\u05DB\u05E1\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD \u05D5\u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA \u05DB\u05D4\u05D2\u05D3\u05E8\u05EA\u05DD \u05D1\u05E1\u05E2\u05D9\u05E3 52 \u05DC\u05D7\u05D5\u05E7 \u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA, \u05D4\u05EA\u05E9\u05DB"\u05D7-1968'}
+        </Text>
+        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+          {'\u05E9\u05D1\u05D1\u05E2\u05DC\u05D5\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7 \u05E2\u05D5\u05DC\u05D4 \u05E2\u05DC ' + amountAdvisor + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05E7\u05DC\u05D9\u05DD \u05D7\u05D3\u05E9\u05D9\u05DD;'}
+        </Text>
+      </NumPara>
 
       {/* Signature for condition 1 */}
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 6, gap: 8 }}>
@@ -209,41 +234,34 @@ const Page1 = ({ data: d, styled: s }) => {
       </View>
 
       {/* Bold note — AS IS */}
-      <T size={8} bold mb={12}>
+      <T size={8} bold mb={10}>
         {'[\u05D9\u05E9 \u05DC\u05E6\u05E8\u05E3 \u05D0\u05D9\u05E9\u05D5\u05E8 \u05D7\u05EA\u05D5\u05DD \u05E2"\u05D9 \u05E8\u05D5"\u05D7 \u05D0\u05D5 \u05E2\u05D5"\u05D3 \u05D0\u05D5 \u05D0\u05E1\u05DE\u05DB\u05EA\u05D0\u05D5\u05EA \u05D0\u05D7\u05E8\u05D5\u05EA \u05E8\u05DC\u05D5\u05D5\u05E0\u05D8\u05D9\u05D5\u05EA \u05D4\u05DE\u05E2\u05D9\u05D3\u05D5\u05EA \u05E2\u05DC \u05D4\u05EA\u05E7\u05D9\u05D9\u05DE\u05D5\u05EA \u05D4\u05EA\u05E0\u05D0\u05D9]'}
       </T>
 
-      {/* ── Condition (2) ── */}
-      <T size={9} mb={4}>
-        {'(2) \u05D4\u05DC\u05E7\u05D5\u05D7 \u05D1\u05E2\u05DC \u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D5\u05DB\u05E9\u05D9\u05E8\u05D5\u05EA \u05D1\u05EA\u05D7\u05D5\u05DD \u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF \u05D0\u05D5 \u05D4\u05D5\u05E2\u05E1\u05E7 \u05DC\u05E4\u05D7\u05D5\u05EA \u05E9\u05E0\u05D4 \u05D1\u05EA\u05E4\u05E7\u05D9\u05D3 \u05DE\u05E7\u05E6\u05D5\u05E2\u05D9 \u05E9\u05D3\u05D5\u05E8\u05E9 \u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D1\u05E9\u05D5\u05E7'}
-      </T>
-      <T size={9} mb={6}>{'\u05D4\u05D4\u05D5\u05DF -'}</T>
+      {/* ── Condition (2) — number in separate column ── */}
+      <NumPara num="(2)" mb={6}>
+        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+          {'\u05D4\u05DC\u05E7\u05D5\u05D7 \u05D1\u05E2\u05DC \u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D5\u05DB\u05E9\u05D9\u05E8\u05D5\u05EA \u05D1\u05EA\u05D7\u05D5\u05DD \u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF \u05D0\u05D5 \u05D4\u05D5\u05E2\u05E1\u05E7 \u05DC\u05E4\u05D7\u05D5\u05EA \u05E9\u05E0\u05D4 \u05D1\u05EA\u05E4\u05E7\u05D9\u05D3 \u05DE\u05E7\u05E6\u05D5\u05E2\u05D9 \u05E9\u05D3\u05D5\u05E8\u05E9 \u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF -'}
+        </Text>
+      </NumPara>
 
-      {/* 5 radio options */}
-      {[
-        { value: 'ceo', label: '\u05DE\u05E0\u05DB"\u05DC/\u05D1\u05E2\u05DC\u05D9\u05DD \u05E9\u05DC \u05D7\u05D1\u05E8\u05D4 \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF / \u05D1\u05D9\u05D8\u05D5\u05D7' },
-        { value: 'cfo', label: '\u05DE\u05E0\u05D4\u05DC \u05DB\u05E1\u05E4\u05D9\u05DD' },
-        { value: 'investment', label: '\u05DE\u05E0\u05D4\u05DC \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA' },
-        { value: 'trader', label: '\u05E1\u05D5\u05D7\u05E8' },
-        { value: 'other', label: '\u05D0\u05D7\u05E8' },
-      ].map((opt, i) => (
-        <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 4, gap: 6, paddingRight: 15 }}>
-          <Radio checked={d.condition2Role === opt.value} />
-          <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
-            {(i + 1) + ') ' + opt.label}
-          </Text>
-          {opt.value === 'other' && (
-            d.condition2Other ? (
-              <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 4 }}>{d.condition2Other}</Text>
-            ) : (
-              <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: 200, height: 14, marginRight: 4 }} />
-            )
-          )}
-        </View>
-      ))}
+      {/* 5 radio options with proper numbering */}
+      <RadioOption num="(1" label={'\u05DE\u05E0\u05DB"\u05DC/\u05D1\u05E2\u05DC\u05D9\u05DD \u05E9\u05DC \u05D7\u05D1\u05E8\u05D4 \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF / \u05D1\u05D9\u05D8\u05D5\u05D7'} checked={d.condition2Role === 'ceo'} />
+      <RadioOption num="(2" label={'\u05DE\u05E0\u05D4\u05DC \u05DB\u05E1\u05E4\u05D9\u05DD'} checked={d.condition2Role === 'cfo'} />
+      <RadioOption num="(3" label={'\u05DE\u05E0\u05D4\u05DC \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA'} checked={d.condition2Role === 'investment'} />
+      <RadioOption num="(4" label={'\u05E1\u05D5\u05D7\u05E8'} checked={d.condition2Role === 'trader'} />
+      <RadioOption num="(5" label={'\u05D0\u05D7\u05E8'} checked={d.condition2Role === 'other'}
+        extra={
+          d.condition2Other ? (
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 6 }}>{d.condition2Other}</Text>
+          ) : (
+            <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: 180, height: 14, marginRight: 6 }} />
+          )
+        }
+      />
 
       {/* Note about extended questionnaire */}
-      <T size={8} mb={8} mt={2}>{'(\u05D1\u05DE\u05D9\u05D3\u05D4 \u05D5\u05E1\u05D5\u05DE\u05DF \u05D0\u05D7\u05E8 \u05D9\u05E9 \u05DC\u05DE\u05DC\u05D0 \u05E9\u05D0\u05DC\u05D5\u05DF \u05DE\u05D5\u05E8\u05D7\u05D1)'}</T>
+      <T size={8} mb={8} mt={2}>{' (\u05D1\u05DE\u05D9\u05D3\u05D4 \u05D5\u05E1\u05D5\u05DE\u05DF \u05D0\u05D7\u05E8 \u05D9\u05E9 \u05DC\u05DE\u05DC\u05D0 \u05E9\u05D0\u05DC\u05D5\u05DF \u05DE\u05D5\u05E8\u05D7\u05D1)'}</T>
 
       {/* Experience details */}
       <T size={9} bold mb={4}>{'\u05E4\u05D9\u05E8\u05D5\u05D8 \u05D0\u05D5\u05D3\u05D5\u05EA \u05E0\u05D9\u05E1\u05D9\u05D5\u05DF \u05E8\u05DC\u05D5\u05D5\u05E0\u05D8\u05D9'}</T>
@@ -276,13 +294,15 @@ const Page2 = ({ data: d, styled: s }) => (
       <View />
     </View>
 
-    {/* ── Condition (3) ── */}
-    <T size={9} mb={4}>
-      {'(3) \u05D4\u05DC\u05E7\u05D5\u05D7 \u05D1\u05D9\u05E6\u05E2 \u05DC\u05E4\u05D7\u05D5\u05EA 30 \u05E2\u05E1\u05E7\u05D0\u05D5\u05EA, \u05D1\u05DE\u05DE\u05D5\u05E6\u05E2, \u05D1\u05DB\u05DC \u05E8\u05D1\u05E2\u05D5\u05DF \u05D1\u05DE\u05E9\u05DA \u05D0\u05E8\u05D1\u05E2\u05EA \u05D4\u05E8\u05D1\u05E2\u05D5\u05E0\u05D9\u05DD \u05E9\u05E7\u05D3\u05DE\u05D5 \u05DC\u05D4\u05E1\u05DB\u05DE\u05EA\u05D5; \u05DC\u05E2\u05E0\u05D9\u05D9\u05DF \u05D6\u05D4'}
-    </T>
-    <T size={9} mb={6}>
-      {'"\u05E2\u05E1\u05E7\u05D4" \u2013 \u05DC\u05DE\u05E2\u05D8 \u05E2\u05E1\u05E7\u05D4 \u05E9\u05D1\u05D9\u05E6\u05E2 \u05DE\u05E0\u05D4\u05DC \u05EA\u05D9\u05E7\u05D9\u05DD \u05D1\u05E2\u05D1\u05D5\u05E8 \u05D9\u05D7\u05D9\u05D3 \u05D4\u05E7\u05E9\u05D5\u05E8 \u05E2\u05D9\u05DE\u05D5 \u05D1\u05D4\u05E1\u05DB\u05DD \u05DC\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D9\u05E7\u05D9 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA.'}
-    </T>
+    {/* ── Condition (3) — number in separate column ── */}
+    <NumPara num="(3)" mb={2}>
+      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+        {'\u05D4\u05DC\u05E7\u05D5\u05D7 \u05D1\u05D9\u05E6\u05E2 \u05DC\u05E4\u05D7\u05D5\u05EA 30 \u05E2\u05E1\u05E7\u05D0\u05D5\u05EA, \u05D1\u05DE\u05DE\u05D5\u05E6\u05E2, \u05D1\u05DB\u05DC \u05E8\u05D1\u05E2\u05D5\u05DF \u05D1\u05DE\u05E9\u05DA \u05D0\u05E8\u05D1\u05E2\u05EA \u05D4\u05E8\u05D1\u05E2\u05D5\u05E0\u05D9\u05DD \u05E9\u05E7\u05D3\u05DE\u05D5 \u05DC\u05D4\u05E1\u05DB\u05DE\u05EA\u05D5; \u05DC\u05E2\u05E0\u05D9\u05D9\u05DF \u05D6\u05D4'}
+      </Text>
+      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+        {'"\u05E2\u05E1\u05E7\u05D4" \u2013 \u05DC\u05DE\u05E2\u05D8 \u05E2\u05E1\u05E7\u05D4 \u05E9\u05D1\u05D9\u05E6\u05E2 \u05DE\u05E0\u05D4\u05DC \u05EA\u05D9\u05E7\u05D9\u05DD \u05D1\u05E2\u05D1\u05D5\u05E8 \u05D9\u05D7\u05D9\u05D3 \u05D4\u05E7\u05E9\u05D5\u05E8 \u05E2\u05D9\u05DE\u05D5 \u05D1\u05D4\u05E1\u05DB\u05DD \u05DC\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D9\u05E7\u05D9 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA.'}
+      </Text>
+    </NumPara>
 
     {/* Signature for condition 3 */}
     <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 12, gap: 8 }}>
@@ -298,22 +318,25 @@ const Page2 = ({ data: d, styled: s }) => (
     </View>
 
     {/* ── Waiver section ── */}
-    <T size={9} mb={4}>
+    <T size={9} mb={2}>
       {'\u05D4\u05D7"\u05DE \u05DE\u05E6\u05D4\u05D9\u05E8 \u05DB\u05D9 \u05D1\u05E2\u05DC \u05D4\u05E8\u05D9\u05E9\u05D9\u05D5\u05DF \u05D4\u05E1\u05D1\u05D9\u05E8 \u05DC\u05D5 \u05DE\u05E4\u05D5\u05E8\u05E9\u05D5\u05EA \u05D0\u05D5\u05D3\u05D5\u05EA \u05DE\u05E9\u05DE\u05E2\u05D5\u05EA \u05D4\u05D4\u05E1\u05DB\u05DE\u05D4 \u05DC\u05D4\u05D9\u05D7\u05E9\u05D1 \u05DC\u05E7\u05D5\u05D7 \u05DB\u05E9\u05D9\u05E8, \u05D0\u05E9\u05E8 \u05DB\u05D5\u05DC\u05DC\u05EA'}
     </T>
     <T size={9} bold mb={8}>{'\u05D5\u05D9\u05EA\u05D5\u05E8 \u05E2\u05DC \u05D4\u05D4\u05D2\u05E0\u05D5\u05EA \u05DE\u05DB\u05D5\u05D7 \u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5 \u05DB\u05DE\u05E4\u05D5\u05E8\u05D8 \u05DC\u05D4\u05DC\u05DF:'}</T>
 
-    {/* 7 waiver clauses — AS IS */}
-    <T size={9} mb={4}>{'(1) \u05D4\u05EA\u05D0\u05DE\u05EA \u05E9\u05D9\u05E8\u05D5\u05EA \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 12 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
-    <T size={9} mb={4}>{'(2) \u05E2\u05E8\u05D9\u05DB\u05EA \u05D4\u05E1\u05DB\u05DD \u05D1\u05DB\u05EA\u05D1 \u05D5\u05DE\u05E1\u05D9\u05E8\u05EA\u05D5 \u05D8\u05E8\u05DD \u05EA\u05D7\u05D9\u05DC\u05EA \u05D4\u05E9\u05D9\u05E8\u05D5\u05EA \u05D1\u05DE\u05EA\u05DB\u05D5\u05E0\u05EA \u05D4\u05E7\u05D1\u05D5\u05E2\u05D4 \u05D1\u05E1\u05E2\u05D9\u05E3 13 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
-    <T size={9} mb={2}>{'(3) \u05E7\u05D1\u05DC\u05EA \u05D2\u05D9\u05DC\u05D5\u05D9 \u05E0\u05D0\u05D5\u05EA \u05E2\u05DC \u05DB\u05DC \u05D4\u05E2\u05E0\u05D9\u05D9\u05E0\u05D9\u05DD \u05D4\u05DE\u05D4\u05D5\u05EA\u05D9\u05D9\u05DD \u05DC\u05E9\u05D9\u05D5\u05D5\u05E7 \u05D4\u05E0\u05D9\u05EA\u05DF \u05E2\u05DC \u05D9\u05D3\u05D9 \u05D4\u05D7\u05D1\u05E8\u05D4, \u05DC\u05E8\u05D1\u05D5\u05EA \u05D6\u05D9\u05E7\u05D4 \u05DC\u05DE\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD'}</T>
-    <T size={9} mb={4}>{'\u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 14 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
-    <T size={9} mb={2}>{'(4) \u05D0\u05D9\u05E1\u05D5\u05E8 \u05D4\u05E2\u05D3\u05E4\u05EA \u05D1\u05E2\u05DC \u05D4\u05E8\u05D9\u05E9\u05D9\u05D5\u05DF \u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA \u05D0\u05D5 \u05E0\u05DB\u05E1\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05DD \u05E9\u05DC\u05D5 \u05D0\u05D5 \u05E9\u05DC \u05EA\u05D0\u05D2\u05D9\u05D3 \u05E7\u05E9\u05D5\u05E8 \u05DC\u05EA\u05D0\u05D2\u05D9\u05D3 \u05E9\u05D1\u05D5 \u05D4\u05D5\u05D0'}</T>
-    <T size={9} mb={4}>{'\u05E2\u05D5\u05D1\u05D3 \u05D0\u05D5 \u05E9\u05D5\u05EA\u05E3 \u05D1\u05E9\u05DC \u05D4\u05E7\u05E9\u05E8 \u05D4\u05D0\u05DE\u05D5\u05E8 \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 16 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
-    <T size={9} mb={4}>{'(5) \u05E7\u05D1\u05DC\u05EA \u05D4\u05E1\u05DB\u05DE\u05D4 \u05DC\u05D1\u05D9\u05E6\u05D5\u05E2 \u05E2\u05E1\u05E7\u05D4 \u05D1\u05E1\u05D9\u05DB\u05D5\u05DF \u05DE\u05D9\u05D5\u05D7\u05D3;'}</T>
-    <T size={9} mb={4}>{'(6) \u05E8\u05D9\u05E9\u05D5\u05DD \u05D5\u05E9\u05DE\u05D9\u05E8\u05D4 \u05E9\u05DC \u05DB\u05DC \u05E2\u05E1\u05E7\u05D4 \u05D5\u05E4\u05E2\u05D5\u05DC\u05EA \u05E9\u05D9\u05D5\u05D5\u05E7 \u05E9\u05D1\u05D5\u05E6\u05E2\u05D4 \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05D0\u05DE\u05D5\u05E8 \u05D1\u05E1\u05E2\u05D9\u05E3 25 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
-    <T size={9} mb={2}>{'(7) \u05D1\u05E0\u05D5\u05E1\u05E3, \u05D4\u05D7\u05D1\u05E8\u05D4 \u05EA\u05D4\u05D0 \u05E8\u05E9\u05D0\u05D9\u05EA \u05DC\u05D4\u05EA\u05E0\u05D5\u05EA \u05D0\u05EA \u05E9\u05DB\u05E8\u05D4 \u05D1\u05E8\u05D5\u05D5\u05D7 \u05E9\u05EA\u05E4\u05D9\u05E7 \u05DE\u05E2\u05E1\u05E7\u05D0\u05D5\u05EA \u05E9\u05D9\u05D1\u05D5\u05E6\u05E2\u05D5 \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 24'}</T>
-    <T size={9} mb={8}>{'\u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5.'}</T>
+    {/* 7 waiver clauses — each with number in separate column */}
+    <NumPara num="(1)"><T size={9}>{'\u05D4\u05EA\u05D0\u05DE\u05EA \u05E9\u05D9\u05E8\u05D5\u05EA \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 12 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T></NumPara>
+    <NumPara num="(2)"><T size={9}>{'\u05E2\u05E8\u05D9\u05DB\u05EA \u05D4\u05E1\u05DB\u05DD \u05D1\u05DB\u05EA\u05D1 \u05D5\u05DE\u05E1\u05D9\u05E8\u05EA\u05D5 \u05D8\u05E8\u05DD \u05EA\u05D7\u05D9\u05DC\u05EA \u05D4\u05E9\u05D9\u05E8\u05D5\u05EA \u05D1\u05DE\u05EA\u05DB\u05D5\u05E0\u05EA \u05D4\u05E7\u05D1\u05D5\u05E2\u05D4 \u05D1\u05E1\u05E2\u05D9\u05E3 13 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T></NumPara>
+    <NumPara num="(3)">
+      <T size={9}>{'\u05E7\u05D1\u05DC\u05EA \u05D2\u05D9\u05DC\u05D5\u05D9 \u05E0\u05D0\u05D5\u05EA \u05E2\u05DC \u05DB\u05DC \u05D4\u05E2\u05E0\u05D9\u05D9\u05E0\u05D9\u05DD \u05D4\u05DE\u05D4\u05D5\u05EA\u05D9\u05D9\u05DD \u05DC\u05E9\u05D9\u05D5\u05D5\u05E7 \u05D4\u05E0\u05D9\u05EA\u05DF \u05E2\u05DC \u05D9\u05D3\u05D9 \u05D4\u05D7\u05D1\u05E8\u05D4, \u05DC\u05E8\u05D1\u05D5\u05EA \u05D6\u05D9\u05E7\u05D4 \u05DC\u05DE\u05D5\u05E6\u05E8\u05D9\u05DD \u05D0\u05D7\u05E8\u05D9\u05DD \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 14 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
+    </NumPara>
+    <NumPara num="(4)">
+      <T size={9}>{'\u05D0\u05D9\u05E1\u05D5\u05E8 \u05D4\u05E2\u05D3\u05E4\u05EA \u05D1\u05E2\u05DC \u05D4\u05E8\u05D9\u05E9\u05D9\u05D5\u05DF \u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA \u05D0\u05D5 \u05E0\u05DB\u05E1\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05DD \u05E9\u05DC\u05D5 \u05D0\u05D5 \u05E9\u05DC \u05EA\u05D0\u05D2\u05D9\u05D3 \u05E7\u05E9\u05D5\u05E8 \u05DC\u05EA\u05D0\u05D2\u05D9\u05D3 \u05E9\u05D1\u05D5 \u05D4\u05D5\u05D0 \u05E2\u05D5\u05D1\u05D3 \u05D0\u05D5 \u05E9\u05D5\u05EA\u05E3 \u05D1\u05E9\u05DC \u05D4\u05E7\u05E9\u05E8 \u05D4\u05D0\u05DE\u05D5\u05E8 \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 16 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T>
+    </NumPara>
+    <NumPara num="(5)"><T size={9}>{'\u05E7\u05D1\u05DC\u05EA \u05D4\u05E1\u05DB\u05DE\u05D4 \u05DC\u05D1\u05D9\u05E6\u05D5\u05E2 \u05E2\u05E1\u05E7\u05D4 \u05D1\u05E1\u05D9\u05DB\u05D5\u05DF \u05DE\u05D9\u05D5\u05D7\u05D3;'}</T></NumPara>
+    <NumPara num="(6)"><T size={9}>{'\u05E8\u05D9\u05E9\u05D5\u05DD \u05D5\u05E9\u05DE\u05D9\u05E8\u05D4 \u05E9\u05DC \u05DB\u05DC \u05E2\u05E1\u05E7\u05D4 \u05D5\u05E4\u05E2\u05D5\u05DC\u05EA \u05E9\u05D9\u05D5\u05D5\u05E7 \u05E9\u05D1\u05D5\u05E6\u05E2\u05D4 \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05D0\u05DE\u05D5\u05E8 \u05D1\u05E1\u05E2\u05D9\u05E3 25 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5;'}</T></NumPara>
+    <NumPara num="(7)" mb={8}>
+      <T size={9}>{'\u05D1\u05E0\u05D5\u05E1\u05E3, \u05D4\u05D7\u05D1\u05E8\u05D4 \u05EA\u05D4\u05D0 \u05E8\u05E9\u05D0\u05D9\u05EA \u05DC\u05D4\u05EA\u05E0\u05D5\u05EA \u05D0\u05EA \u05E9\u05DB\u05E8\u05D4 \u05D1\u05E8\u05D5\u05D5\u05D7 \u05E9\u05EA\u05E4\u05D9\u05E7 \u05DE\u05E2\u05E1\u05E7\u05D0\u05D5\u05EA \u05E9\u05D9\u05D1\u05D5\u05E6\u05E2\u05D5 \u05D1\u05D4\u05EA\u05D0\u05DD \u05DC\u05E1\u05E2\u05D9\u05E3 24 \u05DC\u05D7\u05D5\u05E7 \u05D4\u05D9\u05D9\u05E2\u05D5\u05E5.'}</T>
+    </NumPara>
 
     {/* Client signature on waiver */}
     <T size={10} bold mb={6}>{'\u05D5\u05DC\u05E8\u05D0\u05D9\u05D4 \u05D1\u05D0\u05EA\u05D9 \u05E2\u05DC \u05D4\u05D7\u05EA\u05D5\u05DD:'}</T>
@@ -370,19 +393,25 @@ const Page3 = ({ data: d, styled: s }) => (
     </View>
 
     {/* Q1 */}
-    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', marginBottom: 10, alignItems: 'flex-end' }}>
-      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
-        {'1. \u05D9\u05EA\u05E8\u05EA \u05E0\u05DB\u05E1\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD \u05D1\u05E0\u05D9\u05DB\u05D5\u05D9\u05D9 \u05D4\u05EA\u05D7\u05D9\u05D9\u05D1\u05D5\u05D9\u05D5\u05EA \u05D5\u05E0\u05D9"\u05E2 \u05E9\u05D0\u05D9\u05E0\u05DD \u05E1\u05D7\u05D9\u05E8\u05D9\u05DD (\u05D1\u05DE\u05D9\u05D3\u05D4 \u05D5\u05D9\u05E9):'}
-      </Text>
-      {d.q1_assets ? (
-        <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 4 }}>{d.q1_assets}</Text>
-      ) : (
-        <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: 100, height: 14, marginRight: 4 }} />
-      )}
-    </View>
+    <NumPara num=".1" mb={10}>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
+          {'\u05D9\u05EA\u05E8\u05EA \u05E0\u05DB\u05E1\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD \u05D1\u05E0\u05D9\u05DB\u05D5\u05D9\u05D9 \u05D4\u05EA\u05D7\u05D9\u05D9\u05D1\u05D5\u05D9\u05D5\u05EA \u05D5\u05E0\u05D9"\u05E2 \u05E9\u05D0\u05D9\u05E0\u05DD \u05E1\u05D7\u05D9\u05E8\u05D9\u05DD (\u05D1\u05DE\u05D9\u05D3\u05D4 \u05D5\u05D9\u05E9):'}
+        </Text>
+        {d.q1_assets ? (
+          <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 4 }}>{d.q1_assets}</Text>
+        ) : (
+          <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: 100, height: 14, marginRight: 4 }} />
+        )}
+      </View>
+    </NumPara>
 
     {/* Q2 */}
-    <T size={9} mb={6}>{'2. \u05D4\u05D0\u05DD \u05E2\u05E1\u05E7\u05EA/\u05D4\u05D9\u05E0\u05DA \u05E2\u05D5\u05E1\u05E7 \u05D1\u05EA\u05E4\u05E7\u05D9\u05D3 \u05DE\u05E7\u05E6\u05D5\u05E2\u05D9 \u05D4\u05D3\u05D5\u05E8\u05E9 \u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF:'}</T>
+    <NumPara num=".2" mb={6}>
+      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
+        {'\u05D4\u05D0\u05DD \u05E2\u05E1\u05E7\u05EA/\u05D4\u05D9\u05E0\u05DA \u05E2\u05D5\u05E1\u05E7 \u05D1\u05EA\u05E4\u05E7\u05D9\u05D3 \u05DE\u05E7\u05E6\u05D5\u05E2\u05D9 \u05D4\u05D3\u05D5\u05E8\u05E9 \u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF:'}
+      </Text>
+    </NumPara>
 
     {[
       { value: 'ceo', label: '\u05DE\u05E0\u05DB"\u05DC/\u05D1\u05E2\u05DC\u05D9\u05DD \u05E9\u05DC \u05D7\u05D1\u05E8\u05D4 \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF / \u05D1\u05D9\u05D8\u05D5\u05D7' },
@@ -391,7 +420,7 @@ const Page3 = ({ data: d, styled: s }) => (
       { value: 'trader', label: '\u05E1\u05D5\u05D7\u05E8' },
       { value: 'other', label: '\u05D0\u05D7\u05E8' },
     ].map((opt, i) => (
-      <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 3, gap: 6, paddingRight: 10 }}>
+      <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 3, gap: 6, paddingRight: 25 }}>
         <Radio checked={d.q2_role === opt.value} />
         <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>{opt.label}</Text>
         {opt.value === 'other' && (
@@ -405,22 +434,26 @@ const Page3 = ({ data: d, styled: s }) => (
     ))}
 
     {/* Q3 */}
-    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', marginBottom: 4, marginTop: 10, alignItems: 'flex-end' }}>
+    <NumPara num=".3" mb={4} mt={10}>
       <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
-        {'3. \u05D1\u05D4\u05EA\u05D9\u05D9\u05D7\u05E1\u05D5\u05EA \u05DC (2) \u05E0\u05D0 \u05E6\u05D9\u05D9\u05DF \u05E1\u05D4"\u05DB \u05E0\u05D9\u05E1\u05D9\u05D5\u05DF \u05E2\u05D9\u05E1\u05D5\u05E7 \u05D1\u05E9\u05E0\u05D9\u05DD'}
+        {'\u05D1\u05D4\u05EA\u05D9\u05D9\u05D7\u05E1\u05D5\u05EA \u05DC (2) \u05E0\u05D0 \u05E6\u05D9\u05D9\u05DF \u05E1\u05D4"\u05DB \u05E0\u05D9\u05E1\u05D9\u05D5\u05DF \u05E2\u05D9\u05E1\u05D5\u05E7 \u05D1\u05E9\u05E0\u05D9\u05DD'}
       </Text>
-    </View>
-    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', marginBottom: 10, alignItems: 'flex-end' }}>
+    </NumPara>
+    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', marginBottom: 10, alignItems: 'flex-end', paddingRight: 20 }}>
       <Text style={{ fontSize: 9, color: C.black }}>{'\u05E4\u05E8\u05D8:'}</Text>
       {d.q3_years ? (
         <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, marginRight: 4 }}>{d.q3_years}</Text>
       ) : (
-        <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: '90%', height: 14, marginRight: 4 }} />
+        <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: '85%', height: 14, marginRight: 4 }} />
       )}
     </View>
 
     {/* Q4 — Education */}
-    <T size={9} bold mb={6}>{'4. \u05D0\u05E0\u05D0 \u05E4\u05E8\u05D8 \u05D4\u05E9\u05DB\u05DC\u05D4 \u05E8\u05DC\u05D5\u05D5\u05E0\u05D8\u05D9\u05EA \u05DC\u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF'}</T>
+    <NumPara num=".4" mb={6}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, textAlign: 'right' }}>
+        {'\u05D0\u05E0\u05D0 \u05E4\u05E8\u05D8 \u05D4\u05E9\u05DB\u05DC\u05D4 \u05E8\u05DC\u05D5\u05D5\u05E0\u05D8\u05D9\u05EA \u05DC\u05DE\u05D5\u05DE\u05D7\u05D9\u05D5\u05EA \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF'}
+      </Text>
+    </NumPara>
     {[
       { key: 'economics', label: '\u05DB\u05DC\u05DB\u05DC\u05D4' },
       { key: 'accounting', label: '\u05D7\u05E9\u05D1\u05D5\u05E0\u05D0\u05D5\u05EA' },
@@ -428,8 +461,8 @@ const Page3 = ({ data: d, styled: s }) => (
       { key: 'math', label: '\u05DE\u05EA\u05DE\u05D8\u05D9\u05E7\u05D4/\u05E4\u05D9\u05D6\u05D9\u05E7\u05D4' },
       { key: 'other', label: '\u05D0\u05D7\u05E8' },
     ].map((field) => (
-      <View key={field.key} style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 4, gap: 4 }}>
-        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', width: 90 }}>{field.label}</Text>
+      <View key={field.key} style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginBottom: 5, paddingRight: 20 }}>
+        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', width: 85, flexShrink: 0 }}>{field.label}</Text>
         {d[`q4_${field.key}`] ? (
           <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black }}>{d[`q4_${field.key}`]}</Text>
         ) : (
@@ -439,12 +472,16 @@ const Page3 = ({ data: d, styled: s }) => (
     ))}
 
     {/* Q5 — Financial instruments */}
-    <T size={9} mb={4} mt={10}>
-      {'5. \u05E4\u05E8\u05D8 (\u05DC\u05E4\u05D7\u05D5\u05EA) 3 \u05DE\u05DB\u05E9\u05D9\u05E8\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD \u05DE\u05D5\u05E8\u05DB\u05D1\u05D9\u05DD (\u05E1\u05D7\u05D9\u05E8\u05D9\u05DD /\u05DC\u05D0 \u05E1\u05D7\u05D9\u05E8\u05D9\u05DD) \u05D1\u05D4\u05DD \u05D4\u05E9\u05E7\u05E2\u05EA \u05D1\u05E2\u05D1\u05E8, \u05DE\u05E1\u05D5\u05D2:'}
-    </T>
-    <T size={8} mb={6}>{'\u05D0\u05D5\u05E4\u05E6\u05D9\u05D5\u05EA, \u05E7\u05E8\u05E0\u05D5\u05EA \u05D2\u05D9\u05D3\u05D5\u05E8, \u05DE\u05D5\u05E6\u05E8\u05D9\u05DD \u05DE\u05D5\u05D1\u05E0\u05D9\u05DD \u05D5\u05DB\u05D3\u05D5\u05DE\u05D4.'}</T>
+    <NumPara num=".5" mb={4} mt={10}>
+      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+        {'\u05E4\u05E8\u05D8 (\u05DC\u05E4\u05D7\u05D5\u05EA) 3 \u05DE\u05DB\u05E9\u05D9\u05E8\u05D9\u05DD \u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD \u05DE\u05D5\u05E8\u05DB\u05D1\u05D9\u05DD (\u05E1\u05D7\u05D9\u05E8\u05D9\u05DD /\u05DC\u05D0 \u05E1\u05D7\u05D9\u05E8\u05D9\u05DD) \u05D1\u05D4\u05DD \u05D4\u05E9\u05E7\u05E2\u05EA \u05D1\u05E2\u05D1\u05E8, \u05DE\u05E1\u05D5\u05D2:'}
+      </Text>
+      <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>
+        {'\u05D0\u05D5\u05E4\u05E6\u05D9\u05D5\u05EA, \u05E7\u05E8\u05E0\u05D5\u05EA \u05D2\u05D9\u05D3\u05D5\u05E8, \u05DE\u05D5\u05E6\u05E8\u05D9\u05DD \u05DE\u05D5\u05D1\u05E0\u05D9\u05DD \u05D5\u05DB\u05D3\u05D5\u05DE\u05D4.'}
+      </Text>
+    </NumPara>
     {[0, 1].map((i) => (
-      <View key={i} style={{ marginBottom: 4 }}>
+      <View key={i} style={{ marginBottom: 5, paddingRight: 20 }}>
         {d[`q5_instrument${i + 1}`] ? (
           <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.black, textAlign: 'right' }}>{d[`q5_instrument${i + 1}`]}</Text>
         ) : (
@@ -454,10 +491,14 @@ const Page3 = ({ data: d, styled: s }) => (
     ))}
 
     {/* Q6 — Frequency table */}
-    <T size={9} mb={6} mt={10}>{'\u05006. \u05DE\u05D4 \u05D4\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA \u05D5\u05D0\u05D5\u05E4\u05DF \u05D4\u05EA\u05E2\u05D3\u05DB\u05E0\u05D5\u05EA \u05E9\u05DC\u05DA \u05D1\u05E9\u05D5\u05D5\u05E7\u05D9\u05DD \u05D4\u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD:'}</T>
+    <NumPara num=".6" mb={6} mt={10}>
+      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
+        {'\u05DE\u05D4 \u05D4\u05EA\u05D3\u05D9\u05E8\u05D5\u05EA \u05D5\u05D0\u05D5\u05E4\u05DF \u05D4\u05EA\u05E2\u05D3\u05DB\u05E0\u05D5\u05EA \u05E9\u05DC\u05DA \u05D1\u05E9\u05D5\u05D5\u05E7\u05D9\u05DD \u05D4\u05E4\u05D9\u05E0\u05E0\u05E1\u05D9\u05D9\u05DD:'}
+      </Text>
+    </NumPara>
 
     {/* Table header */}
-    <View style={{ flexDirection: 'row-reverse', borderBottomWidth: 1, borderBottomColor: C.black, paddingBottom: 4, marginBottom: 6 }}>
+    <View style={{ flexDirection: 'row-reverse', borderBottomWidth: 1, borderBottomColor: C.black, paddingBottom: 4, marginBottom: 6, paddingRight: 20 }}>
       <View style={{ width: '34%' }} />
       <View style={{ width: '33%', alignItems: 'center' }}>
         <Text style={{ fontSize: 8, color: C.black, textAlign: 'center' }}>{'\u05D0\u05DC\u05E7\u05D8\u05E8\u05D5\u05E0\u05D9/\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05DE\u05D7\u05E7\u05E8'}</Text>
@@ -474,7 +515,7 @@ const Page3 = ({ data: d, styled: s }) => (
       { label: '\u05DC\u05E4\u05D7\u05D5\u05EA \u05E9\u05D1\u05D5\u05E2\u05D9\u05EA', key: 'weekly' },
       { label: '\u05E9\u05E0\u05D4 \u05D5\u05DE\u05E2\u05DC\u05D4', key: 'yearly' },
     ].map((row) => (
-      <View key={row.key} style={{ flexDirection: 'row-reverse', marginBottom: 6, alignItems: 'center' }}>
+      <View key={row.key} style={{ flexDirection: 'row-reverse', marginBottom: 6, alignItems: 'center', paddingRight: 20 }}>
         <View style={{ width: '34%' }}>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>{row.label}</Text>
         </View>
@@ -488,34 +529,32 @@ const Page3 = ({ data: d, styled: s }) => (
     ))}
 
     {/* Q7 */}
-    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginTop: 10, marginBottom: 10, gap: 8 }}>
-      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
-        {'7. \u05D4\u05D0\u05DD \u05D4\u05E0\u05DA \u05D9\u05D5\u05D6\u05DD \u05E4\u05E2\u05D9\u05DC\u05D5\u05EA \u05E2\u05E6\u05DE\u05D0\u05D9\u05EA \u05D1\u05EA\u05D9\u05E7 \u05E0\u05D9"\u05E2 \u05E9\u05DC\u05DA:'}
-      </Text>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
-        <Radio checked={d.q7_initiative === 'yes'} />
-        <Text style={{ fontSize: 9, color: C.black }}>{'\u05DB\u05DF'}</Text>
+    <NumPara num=".7" mb={10} mt={10}>
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+        <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>
+          {'\u05D4\u05D0\u05DD \u05D4\u05E0\u05DA \u05D9\u05D5\u05D6\u05DD \u05E4\u05E2\u05D9\u05DC\u05D5\u05EA \u05E2\u05E6\u05DE\u05D0\u05D9\u05EA \u05D1\u05EA\u05D9\u05E7 \u05E0\u05D9"\u05E2 \u05E9\u05DC\u05DA:'}
+        </Text>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+          <Radio checked={d.q7_initiative === 'yes'} />
+          <Text style={{ fontSize: 9, color: C.black }}>{'\u05DB\u05DF'}</Text>
+        </View>
+        <Text style={{ fontSize: 9, color: C.black }}>/</Text>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+          <Radio checked={d.q7_initiative === 'no'} />
+          <Text style={{ fontSize: 9, color: C.black }}>{'\u05DC\u05D0'}</Text>
+        </View>
       </View>
-      <Text style={{ fontSize: 9, color: C.black }}>/</Text>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
-        <Radio checked={d.q7_initiative === 'no'} />
-        <Text style={{ fontSize: 9, color: C.black }}>{'\u05DC\u05D0'}</Text>
-      </View>
-    </View>
+    </NumPara>
 
     {/* Q8 */}
-    <T size={9} mb={2}>
-      {'8. \u05D1\u05D0\u05D9\u05D6\u05D5 \u05DE\u05D9\u05D3\u05D4 \u05DC\u05D4\u05E2\u05E8\u05DB\u05EA\u05DA \u05D4\u05D9\u05E0\u05DA \u05D1\u05E2\u05DC \u05D4\u05D1\u05E0\u05D4 \u05D5\u05D1\u05E7\u05D9\u05D0\u05D5\u05EA \u05D2\u05D1\u05D5\u05D4\u05D9\u05DD \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF \u05D5\u05D1\u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA \u05D5\u05D1\u05E1\u05D9\u05DB\u05D5\u05E0\u05D9\u05DD'}
-    </T>
-    <T size={9} mb={2}>
-      {'\u05D4\u05DB\u05E8\u05D5\u05DB\u05D9\u05DD \u05D1\u05D4\u05DD, \u05D5\u05D9\u05DB\u05D5\u05DC \u05DC\u05E7\u05D1\u05DC \u05D4\u05D7\u05DC\u05D8\u05D5\u05EA \u05E2\u05E6\u05DE\u05D0\u05D9\u05D5\u05EA \u05D1\u05E0\u05D5\u05D2\u05E2 \u05DC\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D9\u05E7 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA\u05D9\u05DA \u05E2\u05DC \u05E1\u05DE\u05DA \u05D4\u05EA\u05E2\u05D3\u05DB\u05E0\u05D5\u05EA\u05DA'}
-    </T>
-    <T size={9} mb={8}>
-      {'\u05D1\u05DC\u05D1\u05D3 \u05D1\u05D0\u05D9\u05E8\u05D5\u05E2\u05D9\u05DD \u05D4\u05E9\u05D5\u05E0\u05D9\u05DD \u05D4\u05DE\u05EA\u05E8\u05D7\u05E9\u05D9\u05DD \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF \u05DC\u05DC\u05D0 \u05E2\u05D6\u05E8\u05EA\u05D5 \u05E9\u05DC \u05D1\u05E2\u05DC \u05E8\u05D9\u05E9\u05D9\u05D5\u05DF?'}
-    </T>
+    <NumPara num=".8" mb={8}>
+      <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
+        {'\u05D1\u05D0\u05D9\u05D6\u05D5 \u05DE\u05D9\u05D3\u05D4 \u05DC\u05D4\u05E2\u05E8\u05DB\u05EA\u05DA \u05D4\u05D9\u05E0\u05DA \u05D1\u05E2\u05DC \u05D4\u05D1\u05E0\u05D4 \u05D5\u05D1\u05E7\u05D9\u05D0\u05D5\u05EA \u05D2\u05D1\u05D5\u05D4\u05D9\u05DD \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF \u05D5\u05D1\u05E0\u05D9\u05D9\u05E8\u05D5\u05EA \u05E2\u05E8\u05DA \u05D5\u05D1\u05E1\u05D9\u05DB\u05D5\u05E0\u05D9\u05DD \u05D4\u05DB\u05E8\u05D5\u05DB\u05D9\u05DD \u05D1\u05D4\u05DD, \u05D5\u05D9\u05DB\u05D5\u05DC \u05DC\u05E7\u05D1\u05DC \u05D4\u05D7\u05DC\u05D8\u05D5\u05EA \u05E2\u05E6\u05DE\u05D0\u05D9\u05D5\u05EA \u05D1\u05E0\u05D5\u05D2\u05E2 \u05DC\u05E0\u05D9\u05D4\u05D5\u05DC \u05EA\u05D9\u05E7 \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA\u05D9\u05DA \u05E2\u05DC \u05E1\u05DE\u05DA \u05D4\u05EA\u05E2\u05D3\u05DB\u05E0\u05D5\u05EA\u05DA \u05D1\u05DC\u05D1\u05D3 \u05D1\u05D0\u05D9\u05E8\u05D5\u05E2\u05D9\u05DD \u05D4\u05E9\u05D5\u05E0\u05D9\u05DD \u05D4\u05DE\u05EA\u05E8\u05D7\u05E9\u05D9\u05DD \u05D1\u05E9\u05D5\u05E7 \u05D4\u05D4\u05D5\u05DF \u05DC\u05DC\u05D0 \u05E2\u05D6\u05E8\u05EA\u05D5 \u05E9\u05DC \u05D1\u05E2\u05DC \u05E8\u05D9\u05E9\u05D9\u05D5\u05DF?'}
+      </Text>
+    </NumPara>
 
     {/* Q8 radio options */}
-    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 30, marginBottom: 10 }}>
+    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 30, marginBottom: 10, paddingRight: 20 }}>
       {[
         { value: 'high', label: '\u05D2\u05D1\u05D5\u05D4\u05D4' },
         { value: 'medium', label: '\u05D1\u05D9\u05E0\u05D5\u05E0\u05D9\u05EA' },
@@ -604,7 +643,8 @@ const Page4 = ({ data: d, styled: s }) => (
 // DOCUMENT
 // ══════════════════════════════════════════════════════════════
 const QualifiedAdvisorDoc = ({ data = {}, styled: s }) => {
-  const showExtended = data.condition2Role === 'other'
+  // Show extended pages if condition2Role is 'other' OR if showExtended flag is set (for blank version)
+  const showExtended = data.condition2Role === 'other' || data.showExtended === true
 
   return (
     <Document>
@@ -632,8 +672,8 @@ export async function generateQualifiedAdvisorStyled(clientData) {
 }
 
 export async function generateQualifiedAdvisorBlank() {
-  // Blank version: "other" selected to include all 4 pages
-  const blankData = { condition2Role: 'other' }
+  // Blank version: showExtended flag triggers pages 3-4 WITHOUT filling any radio
+  const blankData = { showExtended: true }
   const blob = await pdf(<QualifiedAdvisorDoc data={blankData} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const fileName = '\u05DC\u05E7\u05D5\u05D7_\u05DB\u05E9\u05D9\u05E8_\u05D7\u05D5\u05E7_\u05D4\u05D9\u05D9\u05E2\u05D5\u05E5_\u05D9\u05D3\u05E0\u05D9.pdf'
