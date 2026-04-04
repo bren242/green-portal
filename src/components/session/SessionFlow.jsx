@@ -9,6 +9,7 @@ import Wizard from '../wizard/Wizard'
 import AgreementModule from './AgreementModule'
 import MeetingSummaryModule from './MeetingSummaryModule'
 import QualifiedInvestorModule from './QualifiedInvestorModule'
+import QualifiedAdvisorModule from './QualifiedAdvisorModule'
 
 // Session steps: advisor → clientType → clientDetails → modules → (module work)
 const STEPS = ['advisor', 'clientType', 'clientDetails', 'modules']
@@ -147,6 +148,20 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
           onAdmin={onAdmin}
           onSavePDF={(pdfBytes, fileName) => handleSavePDF('qualified', pdfBytes, fileName)}
           onComplete={() => handleModuleComplete('qualified')}
+          onBack={handleModuleBack}
+        />
+      )
+    }
+
+    if (activeModule === 'qualifiedAdvisor') {
+      return (
+        <QualifiedAdvisorModule
+          user={user}
+          session={session}
+          onLogout={onLogout}
+          onAdmin={onAdmin}
+          onSavePDF={(pdfBytes, fileName) => handleSavePDF('qualifiedAdvisor', pdfBytes, fileName)}
+          onComplete={() => handleModuleComplete('qualifiedAdvisor')}
           onBack={handleModuleBack}
         />
       )

@@ -8,6 +8,7 @@ export const DEFAULT_QUALIFIED_AMOUNTS = {
   amount4: '5.882',
   amount5: '706 אלף',
   amount6: '1.058',
+  amount_advisor: '12',
 }
 
 const STORAGE_KEY = 'qualifiedAmounts'

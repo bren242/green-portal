@@ -229,6 +229,7 @@ function QualifiedAmountsTab() {
     { key: 'amount4', label: 'תנאי 3: נכסים נזילים (משולב)', desc: 'מיליון ש"ח' },
     { key: 'amount5', label: 'תנאי 3: הכנסה אישית (משולב)', desc: 'ש"ח' },
     { key: 'amount6', label: 'תנאי 3: הכנסת תא משפחתי (משולב)', desc: 'מיליון ש"ח' },
+    { key: 'amount_advisor', label: 'חוק הייעוץ: שווי נכסים', desc: 'מיליון ש"ח' },
   ]
 
   return (

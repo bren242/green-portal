@@ -28,6 +28,7 @@ export const ALL_MODULES = [
   { id: 'agreement', name: 'הסכם שיווק השקעות' },
   { id: 'kyc', name: 'איפיון צרכים' },
   { id: 'qualified', name: 'הצהרת לקוח כשיר' },
+  { id: 'qualifiedAdvisor', name: 'לקוח כשיר — חוק הייעוץ' },
   { id: 'meeting', name: 'סיכום פגישה' },
 ]
 
@@ -37,6 +38,7 @@ export const BLANK_FORMS = [
   { id: 'agreement_blank', name: 'הסכם שיווק (ידני)', generator: 'generateMarketingAgreementBlank' },
   { id: 'meeting_blank', name: 'סיכום פגישה (ידני)', generator: 'generateMeetingSummaryBlank' },
   { id: 'qualified_blank', name: 'הצהרת כשיר (ידני)', generator: 'generateQualifiedInvestorBlank' },
+  { id: 'qualifiedAdvisor_blank', name: 'כשיר חוק הייעוץ (ידני)', generator: 'generateQualifiedAdvisorBlank' },
 ]
 
 // Session data factory
