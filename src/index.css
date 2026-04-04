@@ -25,9 +25,7 @@ input, select, textarea, button {
   font-family: inherit;
 }
 
-input, textarea {
-  autocomplete: off;
-}
+/* autocomplete is handled via HTML autoComplete="off" attribute on each input */
 
 /* Hide scrollbar on step progress */
 .scrollbar-hide {

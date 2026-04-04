@@ -40,13 +40,11 @@ export const C = {
 // ── Page Styles ────────────────────────────────────────────────
 export const coverPageStyle = {
   fontFamily: 'Assistant',
-  direction: 'rtl',
   backgroundColor: C.white,
 }
 
 export const contentPageStyle = {
   fontFamily: 'Assistant',
-  direction: 'rtl',
   paddingTop: 10,
   paddingBottom: 36,
   paddingHorizontal: 36,

@@ -118,12 +118,12 @@ function UsersTab() {
         <div className="border border-gold rounded-card p-4 bg-surface-cream space-y-3">
           <h3 className="text-sm font-bold text-green-primary">משווק חדש</h3>
           <div className="grid gap-3 sm:grid-cols-2">
-            <input className={fieldClass} placeholder="שם מלא *" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} />
-            <input className={fieldClass} placeholder="שם משתמש *" value={newUser.username} onChange={(e) => setNewUser({ ...newUser, username: e.target.value })} />
-            <input className={fieldClass} placeholder="סיסמה *" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
-            <input className={fieldClass} placeholder="תעודת זהות" value={newUser.idNumber} onChange={(e) => setNewUser({ ...newUser, idNumber: e.target.value })} />
-            <input className={fieldClass} placeholder="מספר רישיון" value={newUser.license} onChange={(e) => setNewUser({ ...newUser, license: e.target.value })} />
-            <select className={fieldClass} value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}>
+            <input className={fieldClass} placeholder="שם מלא *" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} autoComplete="off" />
+            <input className={fieldClass} placeholder="שם משתמש *" value={newUser.username} onChange={(e) => setNewUser({ ...newUser, username: e.target.value })} autoComplete="off" />
+            <input className={fieldClass} placeholder="סיסמה *" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} autoComplete="off" />
+            <input className={fieldClass} placeholder="תעודת זהות" value={newUser.idNumber} onChange={(e) => setNewUser({ ...newUser, idNumber: e.target.value })} autoComplete="off" />
+            <input className={fieldClass} placeholder="מספר רישיון" value={newUser.license} onChange={(e) => setNewUser({ ...newUser, license: e.target.value })} autoComplete="off" />
+            <select className={fieldClass} value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })} autoComplete="off">
               <option value="advisor">משווק</option>
               <option value="admin">מנהל + משווק</option>
             </select>
@@ -141,27 +141,27 @@ function UsersTab() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <label className="text-xs text-text-muted">שם מלא</label>
-                    <input className={fieldClass} value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} />
+                    <input className={fieldClass} value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} autoComplete="off" />
                   </div>
                   <div>
                     <label className="text-xs text-text-muted">שם משתמש</label>
-                    <input className={fieldClass} value={editData.username} onChange={(e) => setEditData({ ...editData, username: e.target.value })} />
+                    <input className={fieldClass} value={editData.username} onChange={(e) => setEditData({ ...editData, username: e.target.value })} autoComplete="off" />
                   </div>
                   <div>
                     <label className="text-xs text-text-muted">סיסמה</label>
-                    <input className={fieldClass} value={editData.password} onChange={(e) => setEditData({ ...editData, password: e.target.value })} />
+                    <input className={fieldClass} value={editData.password} onChange={(e) => setEditData({ ...editData, password: e.target.value })} autoComplete="off" />
                   </div>
                   <div>
                     <label className="text-xs text-text-muted">תעודת זהות</label>
-                    <input className={fieldClass} value={editData.idNumber || ''} onChange={(e) => setEditData({ ...editData, idNumber: e.target.value })} />
+                    <input className={fieldClass} value={editData.idNumber || ''} onChange={(e) => setEditData({ ...editData, idNumber: e.target.value })} autoComplete="off" />
                   </div>
                   <div>
                     <label className="text-xs text-text-muted">מספר רישיון</label>
-                    <input className={fieldClass} value={editData.license || ''} onChange={(e) => setEditData({ ...editData, license: e.target.value })} />
+                    <input className={fieldClass} value={editData.license || ''} onChange={(e) => setEditData({ ...editData, license: e.target.value })} autoComplete="off" />
                   </div>
                   <div>
                     <label className="text-xs text-text-muted">תפקיד</label>
-                    <select className={fieldClass} value={editData.role} onChange={(e) => setEditData({ ...editData, role: e.target.value })}>
+                    <select className={fieldClass} value={editData.role} onChange={(e) => setEditData({ ...editData, role: e.target.value })} autoComplete="off">
                       <option value="advisor">משווק</option>
                       <option value="admin">מנהל + משווק</option>
                     </select>
@@ -248,6 +248,7 @@ function QualifiedAmountsTab() {
                 className={fieldClass}
                 value={amounts[f.key]}
                 onChange={(e) => handleChange(f.key, e.target.value)}
+                autoComplete="off"
               />
               <span className="text-xs text-text-muted whitespace-nowrap">{f.desc}</span>
             </div>

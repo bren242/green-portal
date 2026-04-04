@@ -12,10 +12,11 @@ Then advisor selects which modules to complete.
 Each module generates a separate PDF.
 
 ### Modules
-1. **KYC — אפיון צרכים** (in progress)
-2. **הסכם שיווק השקעות** (future)
-3. **לקוח כשיר / מסווג** (future)
-4. **סיכום פגישה** (future)
+1. **KYC — אפיון צרכים** ✅
+2. **הסכם שיווק השקעות** ✅
+3. **הצהרת משקיע כשיר** ✅
+4. **לקוח כשיר — חוק הייעוץ** ✅
+5. **סיכום פגישה** ✅
 
 ### Session Flow
 ```
@@ -129,21 +130,27 @@ See docs/DESIGN.md for complete design system.
 
 ---
 
-## Module 3: לקוח כשיר / מסווג (FUTURE)
-Two sub-types:
-- לקוח כשיר: assets > 12M NIS
-- לקוח מסווג: assets > 9.3M NIS
-
-Thresholds updated annually by admin.
-Simple questionnaire + signatures.
-Separate PDF output.
+## Module 3: הצהרת משקיע כשיר ✅
+- `generateQualifiedInvestor.jsx` — styled + blank
+- סכומים מתעדכנים דרך אדמין (localStorage)
+- ברירת מחדל: כשיר 12M, מסווג 9.3M
+- גיבוי: אין (לא נדרש)
 
 ---
 
-## Module 4: סיכום פגישה (FUTURE)
-Used after every meeting (new or ongoing).
-Can include abbreviated KYC update.
-Separate PDF output.
+## Module 4: לקוח כשיר — חוק הייעוץ ✅
+- `generateQualifiedAdvisor.jsx` — styled + blank
+- 4 עמודים (עמודים 3-4 מותנים בבחירת "אחר")
+- שאלון מורחב רק אם נבחר "אחר" בתנאי 2
+- סכום מאדמין (amount_advisor)
+- גיבוי: אין
+
+---
+
+## Module 5: סיכום פגישה ✅
+- `generateMeetingSummary.jsx` — styled + blank
+- Used after every meeting (new or ongoing)
+- גיבוי: אין
 
 ---
 
@@ -167,6 +174,8 @@ Font: Assistant (Google Fonts)
 - גרסת ממשק = צבעי GREEN מלאים (ירוק #1B3A2F, זהב #B8975A) + תאריכים אוטומטיים
 - פורמט תאריך אוטומטי = DD/MM/YYYY מ-new Date()
 - טקסט משפטי = AS IS, אסור לשנות מילה
+- **CRITICAL**: אסור להשתמש ב-`direction: 'rtl'` או `direction: 'ltr'` ב-style של @react-pdf/renderer — גורם ל-bidi reorderLine crash. במקום זה: `textAlign: 'right'` / `textAlign: 'left'`
+- **CRITICAL**: מספרים כמו (1), (2) בטקסט עברי עוברים bidi reorder — יש לשים אותם בעמודה נפרדת (NumPara pattern)
 
 ## Key Files
 - docs/FLOW.md — KYC wizard flow (complete)
@@ -174,3 +183,4 @@ Font: Assistant (Google Fonts)
 - docs/ASSETS.md — balance sheet asset categories
 - docs/DESIGN.md — design system (colors, fonts, spacing)
 - docs/TECH.md — technical architecture
+- docs/STATUS.md — סטטוס פרויקט מלא (QA 04/04/2026)

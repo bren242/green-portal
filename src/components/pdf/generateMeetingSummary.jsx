@@ -59,7 +59,7 @@ const PageHeader = ({ styled }) => (
       <Image src={logoPng} style={{ height: styled ? 36 : 30, width: 'auto' }} />
       {styled && (
         <View style={{ flex: 1, alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 9, color: C.primary, fontWeight: 'bold', direction: 'rtl' }}>{'\u05E1\u05D9\u05DB\u05D5\u05DD \u05E4\u05D2\u05D9\u05E9\u05D4'}</Text>
+          <Text style={{ fontSize: 9, color: C.primary, fontWeight: 'bold', textAlign: 'right' }}>{'\u05E1\u05D9\u05DB\u05D5\u05DD \u05E4\u05D2\u05D9\u05E9\u05D4'}</Text>
         </View>
       )}
       {!styled && <View style={{ flex: 1 }} />}
@@ -80,10 +80,10 @@ const PageFooter = () => (
     borderTopColor: C.border,
     paddingTop: 6,
   }}>
-    <Text style={{ fontSize: 7, color: C.muted, direction: 'ltr', textAlign: 'left' }}>INFO@GREENWM.CO.IL</Text>
-    <Text style={{ fontSize: 7, color: C.muted, direction: 'ltr', textAlign: 'left' }}>03-6456005/6</Text>
-    <Text style={{ fontSize: 7, color: C.muted, direction: 'rtl' }}>{'\u05D6\u05F3\u05D1\u05D5\u05D8\u05D9\u05E0\u05E1\u05E7\u05D9 7, \u05DE\u05D2\u05D3\u05DC \u05DE\u05E9\u05D4 \u05D0\u05D1\u05D9\u05D1, \u05E8\u05DE\u05EA \u05D2\u05DF'}</Text>
-    <Text style={{ fontSize: 7, color: C.muted, direction: 'ltr', textAlign: 'left' }}>WWW.GREENWM.CO.IL</Text>
+    <Text style={{ fontSize: 7, color: C.muted, textAlign: 'left' }}>INFO@GREENWM.CO.IL</Text>
+    <Text style={{ fontSize: 7, color: C.muted, textAlign: 'left' }}>03-6456005/6</Text>
+    <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right' }}>{'\u05D6\u05F3\u05D1\u05D5\u05D8\u05D9\u05E0\u05E1\u05E7\u05D9 7, \u05DE\u05D2\u05D3\u05DC \u05DE\u05E9\u05D4 \u05D0\u05D1\u05D9\u05D1, \u05E8\u05DE\u05EA \u05D2\u05DF'}</Text>
+    <Text style={{ fontSize: 7, color: C.muted, textAlign: 'left' }}>WWW.GREENWM.CO.IL</Text>
   </View>
 )
 
