@@ -168,7 +168,7 @@ const IdCell = ({ label, value, styled: s, borderLeft }) => (
   }}>
     <Text style={{ fontSize: s ? 7 : 6.5, color: s ? C.gold : C.muted, textAlign: 'right', marginBottom: 1 }}>{label}</Text>
     {value ? (
-      <Text style={{ fontSize: s ? 10 : 8, color: s ? C.white : C.black, textAlign: 'right', fontWeight: 'bold' }}>{value}</Text>
+      <Text style={{ fontSize: s ? 10 : 8, color: s ? C.primary : C.black, textAlign: 'right', fontWeight: 'bold' }}>{value}</Text>
     ) : (
       <View style={{ borderBottomWidth: 1, borderBottomColor: s ? C.gold : C.black, height: s ? 16 : 12, width: '90%', marginRight: 0 }} />
     )}
