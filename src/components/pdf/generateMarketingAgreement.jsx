@@ -648,12 +648,36 @@ const MarketingAgreementDoc = ({ data, styled }) => {
             <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
           </View>
 
-          {/* Footnote */}
+          {/* Footnote — numbers separated to avoid bidi crash */}
           <View style={{ position: 'absolute', bottom: 50, left: 40, right: 40 }}>
             <View style={{ borderTopWidth: 0.5, borderTopColor: C.muted, paddingTop: 4 }}>
-              <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', lineHeight: 1.5 }}>
-                {'1 עסקאות המפורטות להלן, הינן עסקאות שביצוען כרוך בסיכון מיוחד: (1) עסקה בנייר ערך אשר בתשקיף צויין כי ההשקעה בו כרוכה בסיכון מיוחד, כל עוד לא חלפו שנתיים מתאריך התשקיף, זולת אם הסיכון אשר צויין כאמור אינו קיים עוד; (2)עסקה שכרוכה בה מכירה בחסר, כמשמעותה בסעיף 63 לחוק השקעות משותפות בנאמנות, תשנ"ד-1994 והשאלת ניירות ערך לצורך ביצוע עסקה כאמור; (3) עסקה בחוזה עתידי, באופציה או במוצר מובנה; (3)עסקה בחוזה עתידי עתידי, באופציה או במוצר מובנה;(4)עסקה אחרת שקבע לענין זה שר האוצר, בהתייעצות עם הרשות ובאישור ועדת הכספים של הכנסת.'}
+              <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', lineHeight: 1.5, marginBottom: 2 }}>
+                {'1 עסקאות המפורטות להלן, הינן עסקאות שביצוען כרוך בסיכון מיוחד:'}
               </Text>
+              <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+                <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'1.'}</Text>
+                <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+                  {'עסקה בנייר ערך אשר בתשקיף צויין כי ההשקעה בו כרוכה בסיכון מיוחד, כל עוד לא חלפו שנתיים מתאריך התשקיף, זולת אם הסיכון אשר צויין כאמור אינו קיים עוד;'}
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+                <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'2.'}</Text>
+                <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+                  {'עסקה שכרוכה בה מכירה בחסר, כמשמעותה בסעיף 63 לחוק השקעות משותפות בנאמנות, תשנ"ד-1994 והשאלת ניירות ערך לצורך ביצוע עסקה כאמור;'}
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+                <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'3.'}</Text>
+                <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+                  {'עסקה בחוזה עתידי, באופציה או במוצר מובנה;'}
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+                <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'4.'}</Text>
+                <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+                  {'עסקה אחרת שקבע לענין זה שר האוצר, בהתייעצות עם הרשות ובאישור ועדת הכספים של הכנסת.'}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -1104,12 +1128,36 @@ const BlankMarketingAgreementDoc = () => (
         <BlankSign label="חתימת הלקוח" />
       </View>
 
-      {/* Footnote */}
+      {/* Footnote — numbers separated to avoid bidi crash */}
       <View style={{ position: 'absolute', bottom: 50, left: 40, right: 40 }}>
         <View style={{ borderTopWidth: 0.5, borderTopColor: C.muted, paddingTop: 4 }}>
-          <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', lineHeight: 1.5 }}>
-            {'1 עסקאות המפורטות להלן, הינן עסקאות שביצוען כרוך בסיכון מיוחד: (1) עסקה בנייר ערך אשר בתשקיף צויין כי ההשקעה בו כרוכה בסיכון מיוחד, כל עוד לא חלפו שנתיים מתאריך התשקיף, זולת אם הסיכון אשר צויין כאמור אינו קיים עוד; (2)עסקה שכרוכה בה מכירה בחסר, כמשמעותה בסעיף 63 לחוק השקעות משותפות בנאמנות, תשנ"ד-1994 והשאלת ניירות ערך לצורך ביצוע עסקה כאמור; (3) עסקה בחוזה עתידי, באופציה או במוצר מובנה; (3)עסקה בחוזה עתידי עתידי, באופציה או במוצר מובנה;(4)עסקה אחרת שקבע לענין זה שר האוצר, בהתייעצות עם הרשות ובאישור ועדת הכספים של הכנסת.'}
+          <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', lineHeight: 1.5, marginBottom: 2 }}>
+            {'1 עסקאות המפורטות להלן, הינן עסקאות שביצוען כרוך בסיכון מיוחד:'}
           </Text>
+          <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+            <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'1.'}</Text>
+            <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+              {'עסקה בנייר ערך אשר בתשקיף צויין כי ההשקעה בו כרוכה בסיכון מיוחד, כל עוד לא חלפו שנתיים מתאריך התשקיף, זולת אם הסיכון אשר צויין כאמור אינו קיים עוד;'}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+            <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'2.'}</Text>
+            <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+              {'עסקה שכרוכה בה מכירה בחסר, כמשמעותה בסעיף 63 לחוק השקעות משותפות בנאמנות, תשנ"ד-1994 והשאלת ניירות ערך לצורך ביצוע עסקה כאמור;'}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+            <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'3.'}</Text>
+            <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+              {'עסקה בחוזה עתידי, באופציה או במוצר מובנה;'}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row-reverse', marginBottom: 1 }}>
+            <Text style={{ fontSize: 7, color: C.muted, width: 12, textAlign: 'right' }}>{'4.'}</Text>
+            <Text style={{ fontSize: 7, color: C.muted, flex: 1, textAlign: 'right', lineHeight: 1.5 }}>
+              {'עסקה אחרת שקבע לענין זה שר האוצר, בהתייעצות עם הרשות ובאישור ועדת הכספים של הכנסת.'}
+            </Text>
+          </View>
         </View>
       </View>
 
