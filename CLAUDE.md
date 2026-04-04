@@ -175,7 +175,8 @@ Font: Assistant (Google Fonts)
 - פורמט תאריך אוטומטי = DD/MM/YYYY מ-new Date()
 - טקסט משפטי = AS IS, אסור לשנות מילה
 - **CRITICAL**: אסור להשתמש ב-`direction: 'rtl'` או `direction: 'ltr'` ב-style של @react-pdf/renderer — גורם ל-bidi reorderLine crash. במקום זה: `textAlign: 'right'` / `textAlign: 'left'`
-- **CRITICAL**: מספרים כמו (1), (2) בטקסט עברי עוברים bidi reorder — יש לשים אותם בעמודה נפרדת (NumPara pattern)
+- **CRITICAL**: מספרים כמו (1), (2), 1., 2.1 בטקסט עברי עוברים bidi reorder — יש לשים אותם בעמודה נפרדת (NumPara pattern: `<View style={{flexDirection:'row-reverse'}}>` עם שני `<Text>` נפרדים — אחד למספר ואחד לטקסט)
+- **CRITICAL**: אסור לקנן `<Text>` בתוך `<Text>` עם סגנון שונה (למשל bold) — גורם ל-bidi למקם את הסגנון על תווים לא נכונים. כל Text חייב להיות שטוח (flat)
 
 ## Key Files
 - docs/FLOW.md — KYC wizard flow (complete)

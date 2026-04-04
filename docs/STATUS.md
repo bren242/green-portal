@@ -1,6 +1,6 @@
 # GREEN Portal — סטטוס פרויקט
 
-## תאריך עדכון: 04/04/2026
+## תאריך עדכון: 05/04/2026
 
 ## קבצים חשובים
 
@@ -81,7 +81,7 @@ login → משווק → קיים → קרן → פרטים → מודולים:
 
 | מודול | סטטוס | הערות |
 |---|---|---|
-| הסכם שיווק | ✅ עובד | styled + blank + print. טקסט משפטי AS IS |
+| הסכם שיווק | ✅ עובד | styled + blank + print. טקסט משפטי AS IS. NumPara pattern לכל סעיפים ממוספרים (RTL-safe) |
 | איפיון צרכים (KYC) | ✅ עובד | ויזארד מלא, סקורינג סיכון, styled + blank |
 | סיכום פגישה | ✅ עובד | styled + blank. תוקן crash של direction:rtl |
 | הצהרת משקיע כשיר | ✅ עובד | styled + blank. סכומים מאדמין |
@@ -102,6 +102,12 @@ login → משווק → קיים → קרן → פרטים → מודולים:
 1. **direction: 'rtl' crash** — הוסר מ-PDFTemplate.jsx ו-generateMeetingSummary.jsx. גרם ל-bidi reorderLine crash ב-@react-pdf/renderer
 2. **autocomplete** — הוסף autoComplete="off" לכל שדות AdminPanel
 3. **CSS autocomplete** — הוסר כלל CSS לא-תקין (autocomplete אינו מאפיין CSS)
+
+## בעיות שתוקנו (05/04/2026)
+
+4. **הסכם שיווק — bidi crash מ-direction** — הוסרו כל `direction: 'rtl'`/`'ltr'` מ-generateMarketingAgreement.jsx
+5. **הסכם שיווק — bold על מילים לא נכונות** — שוטחו כל Text-in-Text (nested bold) לטקסט שטוח
+6. **הסכם שיווק — מספרים נדחפים לסוף שורה** — כל סעיף ממוספר (1., 2.1, 15.3, i., א.) הומר ל-NumPara pattern (View row-reverse + שני Text נפרדים)
 
 ---
 
