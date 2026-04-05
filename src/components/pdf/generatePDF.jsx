@@ -503,69 +503,76 @@ const KYCDocument = ({ formData, user }) => {
         {/* Risk questions with visual radio indicators */}
         <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           {RISK_QUESTIONS.map((q) => (
-            <View key={q.key} style={{ width: '48%' }}>
+            <View key={q.key} style={{ width: '48%' }} wrap={false}>
               <QuestionBlock q={q} selectedKey={formData[q.key]} />
             </View>
           ))}
         </View>
 
-        {/* Prior experience — separate LabelValues outside QuestionBlock grid */}
-        <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')} even />
-        <LabelValue label="פירוט ניסיון" value={formData.priorExperienceDetails || '---'} />
+        {/* Prior experience — kept together */}
+        <View wrap={false}>
+          <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')} even />
+          <LabelValue label="פירוט ניסיון" value={formData.priorExperienceDetails || '---'} />
+        </View>
 
         {/* ── Advisor Summary & Policy ────────────────────── */}
         <SectionGap />
-        <SectionTitle>סיכום והמלצת בעל הרישיון</SectionTitle>
+        <View wrap={false}>
+          <SectionTitle>סיכום והמלצת בעל הרישיון</SectionTitle>
 
-        {formData.advisorSummary && (
-          <View wrap={false} style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>סיכום וניתוח</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.advisorSummary}</Text>
-          </View>
-        )}
+          {formData.advisorSummary && (
+            <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>סיכום וניתוח</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.advisorSummary}</Text>
+            </View>
+          )}
 
-        {formData.clientPreferences && (
-          <View wrap={false} style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>העדפות / הגבלות לקוח</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.clientPreferences}</Text>
-          </View>
-        )}
-
-        {/* 4 Policy cubes */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 6 }} wrap={false}>
-          <PolicyCube label="אחוז מניות מקס׳" value={formData.equityPct ? `${formData.equityPct}%` : '---'} />
-          <PolicyCube label="אג״ח קונצרני" value={formData.corporateBondsPct ? (formData.corporateBondsPct === '50' ? 'עד 50%' : 'עד 100%') : '---'} />
-          <PolicyCube label="מט״ח" value={formData.forex ? 'כן' : 'לא'} />
-          <PolicyCube label="אג״ח דירוג נמוך" value={formData.lowRatedBonds ? 'כן' : 'לא'} />
+          {formData.clientPreferences && (
+            <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>העדפות / הגבלות לקוח</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.clientPreferences}</Text>
+            </View>
+          )}
         </View>
 
-        {/* Final risk level box */}
-        {rlFinal && (
-          <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 10, marginTop: 12 }} wrap={false}>
-            <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
-              דרגת סיכון סופית: {formData.finalRiskLevel} — {rlFinal.name}
-            </Text>
-            <Text style={{ fontSize: 9, color: C.secondary, textAlign: 'right', marginTop: 3 }}>{rlFinal.description}</Text>
-            <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginTop: 3 }}>
-              הפסד מקסימלי: {rlFinal.maxLoss} | מניות: {rlFinal.maxStocks} | אג״ח קונצרני: {rlFinal.corpBonds}
-            </Text>
-            <RiskGauge level={formData.finalRiskLevel} size="small" />
+        {/* Policy cubes + final risk level + justifications — kept together */}
+        <View wrap={false}>
+          {/* 4 Policy cubes */}
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 6 }}>
+            <PolicyCube label="אחוז מניות מקס׳" value={formData.equityPct ? `${formData.equityPct}%` : '---'} />
+            <PolicyCube label="אג״ח קונצרני" value={formData.corporateBondsPct ? (formData.corporateBondsPct === '50' ? 'עד 50%' : 'עד 100%') : '---'} />
+            <PolicyCube label="מט״ח" value={formData.forex ? 'כן' : 'לא'} />
+            <PolicyCube label="אג״ח דירוג נמוך" value={formData.lowRatedBonds ? 'כן' : 'לא'} />
           </View>
-        )}
 
-        {formData.finalRiskJustification && (
-          <View wrap={false} style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לפער בדרגה</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.finalRiskJustification}</Text>
-          </View>
-        )}
+          {/* Final risk level box */}
+          {rlFinal && (
+            <View style={{ backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold, borderRadius: 4, padding: 10, marginTop: 12 }}>
+              <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.primary, textAlign: 'right' }}>
+                דרגת סיכון סופית: {formData.finalRiskLevel} — {rlFinal.name}
+              </Text>
+              <Text style={{ fontSize: 9, color: C.secondary, textAlign: 'right', marginTop: 3 }}>{rlFinal.description}</Text>
+              <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginTop: 3 }}>
+                הפסד מקסימלי: {rlFinal.maxLoss} | מניות: {rlFinal.maxStocks} | אג״ח קונצרני: {rlFinal.corpBonds}
+              </Text>
+              <RiskGauge level={formData.finalRiskLevel} size="small" />
+            </View>
+          )}
 
-        {formData.riskLevelReason && (
-          <View wrap={false} style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
-            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לבחירת רמת הסיכון</Text>
-            <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.riskLevelReason}</Text>
-          </View>
-        )}
+          {formData.finalRiskJustification && (
+            <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לפער בדרגה</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.finalRiskJustification}</Text>
+            </View>
+          )}
+
+          {formData.riskLevelReason && (
+            <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
+              <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לבחירת רמת הסיכון</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.riskLevelReason}</Text>
+            </View>
+          )}
+        </View>
 
         {/* ── Client Answers Recap ────────────────────────── */}
         <SectionGap />
