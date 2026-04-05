@@ -204,23 +204,30 @@ const KYCDocument = ({ formData, user }) => {
     })
   }
 
-  // Liabilities
-  const liabRows = []
-  if (formData.liabilities.mortgage.has) {
-    totalLiabilities += parseAmount(formData.liabilities.mortgage.total)
+  // Monthly expenses (for cash flow block — separate from liabilities)
+  const expenseRows = []
+  if (formData.liabilities.mortgage.has && formData.liabilities.mortgage.monthly) {
     totalMonthlyExpenses += parseAmount(formData.liabilities.mortgage.monthly)
-    liabRows.push(['משכנתא', fmtMoney(formData.liabilities.mortgage.total)])
-    liabRows.push(['   חודשי', fmtMoney(formData.liabilities.mortgage.monthly)])
+    expenseRows.push(['משכנתא חודשי', fmtMoney(formData.liabilities.mortgage.monthly)])
   }
-  if (formData.liabilities.loans.has) {
-    totalLiabilities += parseAmount(formData.liabilities.loans.total)
+  if (formData.liabilities.loans.has && formData.liabilities.loans.monthly) {
     totalMonthlyExpenses += parseAmount(formData.liabilities.loans.monthly)
-    liabRows.push(['הלוואות', fmtMoney(formData.liabilities.loans.total)])
-    liabRows.push(['   חודשי', fmtMoney(formData.liabilities.loans.monthly)])
+    expenseRows.push(['הלוואות חודשי', fmtMoney(formData.liabilities.loans.monthly)])
   }
   if (formData.liabilities.monthlyExpenses) {
     totalMonthlyExpenses += parseAmount(formData.liabilities.monthlyExpenses)
-    liabRows.push(['הוצאות שוטפות', fmtMoney(formData.liabilities.monthlyExpenses)])
+    expenseRows.push(['הוצאות שוטפות', fmtMoney(formData.liabilities.monthlyExpenses)])
+  }
+
+  // Liabilities (totals only — for net worth block)
+  const liabRows = []
+  if (formData.liabilities.mortgage.has) {
+    totalLiabilities += parseAmount(formData.liabilities.mortgage.total)
+    liabRows.push(['משכנתא', fmtMoney(formData.liabilities.mortgage.total)])
+  }
+  if (formData.liabilities.loans.has) {
+    totalLiabilities += parseAmount(formData.liabilities.loans.total)
+    liabRows.push(['הלוואות', fmtMoney(formData.liabilities.loans.total)])
   }
 
   const netWorth = totalAssets - totalLiabilities
@@ -367,18 +374,35 @@ const KYCDocument = ({ formData, user }) => {
               notes={formData.incomeNotes}
             />
           )}
+          {expenseRows.length > 0 && (
+            <SectorCard
+              title="הוצאות חודשיות"
+              total={fmtMoney(totalMonthlyExpenses)}
+              items={expenseRows}
+            />
+          )}
         </View>
 
-        <View style={{ marginTop: 4 }}>
-          <BalanceBox
-            title="מאזן חודשי"
-            rows={[
-              ['סך הכנסות', totalMonthlyIncome > 0 ? fmtMoney(totalMonthlyIncome) : '---'],
-              ['סך הוצאות', totalMonthlyExpenses > 0 ? fmtMoney(totalMonthlyExpenses) : '---'],
-            ]}
-            highlightLabel="מאזן חודשי"
-            highlightValue={monthlyBalance !== 0 ? fmtMoney(monthlyBalance) : '---'}
-          />
+        <View style={{ marginTop: 4, borderWidth: 1, borderColor: C.gold, borderRadius: 4, overflow: 'hidden' }}>
+          <View style={{ backgroundColor: C.primary, paddingVertical: 4, paddingHorizontal: 8 }}>
+            <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.gold, textAlign: 'right' }}>מאזן חודשי</Text>
+          </View>
+          <View style={{ padding: 6 }}>
+            <SummaryRow label="סך הכנסות" value={totalMonthlyIncome > 0 ? fmtMoney(totalMonthlyIncome) : '---'} />
+            <SummaryRow label="סך הוצאות" value={totalMonthlyExpenses > 0 ? fmtMoney(totalMonthlyExpenses) : '---'} />
+            {/* Highlighted balance row with conditional color */}
+            <View style={{
+              flexDirection: 'row-reverse',
+              backgroundColor: monthlyBalance >= 0 ? C.primary : '#B03A2E',
+              paddingVertical: 5,
+              paddingHorizontal: 8,
+              borderRadius: 2,
+              marginTop: 3,
+            }}>
+              <Text style={{ flex: 1, fontSize: 10, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>מאזן חודשי</Text>
+              <Text style={{ flex: 1, fontSize: 10, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{monthlyBalance !== 0 ? fmtMoney(monthlyBalance) : '---'}</Text>
+            </View>
+          </View>
         </View>
 
         {/* ── Block 2: נכסים והתחייבויות ─────────────────── */}
@@ -485,13 +509,9 @@ const KYCDocument = ({ formData, user }) => {
           ))}
         </View>
 
-        {/* Prior experience */}
-        <View style={{ flexDirection: 'row-reverse', gap: 8, marginTop: 4 }}>
-          <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')} even />
-          {formData.priorExperienceDetails && (
-            <LabelValue label="פירוט ניסיון" value={formData.priorExperienceDetails} />
-          )}
-        </View>
+        {/* Prior experience — separate LabelValues outside QuestionBlock grid */}
+        <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')} even />
+        <LabelValue label="פירוט ניסיון" value={formData.priorExperienceDetails || '---'} />
 
         {/* ── Advisor Summary & Policy ────────────────────── */}
         <SectionGap />
@@ -549,6 +569,7 @@ const KYCDocument = ({ formData, user }) => {
 
         {/* ── Client Answers Recap ────────────────────────── */}
         <SectionGap />
+        <View wrap={false}>
         <SectionTitle>סיכום תשובות הלקוח</SectionTitle>
 
         <SummaryCard title="תמונה כלכלית" items={[
@@ -556,6 +577,7 @@ const KYCDocument = ({ formData, user }) => {
           ['סך התחייבויות', totalLiabilities > 0 ? fmtMoney(totalLiabilities) : '---'],
           ['שווי נטו', netWorth !== 0 ? fmtMoney(netWorth) : '---'],
         ]} />
+        </View>{/* end wrap={false} for title + first card */}
 
         <SummaryCard title="מטרות ואופק" items={[
           ['מטרות השקעה', goalsText || '---'],
