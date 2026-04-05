@@ -6,12 +6,28 @@ export function createEmptyForm() {
     clientB: createEmptyClient(),
     familyNetWorth: '',
 
+    // Income & expenses — dropdown ranges
+    incomeRange: '',
+    expenseRange: '',
+
+    // Legacy income fields (synced from incomeRange for PDF)
     income: {
       salary: { has: false, amount: '' },
       pension: { has: false, amount: '' },
       realEstate: { has: false, amount: '' },
       other: { has: false, amount: '' },
     },
+
+    // Grouped assets
+    assetGroups: {
+      cashDeposits: { amount: '', notes: '' },
+      securities: { amount: '', notes: '' },
+      pensionSavings: { amount: '', notes: '' },
+      realEstate: { amount: '', notes: '' },
+      other: { amount: '', notes: '' },
+    },
+
+    // Legacy asset fields (synced from assetGroups for PDF)
     assets: {
       cash: { has: false, amount: '' },
       deposits: { has: false, amount: '' },
@@ -31,6 +47,7 @@ export function createEmptyForm() {
       business: { has: false, amount: '' },
       other: { has: false, amount: '' },
     },
+
     liabilities: {
       mortgage: { has: false, monthly: '', total: '' },
       loans: { has: false, monthly: '', total: '' },
@@ -66,6 +83,7 @@ export function createEmptyForm() {
     calculatedRiskLevel: 0,
     finalRiskLevel: 0,
     finalRiskJustification: '',
+    riskLevelReason: '',
     forex: false,
     lowRatedBonds: false,
     corporateBondsPct: '',

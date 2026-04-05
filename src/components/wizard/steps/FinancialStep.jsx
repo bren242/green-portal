@@ -1,4 +1,30 @@
-import { AssetRow, TextInput, TextArea, RadioGroup, RefuseButton } from '../ui/FormField'
+import { TextArea, SelectInput, RadioGroup, RefuseButton } from '../ui/FormField'
+
+// ── Range options (identical for income & expenses) ──────────────
+const RANGE_OPTIONS = [
+  { value: 'up_to_10', label: 'עד 10,000 ₪' },
+  { value: '10_20', label: '10,000 – 20,000 ₪' },
+  { value: '20_30', label: '20,000 – 30,000 ₪' },
+  { value: '30_50', label: '30,000 – 50,000 ₪' },
+  { value: '50_plus', label: '50,000 ₪ ומעלה' },
+]
+
+const RANGE_MIDPOINTS = {
+  up_to_10: 7500,
+  '10_20': 15000,
+  '20_30': 25000,
+  '30_50': 40000,
+  '50_plus': 60000,
+}
+
+// ── Asset group definitions ──────────────────────────────────────
+const ASSET_GROUPS = [
+  { key: 'cashDeposits', label: 'מזומן ופקדונות', oldKey: 'cash', notesKey: 'cashNotes' },
+  { key: 'securities', label: 'תיק ני״ע (מנוהל/עצמאי)', oldKey: 'managedPortfolio', notesKey: 'securitiesNotes' },
+  { key: 'pensionSavings', label: 'פנסיוני כולל קרה״ש', oldKey: 'pensionFund', notesKey: 'savingsNotes' },
+  { key: 'realEstate', label: 'נדל״ן', oldKey: 'investmentRealEstate', notesKey: 'realEstateNotes' },
+  { key: 'other', label: 'אחר', oldKey: 'other', notesKey: 'otherAssetsNotes' },
+]
 
 function SectionTitle({ children }) {
   return (
@@ -9,17 +35,65 @@ function SectionTitle({ children }) {
 }
 
 export default function FinancialStep({ formData, updateForm, isRefused, toggleRefusal }) {
-  const updateIncome = (key, value) => {
-    updateForm({ income: { ...formData.income, [key]: value } })
+
+  // ── Income handler — syncs midpoint to legacy fields for PDF ───
+  const handleIncomeChange = (value) => {
+    const mid = RANGE_MIDPOINTS[value] || 0
+    updateForm({
+      incomeRange: value,
+      income: {
+        salary: value ? { has: true, amount: String(mid) } : { has: false, amount: '' },
+        pension: { has: false, amount: '' },
+        realEstate: { has: false, amount: '' },
+        other: { has: false, amount: '' },
+      },
+    })
   }
 
-  const updateAsset = (key, value) => {
-    updateForm({ assets: { ...formData.assets, [key]: value } })
+  // ── Expense handler — syncs midpoint to legacy monthlyExpenses ─
+  const handleExpenseChange = (value) => {
+    const mid = RANGE_MIDPOINTS[value] || 0
+    updateForm({
+      expenseRange: value,
+      liabilities: {
+        ...formData.liabilities,
+        monthlyExpenses: value ? String(mid) : '',
+      },
+    })
   }
 
+  // ── Asset group handler — syncs to legacy asset fields ─────────
+  const handleAssetGroup = (groupKey, field, value) => {
+    const groups = formData.assetGroups || {}
+    const current = groups[groupKey] || { amount: '', notes: '' }
+    const newGroups = { ...groups, [groupKey]: { ...current, [field]: value } }
+
+    const group = ASSET_GROUPS.find(g => g.key === groupKey)
+    const updates = { assetGroups: newGroups }
+
+    if (field === 'amount') {
+      updates.assets = {
+        ...formData.assets,
+        [group.oldKey]: { has: !!value, amount: value },
+      }
+    }
+    if (field === 'notes') {
+      updates[group.notesKey] = value
+    }
+
+    updateForm(updates)
+  }
+
+  // ── Liability helpers (mortgage / loans unchanged) ─────────────
   const updateLiability = (key, value) => {
     updateForm({ liabilities: { ...formData.liabilities, [key]: value } })
   }
+
+  // ── Cash flow calculation ──────────────────────────────────────
+  const incomeMid = RANGE_MIDPOINTS[formData.incomeRange] || 0
+  const expenseMid = RANGE_MIDPOINTS[formData.expenseRange] || 0
+  const cashFlow = incomeMid - expenseMid
+  const showCashFlow = formData.incomeRange && formData.expenseRange
 
   return (
     <div className="space-y-4">
@@ -27,118 +101,97 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         כלל הנתונים מתייחסים לתא המשפחתי כולו
       </p>
 
-      {/* Income */}
-      <SectionTitle>הכנסות (חודשי)</SectionTitle>
-      <div className="space-y-1">
-        <div className="flex items-center gap-2">
+      {/* ── Income & Expenses ─────────────────────────────────── */}
+      <SectionTitle>הכנסות והוצאות (חודשי)</SectionTitle>
+      <div className="space-y-4">
+        <div className="flex items-end gap-2">
           <div className="flex-1">
-            <AssetRow label="שכר נטו חודשי" asset={formData.income.salary} onChange={(v) => updateIncome('salary', v)} />
+            <SelectInput
+              label="הכנסה חודשית נטו"
+              value={formData.incomeRange}
+              onChange={handleIncomeChange}
+              options={RANGE_OPTIONS}
+            />
           </div>
-          <RefuseButton field="income.salary" label="שכר נטו" isRefused={isRefused} toggleRefusal={toggleRefusal} />
+          <div className="pb-0.5">
+            <RefuseButton field="income.salary" label="הכנסה חודשית" isRefused={isRefused} toggleRefusal={toggleRefusal} />
+          </div>
         </div>
-        <AssetRow label="פנסיה / קצבה חודשית" asset={formData.income.pension} onChange={(v) => updateIncome('pension', v)} />
-        <AssetRow label="הכנסות מנדל״ן חודשי" asset={formData.income.realEstate} onChange={(v) => updateIncome('realEstate', v)} />
-        <AssetRow label="הכנסות אחרות חודשי" asset={formData.income.other} onChange={(v) => updateIncome('other', v)} />
+
+        <SelectInput
+          label="הוצאות חודשיות"
+          value={formData.expenseRange}
+          onChange={handleExpenseChange}
+          options={RANGE_OPTIONS}
+        />
+
+        {showCashFlow && (
+          <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+            cashFlow > 0
+              ? 'bg-emerald-50 border-emerald-200'
+              : cashFlow < 0
+                ? 'bg-red-50 border-red-200'
+                : 'bg-amber-50 border-amber-200'
+          }`}>
+            <span className="text-xl leading-none">
+              {cashFlow > 0 ? '↑' : cashFlow < 0 ? '↓' : '='}
+            </span>
+            <div>
+              <span className={`text-sm font-bold ${
+                cashFlow > 0 ? 'text-emerald-700' : cashFlow < 0 ? 'text-red-700' : 'text-amber-700'
+              }`}>
+                תזרים חודשי: {cashFlow > 0 ? 'חיובי' : cashFlow < 0 ? 'שלילי' : 'מאוזן'}
+              </span>
+              <span className="text-xs text-text-muted mr-2">(הערכה לפי אמצע המדרגה)</span>
+            </div>
+          </div>
+        )}
       </div>
+
       <TextArea
-        label="הערות להכנסות"
+        label="הערות להכנסות/הוצאות"
         value={formData.incomeNotes || ''}
         onChange={(v) => updateForm({ incomeNotes: v })}
-        placeholder="פירוט נוסף על מקורות ההכנסה..."
-        rows={2}
-      />
-
-      {/* Cash & equivalents */}
-      <SectionTitle>עו״ש, מזומן ופקדונות</SectionTitle>
-      <div className="space-y-1">
-        <AssetRow label="עו״ש / מזומן" asset={formData.assets.cash} onChange={(v) => updateAsset('cash', v)} />
-        <AssetRow label="פקדונות בנקאיים" asset={formData.assets.deposits} onChange={(v) => updateAsset('deposits', v)} />
-        <AssetRow label="קרנות כספיות" asset={formData.assets.moneyMarket} onChange={(v) => updateAsset('moneyMarket', v)} />
-      </div>
-      <TextArea
-        label="הערות"
-        value={formData.cashNotes || ''}
-        onChange={(v) => updateForm({ cashNotes: v })}
         placeholder="פירוט נוסף..."
         rows={2}
       />
 
-      {/* Securities */}
-      <SectionTitle>ני״ע בארץ ובחו״ל</SectionTitle>
-      <p className="text-xs text-gold bg-surface-cream px-3 py-1.5 rounded-lg inline-block mb-2">השקעות בחו״ל — יש להזין שווי שקלי</p>
-      <div className="space-y-1">
-        <AssetRow label="תיק מנוהל" asset={formData.assets.managedPortfolio} onChange={(v) => updateAsset('managedPortfolio', v)} />
-        <AssetRow label="מניות / אג״ח ישיר" asset={formData.assets.stocks} onChange={(v) => updateAsset('stocks', v)} />
-        <AssetRow label="ETF" asset={formData.assets.etf} onChange={(v) => updateAsset('etf', v)} />
-        <AssetRow label="ברוקר זר / חו״ל" asset={formData.assets.foreignBroker} onChange={(v) => updateAsset('foreignBroker', v)} />
+      {/* ── Asset Groups ──────────────────────────────────────── */}
+      <SectionTitle>נכסים</SectionTitle>
+      <div className="space-y-3">
+        {ASSET_GROUPS.map((group) => {
+          const data = formData.assetGroups?.[group.key] || { amount: '', notes: '' }
+          return (
+            <div key={group.key} className="bg-white border border-border/50 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-green-primary min-w-[160px]">
+                  {group.label}
+                </span>
+                <input
+                  type="text"
+                  value={data.amount}
+                  onChange={(e) => handleAssetGroup(group.key, 'amount', e.target.value)}
+                  placeholder="סכום ₪"
+                  autoComplete="off"
+                  className="flex-1 px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+                />
+              </div>
+              {data.amount && (
+                <textarea
+                  value={data.notes}
+                  onChange={(e) => handleAssetGroup(group.key, 'notes', e.target.value)}
+                  placeholder="הערות (אופציונלי)"
+                  rows={1}
+                  autoComplete="off"
+                  className="w-full mt-2 px-3 py-1.5 border border-border/40 rounded-lg text-xs text-text-muted focus:outline-none focus:border-green-secondary resize-none"
+                />
+              )}
+            </div>
+          )
+        })}
       </div>
-      <TextArea
-        label="הערות"
-        value={formData.securitiesNotes || ''}
-        onChange={(v) => updateForm({ securitiesNotes: v })}
-        placeholder="פירוט נוסף..."
-        rows={2}
-      />
 
-      {/* Savings, Gemel, Hishtalmut */}
-      <SectionTitle>חיסכון, גמל והשתלמות</SectionTitle>
-      <div className="space-y-1">
-        <AssetRow label="קרן השתלמות" asset={formData.assets.hishtalmut} onChange={(v) => updateAsset('hishtalmut', v)} />
-        <AssetRow label="קופת גמל" asset={formData.assets.gemel} onChange={(v) => updateAsset('gemel', v)} />
-        <AssetRow label="גמל להשקעה" asset={formData.assets.gemelInvestment} onChange={(v) => updateAsset('gemelInvestment', v)} />
-        <AssetRow label="פוליסת חיסכון" asset={formData.assets.savingsPolicy} onChange={(v) => updateAsset('savingsPolicy', v)} />
-      </div>
-      <TextArea
-        label="הערות"
-        value={formData.savingsNotes || ''}
-        onChange={(v) => updateForm({ savingsNotes: v })}
-        placeholder="פירוט נוסף..."
-        rows={2}
-      />
-
-      {/* Pension */}
-      <SectionTitle>פנסיה</SectionTitle>
-      <div className="space-y-1">
-        <AssetRow label="קרן פנסיה" asset={formData.assets.pensionFund} onChange={(v) => updateAsset('pensionFund', v)} />
-        <AssetRow label="ביטוח מנהלים" asset={formData.assets.bituachMenahalim} onChange={(v) => updateAsset('bituachMenahalim', v)} showGuaranteed />
-      </div>
-      <TextArea
-        label="הערות"
-        value={formData.pensionNotes || ''}
-        onChange={(v) => updateForm({ pensionNotes: v })}
-        placeholder="פירוט נוסף..."
-        rows={2}
-      />
-
-      {/* Real estate */}
-      <SectionTitle>נדל״ן</SectionTitle>
-      <div className="space-y-1">
-        <AssetRow label="נדל״ן להשקעה" asset={formData.assets.investmentRealEstate} onChange={(v) => updateAsset('investmentRealEstate', v)} />
-        <AssetRow label="נדל״ן מגורים (שווי)" asset={formData.assets.residenceRealEstate} onChange={(v) => updateAsset('residenceRealEstate', v)} />
-      </div>
-      <TextArea
-        label="הערות"
-        value={formData.realEstateNotes || ''}
-        onChange={(v) => updateForm({ realEstateNotes: v })}
-        placeholder="פירוט נוסף..."
-        rows={2}
-      />
-
-      {/* Other */}
-      <SectionTitle>אחר</SectionTitle>
-      <div className="space-y-1">
-        <AssetRow label="עסק / שותפות" asset={formData.assets.business} onChange={(v) => updateAsset('business', v)} />
-        <AssetRow label="אחר" asset={formData.assets.other} onChange={(v) => updateAsset('other', v)} />
-      </div>
-      <TextArea
-        label="הערות"
-        value={formData.otherAssetsNotes || ''}
-        onChange={(v) => updateForm({ otherAssetsNotes: v })}
-        placeholder="פירוט נוסף..."
-        rows={2}
-      />
-
-      {/* Liabilities */}
+      {/* ── Liabilities ───────────────────────────────────────── */}
       <SectionTitle>התחייבויות</SectionTitle>
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-3 py-2 border-b border-border/50">
@@ -175,7 +228,6 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
             </div>
           )}
         </div>
-        <TextInput label="הוצאות שוטפות חודשיות" value={formData.liabilities.monthlyExpenses} onChange={(v) => updateLiability('monthlyExpenses', v)} placeholder="₪" />
       </div>
       <TextArea
         label="הערות להתחייבויות"
@@ -185,7 +237,7 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
         rows={2}
       />
 
-      {/* Managed portion */}
+      {/* ── Managed portion ───────────────────────────────────── */}
       <SectionTitle>שיעור הנכסים המופנה לניהול</SectionTitle>
       <RadioGroup
         name="managedPortion"

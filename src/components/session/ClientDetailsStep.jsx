@@ -77,8 +77,13 @@ export default function ClientDetailsStep({ session, onUpdate, onNext, onBack })
             <label className="block text-sm font-semibold text-text-primary mb-1">תעודת זהות *</label>
             <input
               type="text"
+              inputMode="numeric"
               value={client.idNumber}
-              onChange={(e) => updateClient(clientKey, 'idNumber', e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value
+                if (v !== '' && !/^\d*$/.test(v)) return
+                updateClient(clientKey, 'idNumber', v)
+              }}
               autoComplete="off"
               className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
             />

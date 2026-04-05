@@ -1,11 +1,17 @@
-export function TextInput({ label, value, onChange, placeholder, type = 'text', disabled }) {
+export function TextInput({ label, value, onChange, placeholder, type = 'text', disabled, inputMode, onlyDigits }) {
+  const handleChange = (e) => {
+    const v = e.target.value
+    if (onlyDigits && v !== '' && !/^\d*$/.test(v)) return
+    onChange(v)
+  }
   return (
     <div>
       <label className="block text-sm font-semibold text-text-primary mb-1">{label}</label>
       <input
         type={type}
+        inputMode={inputMode}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleChange}
         placeholder={placeholder}
         disabled={disabled}
         autoComplete="off"

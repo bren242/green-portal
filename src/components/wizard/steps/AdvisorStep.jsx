@@ -129,6 +129,16 @@ export default function AdvisorStep({ formData, updateForm, user, onSavePDF, onC
             </div>
           </div>
         )}
+
+        {formData.finalRiskLevel > 0 && (
+          <TextArea
+            label="נימוק לבחירת רמת הסיכון"
+            value={formData.riskLevelReason}
+            onChange={(v) => updateForm({ riskLevelReason: v })}
+            placeholder='לאור / על אף... בחרנו רמת סיכון זו'
+            rows={3}
+          />
+        )}
       </div>
 
       {/* Policy parameters */}

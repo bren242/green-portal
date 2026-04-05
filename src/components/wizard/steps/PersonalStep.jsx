@@ -19,7 +19,7 @@ function ClientFields({ title, client, onChange }) {
       </h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <TextInput label="שם מלא *" value={client.fullName} onChange={(v) => update('fullName', v)} placeholder="שם פרטי ומשפחה" />
-        <TextInput label="תעודת זהות *" value={client.idNumber} onChange={(v) => update('idNumber', v)} placeholder="מספר ת.ז" />
+        <TextInput label="תעודת זהות *" value={client.idNumber} onChange={(v) => update('idNumber', v)} placeholder="מספר ת.ז" inputMode="numeric" onlyDigits />
         <TextInput label="תאריך לידה" value={client.birthDate} onChange={(v) => update('birthDate', v)} type="date" />
         <SelectInput label="מצב משפחתי" value={client.maritalStatus} onChange={(v) => update('maritalStatus', v)} options={MARITAL_OPTIONS} />
         <TextInput label="נפשות תלויות" value={client.dependents} onChange={(v) => update('dependents', v)} placeholder="מספר" />
