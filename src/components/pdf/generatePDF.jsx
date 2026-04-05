@@ -24,6 +24,96 @@ const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי �
 const q2Labels = { a: 'מעדיף לישון בשקט', b: 'מוכן לתנודות לטובת תשואה', c: 'משקיע לטווח ארוך, תנודות לא מדאיגות' }
 const q3Labels = { a: 'רוצה לצאת', b: 'שוקל לצמצם סיכון', c: 'מחזיק ומחכה', d: 'רואה הזדמנות להוסיף' }
 const q4Labels = { a: 'לא להפסיד', b: 'לשמור מעל אינפלציה', c: 'צמיחה לטווח ארוך' }
+
+// ── Full Risk Questions with Hebrew letter options ─────────────
+const RISK_QUESTIONS = [
+  {
+    key: 'riskQ1',
+    title: 'אסימטריה — סיכוי מול סיכון',
+    question: 'מהי רמת הסיכוי/סיכון שתרצה לקחת בתיק ההשקעות?',
+    options: [
+      { key: 'a', letter: 'א', text: q1Labels.a },
+      { key: 'b', letter: 'ב', text: q1Labels.b },
+      { key: 'c', letter: 'ג', text: q1Labels.c },
+      { key: 'd', letter: 'ד', text: q1Labels.d },
+    ],
+  },
+  {
+    key: 'riskQ2',
+    title: 'גישה לתנודות',
+    question: 'מהי גישתך לתנודות בשוק ההון?',
+    options: [
+      { key: 'a', letter: 'א', text: q2Labels.a },
+      { key: 'b', letter: 'ב', text: q2Labels.b },
+      { key: 'c', letter: 'ג', text: q2Labels.c },
+    ],
+  },
+  {
+    key: 'riskQ3',
+    title: 'תרחיש ירידה חדה',
+    question: 'אם תיק ההשקעות שלך ירד 20% בחודש, מה תעשה?',
+    options: [
+      { key: 'a', letter: 'א', text: q3Labels.a },
+      { key: 'b', letter: 'ב', text: q3Labels.b },
+      { key: 'c', letter: 'ג', text: q3Labels.c },
+      { key: 'd', letter: 'ד', text: q3Labels.d },
+    ],
+  },
+  {
+    key: 'riskQ4',
+    title: 'מטרה מרכזית',
+    question: 'מהי המטרה המרכזית שלך בהשקעה?',
+    options: [
+      { key: 'a', letter: 'א', text: q4Labels.a },
+      { key: 'b', letter: 'ב', text: q4Labels.b },
+      { key: 'c', letter: 'ג', text: q4Labels.c },
+    ],
+  },
+]
+
+// ── QuestionBlock Component ───────────────────────────────────
+const QuestionBlock = ({ q, selectedKey }) => (
+  <View wrap={false} style={{ marginBottom: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, overflow: 'hidden' }}>
+    {/* Question header */}
+    <View style={{ backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 10 }}>
+      <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>{q.title}</Text>
+    </View>
+    <View style={{ padding: 8, backgroundColor: C.white }}>
+      <Text style={{ fontSize: 8.5, color: C.black, textAlign: 'right', marginBottom: 6 }}>{q.question}</Text>
+      {q.options.map((opt) => {
+        const isSelected = selectedKey === opt.key
+        return (
+          <View key={opt.key} style={{
+            flexDirection: 'row-reverse',
+            alignItems: 'center',
+            paddingVertical: 3,
+            paddingHorizontal: 4,
+            marginBottom: 2,
+            backgroundColor: isSelected ? C.cream : C.white,
+            borderRadius: 3,
+          }}>
+            {/* Radio indicator */}
+            <View style={{
+              width: 10, height: 10, borderRadius: 5,
+              borderWidth: 1.5,
+              borderColor: isSelected ? C.gold : C.border,
+              backgroundColor: isSelected ? C.gold : C.white,
+              marginLeft: 6,
+            }} />
+            {/* Hebrew letter */}
+            <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.primary, marginLeft: 4, minWidth: 10, textAlign: 'right' }}>
+              {opt.letter}.
+            </Text>
+            {/* Option text */}
+            <Text style={{ fontSize: 8, color: isSelected ? C.primary : C.muted, textAlign: 'right', flex: 1 }}>
+              {opt.text}
+            </Text>
+          </View>
+        )
+      })}
+    </View>
+  </View>
+)
 const portionLabels   = { up_to_35: 'עד 35%', '35_to_70': '35%-70%', over_70: 'מעל 70%' }
 
 // ── Regulatory Paragraphs ──────────────────────────────────────
@@ -103,6 +193,16 @@ const KYCDocument = ({ formData, user }) => {
       .map(([label, a]) => { totalAssets += parseAmount(a.amount); return [label, fmtMoney(a.amount)] })
     return { ...sec, rows }
   }).filter(s => s.rows.length > 0)
+
+  // Always include ני"ע card even when empty
+  const hasSecurities = processedAssets.some(s => s.title === 'ני״ע בארץ ובחו״ל')
+  if (!hasSecurities) {
+    processedAssets.splice(1, 0, {
+      title: 'ני״ע בארץ ובחו״ל',
+      rows: [['סך הכל', 'אין']],
+      notes: '',
+    })
+  }
 
   // Liabilities
   const liabRows = []
@@ -254,13 +354,11 @@ const KYCDocument = ({ formData, user }) => {
           </View>
         )}
 
-        {/* ── Financial Picture ───────────────────────────── */}
+        {/* ── Block 1: תזרים חודשי ─────────────────────── */}
         <SectionGap />
-        <SectionTitle>תמונה כלכלית — התא המשפחתי</SectionTitle>
+        <SectionTitle>תזרים חודשי</SectionTitle>
 
-        {/* Sector Cards — 2 per row */}
         <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-
           {incomeRows.length > 0 && (
             <SectorCard
               title="הכנסות (חודשי)"
@@ -269,14 +367,35 @@ const KYCDocument = ({ formData, user }) => {
               notes={formData.incomeNotes}
             />
           )}
+        </View>
 
+        <View style={{ marginTop: 4 }}>
+          <BalanceBox
+            title="מאזן חודשי"
+            rows={[
+              ['סך הכנסות', totalMonthlyIncome > 0 ? fmtMoney(totalMonthlyIncome) : '---'],
+              ['סך הוצאות', totalMonthlyExpenses > 0 ? fmtMoney(totalMonthlyExpenses) : '---'],
+            ]}
+            highlightLabel="מאזן חודשי"
+            highlightValue={monthlyBalance !== 0 ? fmtMoney(monthlyBalance) : '---'}
+          />
+        </View>
+
+        {/* ── Block 2: נכסים והתחייבויות ─────────────────── */}
+        <SectionGap />
+        <SectionTitle>נכסים והתחייבויות</SectionTitle>
+
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           {processedAssets.map((sec, idx) => {
-            const secTotal = sec.rows.reduce((s, [, v]) => s + parseAmount(v.replace(/[^\d.]/g, '')), 0)
+            const secTotal = sec.rows.reduce((s, [, v]) => {
+              const cleaned = String(v).replace(/[^\d.]/g, '')
+              return s + parseAmount(cleaned)
+            }, 0)
             return (
               <SectorCard
                 key={idx}
                 title={sec.title}
-                total={fmtMoney(secTotal)}
+                total={secTotal > 0 ? fmtMoney(secTotal) : 'אין'}
                 items={sec.rows}
                 notes={sec.notes}
               />
@@ -291,19 +410,12 @@ const KYCDocument = ({ formData, user }) => {
               notes={formData.liabilitiesNotes}
             />
           )}
-
         </View>
 
         {/* Separator */}
-        <View style={{
-          borderTopWidth: 1,
-          borderTopColor: C.gold,
-          marginTop: 16,
-          marginBottom: 12,
-        }} />
+        <View style={{ borderTopWidth: 1, borderTopColor: C.gold, marginTop: 8, marginBottom: 8 }} />
 
-        {/* Two summary boxes side-by-side */}
-        <View style={{ flexDirection: 'row-reverse', gap: 8 }} wrap={false}>
+        <View wrap={false}>
           <BalanceBox
             title="סיכום מאזן"
             rows={[
@@ -312,15 +424,6 @@ const KYCDocument = ({ formData, user }) => {
             ]}
             highlightLabel="שווי נטו"
             highlightValue={netWorth !== 0 ? fmtMoney(netWorth) : '---'}
-          />
-          <BalanceBox
-            title="מאזן חודשי"
-            rows={[
-              ['סך הכנסות', totalMonthlyIncome > 0 ? fmtMoney(totalMonthlyIncome) : '---'],
-              ['סך הוצאות', totalMonthlyExpenses > 0 ? fmtMoney(totalMonthlyExpenses) : '---'],
-            ]}
-            highlightLabel="מאזן חודשי"
-            highlightValue={monthlyBalance !== 0 ? fmtMoney(monthlyBalance) : '---'}
           />
         </View>
 
@@ -373,17 +476,22 @@ const KYCDocument = ({ formData, user }) => {
           </View>
         )}
 
-        <DataTable
-          headers={['שאלה', 'תשובת הלקוח']}
-          rows={[
-            ['אסימטריה — סיכוי מול סיכון', q1Labels[formData.riskQ1] || '---'],
-            ['תחושה — גישה לתנודות', q2Labels[formData.riskQ2] || '---'],
-            ['תרחיש — ירידה חדה', q3Labels[formData.riskQ3] || '---'],
-            ['עדיפות — מטרה מרכזית', q4Labels[formData.riskQ4] || '---'],
-            ['ניסיון קודם בשוק ההון', formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')],
-            ['פירוט ניסיון', formData.priorExperienceDetails || '---'],
-          ]}
-        />
+        {/* Risk questions with visual radio indicators */}
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+          {RISK_QUESTIONS.map((q) => (
+            <View key={q.key} style={{ width: '48%' }}>
+              <QuestionBlock q={q} selectedKey={formData[q.key]} />
+            </View>
+          ))}
+        </View>
+
+        {/* Prior experience */}
+        <View style={{ flexDirection: 'row-reverse', gap: 8, marginTop: 4 }}>
+          <LabelValue label="ניסיון קודם בשוק ההון" value={formData.priorExperience === 'yes' ? 'כן' : (formData.priorExperience === 'no' ? 'לא' : '---')} even />
+          {formData.priorExperienceDetails && (
+            <LabelValue label="פירוט ניסיון" value={formData.priorExperienceDetails} />
+          )}
+        </View>
 
         {/* ── Advisor Summary & Policy ────────────────────── */}
         <SectionGap />
@@ -461,9 +569,19 @@ const KYCDocument = ({ formData, user }) => {
 
         {/* SummaryCard "סיכון ומדיניות" removed — duplicate of הערכת סיכון section above */}
 
-        {/* ── Declarations & Signatures ───────────────────── */}
-        <View wrap={false}>
-        <SectionGap />
+      </Page>
+
+      {/* ═══════════════════ PAGE: DECLARATIONS & SIGNATURES ═══════════════════ */}
+      <Page size="A4" style={contentPageStyle}>
+        <PageHeader
+          clientName={clientName}
+          date={date}
+          docTitle={isCouple
+            ? `${formData.clientA.fullName} ו${formData.clientB.fullName}`
+            : clientName}
+        />
+        <PageFooter />
+
         <SectionTitle>הצהרות וחתימות</SectionTitle>
 
         {/* Client declaration */}
@@ -517,8 +635,6 @@ const KYCDocument = ({ formData, user }) => {
           <SignatureLine label="חתימת בעל הרישיון:" />
           <DateLine date={date} />
         </View>
-
-        </View>{/* end wrap={false} declarations wrapper */}
 
       </Page>
     </Document>
