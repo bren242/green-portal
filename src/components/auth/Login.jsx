@@ -28,7 +28,7 @@ export default function Login({ onLogin }) {
           />
         </div>
         <h1 className="text-xl font-bold text-green-primary text-center mb-1 font-assistant">
-          פורטל טפסים GREEN
+          פורטל טפסים גרין
         </h1>
         <p className="text-sm text-text-muted text-center mb-6">
           כניסה למערכת

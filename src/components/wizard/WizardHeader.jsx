@@ -4,7 +4,7 @@ export default function WizardHeader({ user, onLogout, onAdmin }) {
       {/* Thin dark green nav bar — TOP */}
       <div className="bg-green-primary">
         <div className="max-w-3xl mx-auto px-4 py-1.5 flex items-center justify-between">
-          <span className="text-xs font-semibold text-gold-light tracking-wide">פורטל טפסים GREEN</span>
+          <span className="text-xs font-semibold text-gold-light tracking-wide">פורטל טפסים גרין</span>
           <div className="flex items-center gap-3">
             <span className="text-xs text-gold-light/70 font-medium">{user.name}</span>
             {onAdmin && (

@@ -452,13 +452,7 @@ const KYCDocument = ({ formData, user }) => {
           ['צורך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---'],
         ]} />
 
-        <SummaryCard title="סיכון ומדיניות" items={[
-          ['שאלה 1', q1Labels[formData.riskQ1] || '---'],
-          ['שאלה 2', q2Labels[formData.riskQ2] || '---'],
-          ['שאלה 3', q3Labels[formData.riskQ3] || '---'],
-          ['שאלה 4', q4Labels[formData.riskQ4] || '---'],
-          ['דרגת סיכון סופית', rlFinal ? `${formData.finalRiskLevel} — ${rlFinal.name}` : '---'],
-        ]} />
+        {/* SummaryCard "סיכון ומדיניות" removed — duplicate of הערכת סיכון section above */}
 
         {/* ── Declarations & Signatures ───────────────────── */}
         <View wrap={false}>
