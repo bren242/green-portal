@@ -8,7 +8,7 @@ const DEFAULT_USERS = [
   {
     id: '1',
     username: 'eyal',
-    password: 'green2024',
+    password: 'green2026',
     name: 'אייל ברנר',
     idNumber: '',
     license: '',
@@ -17,7 +17,7 @@ const DEFAULT_USERS = [
   {
     id: '2',
     username: 'yuval',
-    password: 'green2024',
+    password: 'green2026',
     name: 'יובל לרר',
     idNumber: '',
     license: '',
@@ -26,7 +26,7 @@ const DEFAULT_USERS = [
   {
     id: '3',
     username: 'yuval_koren',
-    password: 'green2024',
+    password: 'green2026',
     name: 'יובל קורן',
     idNumber: '',
     license: '',
