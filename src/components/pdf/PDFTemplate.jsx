@@ -327,7 +327,7 @@ export const ClientCard = ({ client, title, full }) => (
     </View>
     <View style={{ padding: 8 }}>
       <LabelValue label="שם מלא" value={client.fullName} even />
-      <LabelValue label="ת.ז." value={client.idNumber} />
+      <LabelValue label="תעודת זהות" value={client.idNumber} />
       {full && <>
         <LabelValue label="תאריך לידה" value={client.birthDate} even />
         <LabelValue label="מצב משפחתי" value={translateMarital(client.maritalStatus)} />
@@ -371,7 +371,7 @@ export const SignatureLine = ({ label }) => (
 // ── Date Line ──────────────────────────────────────────────────
 export const DateLine = ({ date }) => (
   <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 6 }}>
-    <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>תאריך:</Text>
+    <Text style={{ fontSize: 10, color: C.black, textAlign: 'right' }}>תאריך</Text>
     <Text style={{ fontSize: 10, color: C.black, marginRight: 8 }}>{date}</Text>
   </View>
 )

@@ -6,7 +6,7 @@ import { logoPng } from '../../assets/logoBase64'
 import {
   C, coverPageStyle, contentPageStyle,
   PageHeader, PageFooter, SectionTitle, SectionGap,
-  LabelValue, DataTable, SummaryRow, SummaryCard,
+  LabelValue, DataTable, SummaryRow,
   PillTag, RiskGauge, PolicyCube, GoldBox,
   ClientCard, BalanceBox, KpiRow, KpiHeader, SectorCard, SignatureLine, DateLine,
   fmtMoney, parseAmount, translateMarital, fmtDate,
@@ -17,7 +17,7 @@ const goalLabels = {
   preserve: 'שמירת ערך', income: 'הכנסה שוטפת', growth: 'צמיחה לטווח ארוך',
   pension: 'חיסכון לפנסיה', education: 'חינוך ילדים', intergenerational: 'העברה בין-דורית', other: 'אחר',
 }
-const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': 'שנתיים עד 5', '5_to_10': '5–10 שנים', over_10: 'מעל 10 שנים' }
+const horizonLabels   = { up_to_2: 'עד שנתיים', '2_to_5': 'בין 2 ל-5 שנים', '5_to_10': 'בין 5 ל 10 שנים', over_10: 'מעל 10 שנים' }
 const timelineLabels  = { up_to_2: 'עד שנתיים', '2_to_5': '2-5 שנים', over_5: 'מעל 5 שנים', unknown: 'לא ידוע' }
 const next3Labels     = { '0': '0%', up_to_30: 'עד 30%', up_to_50: 'עד 50%', over_50: 'מעל 50%', unknown: 'לא ידוע' }
 const q1Labels = { a: 'סיכוי עד 6%, סיכון עד 5%', b: 'סיכוי עד 14%, סיכון עד 10%', c: 'סיכוי עד 20%, סיכון עד 15%', d: 'סיכוי מעל 20%, סיכון מעל 15%' }
@@ -30,7 +30,7 @@ const RISK_QUESTIONS = [
   {
     key: 'riskQ1',
     title: 'אסימטריה — סיכוי מול סיכון',
-    question: 'מהי רמת הסיכוי/סיכון שתרצה לקחת בתיק ההשקעות?',
+    question: 'מהי רמת הסיכוי/סיכון שתרצה לקחת בתיק ההשקעות',
     options: [
       { key: 'a', letter: 'א', text: q1Labels.a },
       { key: 'b', letter: 'ב', text: q1Labels.b },
@@ -41,7 +41,7 @@ const RISK_QUESTIONS = [
   {
     key: 'riskQ2',
     title: 'גישה לתנודות',
-    question: 'מהי גישתך לתנודות בשוק ההון?',
+    question: 'מהי גישתך לתנודות בשוק ההון',
     options: [
       { key: 'a', letter: 'א', text: q2Labels.a },
       { key: 'b', letter: 'ב', text: q2Labels.b },
@@ -51,7 +51,7 @@ const RISK_QUESTIONS = [
   {
     key: 'riskQ3',
     title: 'תרחיש ירידה חדה',
-    question: 'אם תיק ההשקעות שלך ירד 20% בחודש, מה תעשה?',
+    question: 'אם תיק ההשקעות שלך ירד 20% בחודש, מה תעשה',
     options: [
       { key: 'a', letter: 'א', text: q3Labels.a },
       { key: 'b', letter: 'ב', text: q3Labels.b },
@@ -62,7 +62,7 @@ const RISK_QUESTIONS = [
   {
     key: 'riskQ4',
     title: 'מטרה מרכזית',
-    question: 'מהי המטרה המרכזית שלך בהשקעה?',
+    question: 'מהי המטרה המרכזית שלך בהשקעה',
     options: [
       { key: 'a', letter: 'א', text: q4Labels.a },
       { key: 'b', letter: 'ב', text: q4Labels.b },
@@ -92,22 +92,22 @@ const QuestionBlock = ({ q, selectedKey }) => (
             backgroundColor: isSelected ? C.cream : C.white,
             borderRadius: 3,
           }}>
-            {/* Radio indicator */}
-            <View style={{
-              width: 10, height: 10, borderRadius: 5,
-              borderWidth: 1.5,
-              borderColor: isSelected ? C.gold : C.border,
-              backgroundColor: isSelected ? C.gold : C.white,
-              marginLeft: 6,
-            }} />
             {/* Hebrew letter */}
             <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.primary, marginLeft: 4, minWidth: 10, textAlign: 'right' }}>
-              {opt.letter}.
+              {opt.letter}
             </Text>
             {/* Option text */}
             <Text style={{ fontSize: 8, color: isSelected ? C.primary : C.muted, textAlign: 'right', flex: 1 }}>
               {opt.text}
             </Text>
+            {/* Radio indicator — last in code = leftmost visual */}
+            <View style={{
+              width: 10, height: 10, borderRadius: 5,
+              borderWidth: 1.5,
+              borderColor: isSelected ? C.gold : C.border,
+              backgroundColor: isSelected ? C.gold : C.white,
+              marginRight: 6,
+            }} />
           </View>
         )
       })}
@@ -116,12 +116,21 @@ const QuestionBlock = ({ q, selectedKey }) => (
 )
 const portionLabels   = { up_to_35: 'עד 35%', '35_to_70': '35%-70%', over_70: 'מעל 70%' }
 
-// ── Regulatory Paragraphs ──────────────────────────────────────
+// ── Regulatory Paragraphs (ללא נקודה סופית) ───────────────────
 const REG_TEXTS = [
-  'משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות תשנ״ה-1995 (להלן: "החוק"), להתאים, ככל האפשר, את השירותים שמשווק ההשקעות נותן ללקוח לצרכיו ולהנחיותיו של הלקוח וזאת לאחר שמשווק ההשקעות בירר עם הלקוח את מטרות ההשקעה, את מצבו הכספי לרבות ניירות הערך והנכסים הפיננסיים של הלקוח, ואת שאר הנסיבות הרלוונטיות לעניין זה.',
-  'ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון שלהלן יסייע למשווק ההשקעות להתאים בצורה המיטבית האפשרית את אופי השקעותיו לצרכיו המיוחדים של הלקוח. אי מסירת פרטים או מסירת פרטים חלקית עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לצרכי הלקוח.',
-  'ידוע ללקוח כי קיימת חשיבות לעדכן את משווק ההשקעות בכל שינוי שיחול ביחס לפרטים שמסר במסגרת מסמך זה. משווק ההשקעות הבהיר ללקוח כי כל פרט שהלקוח מוסר למשווק ההשקעות ישמר בסודיות על ידי משווק ההשקעות אך סודיות זו כפופה לחובת משווק ההשקעות למסור ידיעות על פי כל דין.',
-  'הלקוח מצהיר כי הוא מודע לכך שהשקעות בשוק ההון כרוכות בסיכון, וכי אין בתשואות עבר כדי להבטיח תשואות עתידיות.',
+  'משווק השקעות נדרש, על פי חוק הסדרת העיסוק בייעוץ השקעות, בשיווק השקעות ובניהול תיקי השקעות תשנ״ה-1995 (להלן: "החוק"), להתאים, ככל האפשר, את השירותים שמשווק ההשקעות נותן ללקוח לצרכיו ולהנחיותיו של הלקוח וזאת לאחר שמשווק ההשקעות בירר עם הלקוח את מטרות ההשקעה, את מצבו הכספי לרבות ניירות הערך והנכסים הפיננסיים של הלקוח, ואת שאר הנסיבות הרלוונטיות לעניין זה',
+  'ידוע ללקוח כי מענה אמיתי, כן ומלא לשאלון שלהלן יסייע למשווק ההשקעות להתאים בצורה המיטבית האפשרית את אופי השקעותיו לצרכיו המיוחדים של הלקוח. אי מסירת פרטים או מסירת פרטים חלקית עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לצרכי הלקוח',
+  'ידוע ללקוח כי קיימת חשיבות לעדכן את משווק ההשקעות בכל שינוי שיחול ביחס לפרטים שמסר במסגרת מסמך זה. משווק ההשקעות הבהיר ללקוח כי כל פרט שהלקוח מוסר למשווק ההשקעות ישמר בסודיות על ידי משווק ההשקעות אך סודיות זו כפופה לחובת משווק ההשקעות למסור ידיעות על פי כל דין',
+  'הלקוח מצהיר כי הוא מודע לכך שהשקעות בשוק ההון כרוכות בסיכון, וכי אין בתשואות עבר כדי להבטיח תשואות עתידיות',
+]
+
+// ── Risk levels table data (approved values) ──────────────────
+const RISK_TABLE = [
+  { level: 1, name: 'שמרן',       maxLoss: 'עד 5%',    maxStocks: '0%'       },
+  { level: 2, name: 'שמרן-מתון',  maxLoss: 'עד 10%',   maxStocks: 'עד 20%'   },
+  { level: 3, name: 'מאוזן',      maxLoss: 'עד 15%',   maxStocks: 'עד 30%'   },
+  { level: 4, name: 'צמיחה',      maxLoss: 'מעל 15%',  maxStocks: 'עד 50%'   },
+  { level: 5, name: 'אגרסיבי',    maxLoss: 'משמעותי',  maxStocks: 'עד 100%'  },
 ]
 
 // ════════════════════════════════════════════════════════════════
@@ -308,7 +317,7 @@ const KYCDocument = ({ formData, user }) => {
                 }}>
                   <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>{title}</Text>
                   <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{client.fullName || '---'}</Text>
-                  <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>ת.ז: {client.idNumber || '---'}</Text>
+                  <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>תעודת זהות {client.idNumber || '---'}</Text>
                 </View>
               ))}
             </View>
@@ -316,7 +325,7 @@ const KYCDocument = ({ formData, user }) => {
             <View style={{ marginTop: 16, backgroundColor: C.primary, borderRadius: 4, padding: 12 }}>
               <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.gold, textAlign: 'right', marginBottom: 4 }}>פרטי הלקוח</Text>
               <Text style={{ fontSize: 13, fontWeight: 'bold', color: C.white, textAlign: 'right' }}>{formData.clientA.fullName || '---'}</Text>
-              <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>ת.ז: {formData.clientA.idNumber || '---'}</Text>
+              <Text style={{ fontSize: 9, color: C.goldLight, textAlign: 'right', marginTop: 3 }}>תעודת זהות {formData.clientA.idNumber || '---'}</Text>
             </View>
           )}
 
@@ -407,33 +416,35 @@ const KYCDocument = ({ formData, user }) => {
 
         {/* ── Block 2: נכסים והתחייבויות ─────────────────── */}
         <SectionGap />
-        <SectionTitle>נכסים והתחייבויות</SectionTitle>
+        <View wrap={false}>
+          <SectionTitle>נכסים והתחייבויות</SectionTitle>
 
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-          {processedAssets.map((sec, idx) => {
-            const secTotal = sec.rows.reduce((s, [, v]) => {
-              const cleaned = String(v).replace(/[^\d.]/g, '')
-              return s + parseAmount(cleaned)
-            }, 0)
-            return (
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {processedAssets.map((sec, idx) => {
+              const secTotal = sec.rows.reduce((s, [, v]) => {
+                const cleaned = String(v).replace(/[^\d.]/g, '')
+                return s + parseAmount(cleaned)
+              }, 0)
+              return (
+                <SectorCard
+                  key={idx}
+                  title={sec.title}
+                  total={secTotal > 0 ? fmtMoney(secTotal) : 'אין'}
+                  items={sec.rows}
+                  notes={sec.notes}
+                />
+              )
+            })}
+
+            {liabRows.length > 0 && (
               <SectorCard
-                key={idx}
-                title={sec.title}
-                total={secTotal > 0 ? fmtMoney(secTotal) : 'אין'}
-                items={sec.rows}
-                notes={sec.notes}
+                title="התחייבויות"
+                total={fmtMoney(totalLiabilities)}
+                items={liabRows}
+                notes={formData.liabilitiesNotes}
               />
-            )
-          })}
-
-          {liabRows.length > 0 && (
-            <SectorCard
-              title="התחייבויות"
-              total={fmtMoney(totalLiabilities)}
-              items={liabRows}
-              notes={formData.liabilitiesNotes}
-            />
-          )}
+            )}
+          </View>
         </View>
 
         {/* Separator */}
@@ -500,6 +511,32 @@ const KYCDocument = ({ formData, user }) => {
           </View>
         )}
 
+        {/* Risk levels reference table */}
+        <View wrap={false} style={{ marginBottom: 10, borderWidth: 0.5, borderColor: C.border, borderRadius: 4, overflow: 'hidden' }}>
+          <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
+            <Text style={{ width: 36, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>דרגה</Text>
+            <Text style={{ flex: 2, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>שם</Text>
+            <Text style={{ flex: 2, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>הפסד מקס׳</Text>
+            <Text style={{ flex: 2, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>מניות מקס׳</Text>
+          </View>
+          {RISK_TABLE.map((rl) => {
+            const isSelected = formData.finalRiskLevel === rl.level
+            return (
+              <View key={rl.level} style={{
+                flexDirection: 'row-reverse',
+                paddingVertical: 3,
+                paddingHorizontal: 6,
+                backgroundColor: isSelected ? C.gold : (rl.level % 2 === 0 ? C.surface : C.white),
+              }}>
+                <Text style={{ width: 36, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.level}</Text>
+                <Text style={{ flex: 2, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.name}</Text>
+                <Text style={{ flex: 2, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.maxLoss}</Text>
+                <Text style={{ flex: 2, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.maxStocks}</Text>
+              </View>
+            )
+          })}
+        </View>
+
         {/* Risk questions with visual radio indicators */}
         <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           {RISK_QUESTIONS.map((q) => (
@@ -523,14 +560,14 @@ const KYCDocument = ({ formData, user }) => {
           {formData.advisorSummary && (
             <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>סיכום וניתוח</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.advisorSummary}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.advisorSummary).replace(/\.$/, '')}</Text>
             </View>
           )}
 
           {formData.clientPreferences && (
             <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>העדפות / הגבלות לקוח</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.clientPreferences}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.clientPreferences).replace(/\.$/, '')}</Text>
             </View>
           )}
         </View>
@@ -562,41 +599,17 @@ const KYCDocument = ({ formData, user }) => {
           {formData.finalRiskJustification && (
             <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לפער בדרגה</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.finalRiskJustification}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.finalRiskJustification).replace(/\.$/, '')}</Text>
             </View>
           )}
 
           {formData.riskLevelReason && (
             <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לבחירת רמת הסיכון</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{formData.riskLevelReason}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.riskLevelReason).replace(/\.$/, '')}</Text>
             </View>
           )}
         </View>
-
-        {/* ── Client Answers Recap ────────────────────────── */}
-        <SectionGap />
-        <View wrap={false}>
-        <SectionTitle>סיכום תשובות הלקוח</SectionTitle>
-
-        <SummaryCard title="תמונה כלכלית" items={[
-          ['סך נכסים', totalAssets > 0 ? fmtMoney(totalAssets) : '---'],
-          ['סך התחייבויות', totalLiabilities > 0 ? fmtMoney(totalLiabilities) : '---'],
-          ['שווי נטו', netWorth !== 0 ? fmtMoney(netWorth) : '---'],
-        ]} />
-        </View>{/* end wrap={false} for title + first card */}
-
-        <SummaryCard title="מטרות ואופק" items={[
-          ['מטרות השקעה', goalsText || '---'],
-          ['אופק השקעה', horizonLabels[formData.investmentHorizon] || '---'],
-        ]} />
-
-        <SummaryCard title="נזילות" items={[
-          ['צורך בכל הכסף', timelineLabels[formData.liquidityTimeline] || '---'],
-          ['צורך ב-3 שנים', next3Labels[formData.liquidityNext3Years] || '---'],
-        ]} />
-
-        {/* SummaryCard "סיכון ומדיניות" removed — duplicate of הערכת סיכון section above */}
 
       </Page>
 
@@ -617,24 +630,24 @@ const KYCDocument = ({ formData, user }) => {
         <View>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>הצהרת הלקוח</Text>
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
-            {`אני הח"מ ${clientName} מצהיר בזאת כי המידע המופיע לעיל, הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות. כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים וכן כי אי מסירת פרטים או מסירת פרטים חלקיים עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לח"מ. כמו כן, כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו ואני מוותר בזאת על כל טענה ו/או תביעה ו/או זכות כלשהי אודות שימוש שלא ייעשה במידע זה. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי העתק בכתב/בדוא״ל של מסמך זה.`}
+            {`אני הח"מ ${clientName} מצהיר בזאת כי המידע המופיע לעיל, הינו המידע אותו מסרתי לידיעתו של משווק ההשקעות כמו כן, הוסבר לי כי מענה אמיתי, כן ומלא לשאלון יסייע למשווק ההשקעות להתאים בצורה המיטבית את אופי תיק ההשקעות לצרכיי הספציפיים וכן כי אי מסירת פרטים או מסירת פרטים חלקיים עלולה לפגוע ביכולתו של משווק ההשקעות להתאים את השירות שיינתן לח"מ. כמו כן, כל מידע אחר אשר נתבקשתי למסור לידיעת משווק ההשקעות אולם נמנעתי מלמסרו, הינו מידע אשר אין ברצוני שישמש את משווק ההשקעות במסגרת פעילותו ואני מוותר בזאת על כל טענה ו/או תביעה ו/או זכות כלשהי אודות שימוש שלא ייעשה במידע זה. בחתימתי זו מאשר הח"מ כי מדיניות ההשקעה ואופן ניהול תיק ההשקעות הוסברו לח"מ ונקבעו בשיתוף פעולה עם הח"מ. אני מאשר בזאת כי קיבלתי העתק בכתב/בדוא״ל של מסמך זה`}
           </Text>
 
           {/* Signature lines */}
           {isCouple ? (
             <View style={{ flexDirection: 'row-reverse', marginTop: 4 }}>
               <View style={{ flex: 1, marginLeft: 6 }}>
-                <SignatureLine label={`חתימת הלקוח (${formData.clientA.fullName}):`} />
+                <SignatureLine label={`חתימת הלקוח (${formData.clientA.fullName})`} />
                 <DateLine date={date} />
               </View>
               <View style={{ flex: 1, marginRight: 6 }}>
-                <SignatureLine label={`חתימת הלקוח (${formData.clientB.fullName}):`} />
+                <SignatureLine label={`חתימת הלקוח (${formData.clientB.fullName})`} />
                 <DateLine date={date} />
               </View>
             </View>
           ) : (
             <View style={{ marginTop: 4 }}>
-              <SignatureLine label="חתימת הלקוח:" />
+              <SignatureLine label="חתימת הלקוח" />
               <DateLine date={date} />
             </View>
           )}
@@ -648,9 +661,9 @@ const KYCDocument = ({ formData, user }) => {
               <Text key={i} style={{ fontSize: 9, color: C.black, textAlign: 'right', marginBottom: 3 }}>• {r.label}</Text>
             ))}
             <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right', marginTop: 8 }}>
-              הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה.
+              הובהר ללקוח כי אי מסירת המידע עלולה לפגוע באיכות ההמלצה
             </Text>
-            <SignatureLine label="חתימה על הסירובים:" />
+            <SignatureLine label="חתימה על הסירובים" />
             <DateLine date={date} />
           </View>
         )}
@@ -659,9 +672,9 @@ const KYCDocument = ({ formData, user }) => {
         <View style={{ marginTop: 20, borderTopWidth: 0.5, borderTopColor: C.primary, paddingTop: 12 }}>
           <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 6 }}>אישור בעל הרישיון</Text>
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
-            {`אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק.`}
+            {`אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק`}
           </Text>
-          <SignatureLine label="חתימת בעל הרישיון:" />
+          <SignatureLine label="חתימת בעל הרישיון" />
           <DateLine date={date} />
         </View>
 
