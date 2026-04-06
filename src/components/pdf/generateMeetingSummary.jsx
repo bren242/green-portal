@@ -122,7 +122,7 @@ const CB = ({ checked, label, compact }) => (
 // ── Radio group (inline, fixed columns for alignment) ────────
 const RadioRow = ({ label, options, value, compact, maxCols = 4 }) => (
   <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: compact ? 3 : 4 }}>
-    <Text style={{ fontSize: compact ? 7.5 : 9, fontWeight: 'bold', color: C.black, textAlign: 'right', width: compact ? 75 : 90, flexShrink: 0 }}>{label}:</Text>
+    <Text style={{ fontSize: compact ? 7.5 : 9, fontWeight: 'bold', color: C.black, textAlign: 'right', width: compact ? 75 : 90, flexShrink: 0 }}>{label}</Text>
     {Array.from({ length: maxCols }).map((_, i) => {
       const opt = options[i];
       if (!opt) return <View key={i} style={{ width: `${100 / maxCols}%` }} />;
@@ -326,17 +326,21 @@ const MeetingSummaryDoc = ({ data, styled }) => {
         )}
 
         {/* 2. Contact details update */}
-        <SectionTitle styled={s}>{'\u05E2\u05D3\u05DB\u05D5\u05DF \u05E4\u05E8\u05D8\u05D9 \u05D4\u05EA\u05E7\u05E9\u05E8\u05D5\u05EA'}</SectionTitle>
-        <View style={{
-          flexDirection: 'row-reverse',
-          borderWidth: 0.5,
-          borderColor: s ? C.border : C.black,
-        }}>
-          <ContactField label={'\u05DB\u05EA\u05D5\u05D1\u05EA'} value={d.address} styled={s} />
-          <ContactField label={'\u05D8\u05DC\u05E4\u05D5\u05DF'} value={d.phone} styled={s} borderLeft />
-          <ContactField label={'\u05D0\u05D9\u05DE\u05D9\u05D9\u05DC'} value={d.email} styled={s} borderLeft />
-          <ContactField label={'\u05E1\u05DC\u05D5\u05DC\u05E8\u05D9'} value={d.mobile} styled={s} borderLeft />
-        </View>
+        {s && (d.address || d.phone || d.email || d.mobile) && (
+          <>
+            <SectionTitle styled={s}>{'\u05E2\u05D3\u05DB\u05D5\u05DF \u05E4\u05E8\u05D8\u05D9 \u05D4\u05EA\u05E7\u05E9\u05E8\u05D5\u05EA'}</SectionTitle>
+            <View style={{
+              flexDirection: 'row-reverse',
+              borderWidth: 0.5,
+              borderColor: s ? C.border : C.black,
+            }}>
+              <ContactField label={'\u05DB\u05EA\u05D5\u05D1\u05EA'} value={d.address} styled={s} />
+              <ContactField label={'\u05D8\u05DC\u05E4\u05D5\u05DF'} value={d.phone} styled={s} borderLeft />
+              <ContactField label={'\u05D0\u05D9\u05DE\u05D9\u05D9\u05DC'} value={d.email} styled={s} borderLeft />
+              <ContactField label={'\u05E1\u05DC\u05D5\u05DC\u05E8\u05D9'} value={d.mobile} styled={s} borderLeft />
+            </View>
+          </>
+        )}
 
         {/* 3. Meeting meta */}
         <SectionTitle styled={s}>{'\u05E4\u05E8\u05D8\u05D9 \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4'}</SectionTitle>
@@ -379,7 +383,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             </View>
           )}
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', marginBottom: s ? 4 : 2 }}>
-            <Text style={{ fontSize: s ? 9 : 7.5, fontWeight: 'bold', color: C.black, textAlign: 'right', marginLeft: 6 }}>{'\u05DE\u05E9\u05DA \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4:'}</Text>
+            <Text style={{ fontSize: s ? 9 : 7.5, fontWeight: 'bold', color: C.black, textAlign: 'right', marginLeft: 6 }}>{'\u05DE\u05E9\u05DA \u05D4\u05E4\u05D2\u05D9\u05E9\u05D4'}</Text>
             {d.meetingDuration ? (
               <Text style={{ fontSize: s ? 9 : 7.5, color: C.black }}>{d.meetingDuration} {'\u05D3\u05E7\u05D5\u05EA'}</Text>
             ) : (
@@ -414,7 +418,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
 
         {/* Conflict of interest checkbox */}
         <View style={{ marginTop: s ? 10 : 2, paddingHorizontal: 4 }}>
-          <CB checked={d.conflictOfInterest} label={CONFLICT_LABEL} compact={!s} />
+          <CB checked={!!d.conflictOfInterest} label={CONFLICT_LABEL} compact={!s} />
         </View>
 
         {/* 8. Decision */}
