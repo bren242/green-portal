@@ -28,11 +28,15 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
     setGenerating(true)
     setError(null)
     try {
+      console.log('[QualifiedInvestor] amounts:', amounts)
+      console.log('[QualifiedInvestor] selectedOption:', selectedOption)
       const data = buildData()
+      console.log('[QualifiedInvestor] data:', data)
       const res = await generateQualifiedInvestorStyled(data)
       setResult(res)
     } catch (err) {
-      console.error('Error generating qualified investor declaration:', err)
+      console.error('[QualifiedInvestor] Full error:', err)
+      console.error('[QualifiedInvestor] Stack:', err.stack)
       setError(`שגיאה ביצירת ההצהרה: ${err.message}`)
     }
     setGenerating(false)

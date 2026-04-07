@@ -61,6 +61,20 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
   })
 
   const handleGenerate = async () => {
+    // Validation
+    const missing = []
+    if (!meetingReason) missing.push('סיבת הפגישה')
+    if (!meetingType) missing.push('אופן הפגישה')
+    if (!meetingInitiator) missing.push('יוזם הפגישה')
+    if (!meetingDuration) missing.push('משך הפגישה')
+    // First 5 topics (not "אחר") must have yes/no
+    const requiredTopics = topics.slice(0, 5)
+    if (requiredTopics.some(t => t === null)) missing.push('יש לסמן כן/לא בכל הנושאים (חוץ מאחר)')
+    if (missing.length > 0) {
+      setError(`שדות חובה חסרים: ${missing.join(', ')}`)
+      return
+    }
+
     setGenerating(true)
     setError(null)
     try {
