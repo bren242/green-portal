@@ -203,9 +203,9 @@ const DeskReferralDoc = ({ data }) => {
         <View style={{ marginTop: 20 }}>
           {/* Images side-by-side, then the line + label */}
           {(advisorSig || stamp) ? (
-            <View style={{ flexDirection: 'row-reverse', gap: 12, alignItems: 'flex-end', marginBottom: 4 }}>
-              {advisorSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
-              {stamp ? <Image src={stamp} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
+            <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'flex-end', marginBottom: 4 }}>
+              {advisorSig ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+              {stamp ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
             </View>
           ) : null}
           <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.primary, width: '60%', marginBottom: 3 }} />

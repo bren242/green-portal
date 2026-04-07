@@ -214,8 +214,8 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
           {s && (advisorSig || stamp) ? (
             <View style={{ flexDirection: 'row-reverse', marginBottom: 4 }}>
               <View style={{ width: '50%', flexDirection: 'row-reverse', justifyContent: 'center', gap: 8, paddingHorizontal: 10 }}>
-                {advisorSig ? <Image src={advisorSig} style={{ width: 100, height: 42, objectFit: 'contain' }} /> : null}
-                {stamp ? <Image src={stamp} style={{ width: 100, height: 42, objectFit: 'contain' }} /> : null}
+                {advisorSig ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+                {stamp ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
               </View>
             </View>
           ) : null}
