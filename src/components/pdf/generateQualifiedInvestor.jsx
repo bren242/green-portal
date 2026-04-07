@@ -55,7 +55,7 @@ const CB = ({ checked, children, styled: s }) => (
       justifyContent: 'center',
       alignItems: 'center',
     }}>
-      {checked && <CheckMark size={9} />}
+      {checked ? <CheckMark size={9} /> : null}
     </View>
     <View style={{ flex: 1 }}>
       {children}
@@ -80,7 +80,13 @@ const SignLine = ({ label, value, styled: s }) => (
 // ══════════════════════════════════════════════════════════════
 const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
   const d = data
-  const amounts = getQualifiedAmounts()
+  const amounts = getQualifiedAmounts() || {}
+  const a1 = a1 || '---'
+  const a2 = a2 || '---'
+  const a3 = a3 || '---'
+  const a4 = a4 || '---'
+  const a5 = a5 || '---'
+  const a6 = a6 || '---'
 
   const pageStyle = {
     fontFamily: 'Assistant',
@@ -154,30 +160,30 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
         {/* ── Checkbox 1: Liquid assets ── */}
         <CB checked={d.option1} styled={s}>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
-            {'\u05E9\u05D5\u05D5\u05D9 \u05D4\u05E0\u05DB\u05E1\u05D9\u05DD \u05D4\u05E0\u05D6\u05D9\u05DC\u05D9\u05DD* \u05E9\u05DC\u05D9 \u05E2\u05D5\u05DC\u05D4 \u05E2\u05DC ' + amounts.amount1 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7.'}
+            {'\u05E9\u05D5\u05D5\u05D9 \u05D4\u05E0\u05DB\u05E1\u05D9\u05DD \u05D4\u05E0\u05D6\u05D9\u05DC\u05D9\u05DD* \u05E9\u05DC\u05D9 \u05E2\u05D5\u05DC\u05D4 \u05E2\u05DC ' + a1 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7.'}
           </Text>
         </CB>
 
         {/* ── Checkbox 2: Income ── */}
         <CB checked={d.option2} styled={s}>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
-            {'\u05D4\u05DB\u05E0\u05E1\u05EA\u05D9 \u05D4\u05E9\u05E0\u05EA\u05D9\u05EA \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + amounts.amount2 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7,'}
+            {'\u05D4\u05DB\u05E0\u05E1\u05EA\u05D9 \u05D4\u05E9\u05E0\u05EA\u05D9\u05EA \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + a2 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7,'}
           </Text>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
-            {'\u05D0\u05D5 \u05E9\u05D4\u05DB\u05E0\u05E1\u05EA \u05D4\u05EA\u05D0 \u05D4\u05DE\u05E9\u05E4\u05D7\u05EA\u05D9** \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + amounts.amount3 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7.'}
+            {'\u05D0\u05D5 \u05E9\u05D4\u05DB\u05E0\u05E1\u05EA \u05D4\u05EA\u05D0 \u05D4\u05DE\u05E9\u05E4\u05D7\u05EA\u05D9** \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + a3 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7.'}
           </Text>
         </CB>
 
         {/* ── Checkbox 3: Combined ── */}
         <CB checked={d.option3} styled={s}>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
-            {'\u05E9\u05D5\u05D5\u05D9 \u05D4\u05E0\u05DB\u05E1\u05D9\u05DD \u05D4\u05E0\u05D6\u05D9\u05DC\u05D9\u05DD* \u05E9\u05DC\u05D9 \u05E2\u05D5\u05DC\u05D4 \u05E2\u05DC ' + amounts.amount4 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7'}
+            {'\u05E9\u05D5\u05D5\u05D9 \u05D4\u05E0\u05DB\u05E1\u05D9\u05DD \u05D4\u05E0\u05D6\u05D9\u05DC\u05D9\u05DD* \u05E9\u05DC\u05D9 \u05E2\u05D5\u05DC\u05D4 \u05E2\u05DC ' + a4 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7'}
           </Text>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
-            {'\u05D5\u05D4\u05DB\u05E0\u05E1\u05EA\u05D9 \u05D4\u05E9\u05E0\u05EA\u05D9\u05EA \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + amounts.amount5 + ' \u05E9\u05D7,'}
+            {'\u05D5\u05D4\u05DB\u05E0\u05E1\u05EA\u05D9 \u05D4\u05E9\u05E0\u05EA\u05D9\u05EA \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + a5 + ' \u05E9\u05D7,'}
           </Text>
           <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', lineHeight: 1.6 }}>
-            {'\u05D0\u05D5 \u05E9\u05D4\u05DB\u05E0\u05E1\u05EA \u05D4\u05EA\u05D0 \u05D4\u05DE\u05E9\u05E4\u05D7\u05EA\u05D9** \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + amounts.amount6 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7.'}
+            {'\u05D0\u05D5 \u05E9\u05D4\u05DB\u05E0\u05E1\u05EA \u05D4\u05EA\u05D0 \u05D4\u05DE\u05E9\u05E4\u05D7\u05EA\u05D9** \u05D1\u05DB\u05DC \u05D0\u05D7\u05EA \u05DE\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05E9\u05E0\u05EA\u05D9\u05D9\u05DD \u05D4\u05D0\u05D7\u05E8\u05D5\u05E0\u05D5\u05EA \u05DC\u05D0 \u05E4\u05D7\u05EA\u05D4 \u05DE- ' + a6 + ' \u05DE\u05D9\u05DC\u05D9\u05D5\u05DF \u05E9\u05D7.'}
           </Text>
         </CB>
 
