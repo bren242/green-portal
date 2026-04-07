@@ -81,12 +81,12 @@ const SignLine = ({ label, value, styled: s }) => (
 const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
   const d = data
   const amounts = getQualifiedAmounts() || {}
-  const a1 = a1 || '---'
-  const a2 = a2 || '---'
-  const a3 = a3 || '---'
-  const a4 = a4 || '---'
-  const a5 = a5 || '---'
-  const a6 = a6 || '---'
+  const a1 = amounts.amount1 || '---'
+  const a2 = amounts.amount2 || '---'
+  const a3 = amounts.amount3 || '---'
+  const a4 = amounts.amount4 || '---'
+  const a5 = amounts.amount5 || '---'
+  const a6 = amounts.amount6 || '---'
 
   const pageStyle = {
     fontFamily: 'Assistant',
