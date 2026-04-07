@@ -3,6 +3,7 @@ import { Document, Page, Text, View, Image, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
 
 import { logoPng } from '../../assets/logoBase64'
+import { getSignature, getCompanyStamp } from '../../data/signatures'
 import {
   C, coverPageStyle, contentPageStyle,
   PageHeader, PageFooter, SectionTitle, SectionGap,
@@ -248,6 +249,8 @@ const KYCDocument = ({ formData, user }) => {
   const rlFinal = formData.finalRiskLevel > 0 ? RISK_LEVELS[formData.finalRiskLevel - 1] : null
   const advisorName = user.name || '____________'
   const advisorLicense = user.license || '____________'
+  const advisorSig = user.id ? getSignature(user.id) : null
+  const stamp = getCompanyStamp()
 
   return (
     <Document>
@@ -674,6 +677,13 @@ const KYCDocument = ({ formData, user }) => {
           <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, marginBottom: 10, color: C.black }}>
             {`אני הח"מ ${advisorName} בעל רישיון שיווק השקעות שמספרו ${advisorLicense} מטעם גרין סוכנות לביטוח פנסיוני ושיווק השקעות (2024) בע"מ, מאשר כי ביררתי עם הלקוח את הפרטים הנדרשים, הלקוח חתם בפני בכל המקומות הנדרשים, והוסברו לו השלכות אי מסירת מלוא המידע הרלוונטי לצורך התאמת השירות לצרכיו הייחודיים של הלקוח. במידה והלקוח בחר שלא למסור פרטים כמפורט לעיל, הבהרתי ללקוח את משמעות אי מסירת הפרטים. כמו כן, בהתאם לפרטים שמסר לי הלקוח עולה כי קיימת תשתית מספקת להתאמת מדיניות ההשקעה ללקוח בהתאם להוראות החוק`}
           </Text>
+          {/* Signature images */}
+          {(advisorSig || stamp) ? (
+            <View style={{ flexDirection: 'row-reverse', gap: 16, marginBottom: 8 }}>
+              {advisorSig ? <Image src={advisorSig} style={{ height: 50 }} /> : null}
+              {stamp ? <Image src={stamp} style={{ height: 50 }} /> : null}
+            </View>
+          ) : null}
           <SignatureLine label="חתימת בעל הרישיון" />
           <DateLine date={date} />
         </View>

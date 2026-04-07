@@ -292,6 +292,7 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
     clientName: session.clientA?.fullName || '',
     clientId: session.clientA?.idNumber || '',
     advisorName: session.advisor?.name || '',
+    advisorUserId: session.advisor?.id || '',
     date: dateStr,
     instructions,
   })

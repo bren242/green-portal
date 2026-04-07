@@ -5,6 +5,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
+import { getSignature, getCompanyStamp } from '../../data/signatures'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -273,6 +274,8 @@ const CONFLICT_LABEL = '\u05D4\u05D5\u05D1\u05D4\u05E8 \u05DC\u05DC\u05E7\u05D5\
 const MeetingSummaryDoc = ({ data, styled }) => {
   const d = data || {}
   const s = !!styled
+  const advisorSig = s && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const stamp = s ? getCompanyStamp() : null
 
   // fix #1 — identity table border style (shared for both rows)
   const idTableRowStyle = {
@@ -450,8 +453,20 @@ const MeetingSummaryDoc = ({ data, styled }) => {
         {/* Spacer to push signatures to bottom */}
         {!s && <View style={{ flex: 1 }} />}
 
+        {/* Signature images — styled only, above the signature lines */}
+        {s ? (
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 20 }}>
+            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
+              {advisorSig ? <Image src={advisorSig} style={{ height: 50 }} /> : null}
+            </View>
+            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
+              {stamp ? <Image src={stamp} style={{ height: 50 }} /> : null}
+            </View>
+          </View>
+        ) : null}
+
         {/* Signatures: 50% each, symmetric, label below line */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 24 : 4 }}>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 6 : 4 }}>
           <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7'} styled={s} />
           <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'} styled={s} />
         </View>

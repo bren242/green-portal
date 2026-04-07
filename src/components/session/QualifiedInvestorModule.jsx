@@ -15,6 +15,7 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
   const buildData = () => ({
     clientName: session.clientA?.fullName || '',
     clientId: session.clientA?.idNumber || '',
+    advisorUserId: session.advisor?.id || '',
     option1: selectedOption === 1,
     option2: selectedOption === 2,
     option3: selectedOption === 3,

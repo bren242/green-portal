@@ -7,6 +7,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getQualifiedAmounts } from '../../data/qualifiedAmounts'
+import { getSignature, getCompanyStamp } from '../../data/signatures'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -81,6 +82,8 @@ const SignLine = ({ label, value, styled: s }) => (
 const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
   const d = data
   const amounts = getQualifiedAmounts() || {}
+  const advisorSig = s && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const stamp = s ? getCompanyStamp() : null
   const a1 = amounts.amount1 || '---'
   const a2 = amounts.amount2 || '---'
   const a3 = amounts.amount3 || '---'
@@ -205,8 +208,20 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
         {/* ── Spacer to push signatures down ── */}
         <View style={{ flex: 1 }} />
 
+        {/* Signature images — styled only */}
+        {s ? (
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 16, marginBottom: 0 }}>
+            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 10 }}>
+              {advisorSig ? <Image src={advisorSig} style={{ height: 50 }} /> : null}
+            </View>
+            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 10 }}>
+              {stamp ? <Image src={stamp} style={{ height: 50 }} /> : null}
+            </View>
+          </View>
+        ) : null}
+
         {/* ── Signatures ── */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: s ? 20 : 10 }}>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: s ? 4 : 10 }}>
           <SignLine
             label={'\u05EA\u05D0\u05E8\u05D9\u05DA'}
             value={s ? today() : null}

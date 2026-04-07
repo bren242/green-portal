@@ -4,6 +4,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
+import { getSignature, getCompanyStamp } from '../../data/signatures'
 
 Font.register({
   family: 'Assistant',
@@ -170,6 +171,8 @@ const DeskReferralDoc = ({ data }) => {
   const d = data || {}
   const instructions = d.instructions || []
   const dateStr = d.date || today()
+  const advisorSig = d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const stamp = getCompanyStamp()
 
   return (
     <Document>
@@ -195,6 +198,24 @@ const DeskReferralDoc = ({ data }) => {
         {instructions.map((inst, i) => (
           <InstructionBlock key={i} instruction={inst} index={i} />
         ))}
+
+        {/* Signature area */}
+        {(advisorSig || stamp) ? (
+          <View style={{ marginTop: 16, flexDirection: 'row-reverse', gap: 24, alignItems: 'flex-end' }}>
+            {advisorSig ? (
+              <View style={{ alignItems: 'center' }}>
+                <Image src={advisorSig} style={{ height: 50 }} />
+                <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.primary, width: '100%', marginTop: 4 }} />
+                <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center', marginTop: 2 }}>{'חתימת המשווק'}</Text>
+              </View>
+            ) : null}
+            {stamp ? (
+              <View style={{ alignItems: 'center' }}>
+                <Image src={stamp} style={{ height: 50 }} />
+              </View>
+            ) : null}
+          </View>
+        ) : null}
 
         {/* Footer */}
         <View style={{ position: 'absolute', bottom: 20, left: 40, right: 40, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 6, flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
