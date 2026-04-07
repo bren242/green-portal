@@ -147,82 +147,6 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
     </label>
   )
 
-  const ContactPopup = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="bg-white rounded-card shadow-metric w-full max-w-md p-6" dir="rtl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-extrabold text-green-primary">עדכון פרטי התקשרות</h3>
-          <div className="h-0.5 flex-1 mx-4 bg-gold/40 rounded-full" />
-        </div>
-
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-semibold text-text-muted mb-1">כתובת</label>
-            <input
-              type="text"
-              value={contactDraft.address}
-              onChange={(e) => setContactDraft(d => ({ ...d, address: e.target.value }))}
-              autoComplete="off"
-              placeholder="רחוב, עיר..."
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-text-muted mb-1">טלפון</label>
-            <input
-              type="tel"
-              value={contactDraft.phone}
-              onChange={(e) => setContactDraft(d => ({ ...d, phone: e.target.value }))}
-              autoComplete="off"
-              placeholder="03-..."
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-text-muted mb-1">סלולרי</label>
-            <input
-              type="tel"
-              value={contactDraft.mobile}
-              onChange={(e) => setContactDraft(d => ({ ...d, mobile: e.target.value }))}
-              autoComplete="off"
-              placeholder="05..."
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-text-muted mb-1">אימייל</label>
-            <input
-              type="text"
-              value={contactDraft.email}
-              onChange={(e) => setContactDraft(d => ({ ...d, email: e.target.value }))}
-              autoComplete="off"
-              placeholder="name@example.com"
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
-            />
-          </div>
-        </div>
-
-        <p className="text-xs text-text-muted mt-3">רק שדות שמולאו יופיעו ב-PDF</p>
-
-        <div className="flex gap-3 mt-5">
-          <button
-            onClick={handleContactSave}
-            className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
-          >
-            שמור
-          </button>
-          <button
-            onClick={handleContactClose}
-            className="flex-1 py-2.5 border border-border text-text-muted rounded-card text-sm font-bold hover:border-green-primary hover:text-green-primary transition-colors"
-          >
-            סגור
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-
   if (result) {
     return (
       <div className="min-h-screen bg-surface-offwhite">
@@ -253,7 +177,77 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
 
   return (
     <div className="min-h-screen bg-surface-offwhite">
-      {showContactPopup && <ContactPopup />}
+      {showContactPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-card shadow-metric w-full max-w-md p-6" dir="rtl">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base font-extrabold text-green-primary">עדכון פרטי התקשרות</h3>
+              <div className="h-0.5 flex-1 mx-4 bg-gold/40 rounded-full" />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-text-muted mb-1">כתובת</label>
+                <input
+                  type="text"
+                  value={contactDraft.address}
+                  onChange={(e) => setContactDraft(d => ({ ...d, address: e.target.value }))}
+                  autoComplete="off"
+                  placeholder="רחוב, עיר..."
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-muted mb-1">טלפון</label>
+                <input
+                  type="tel"
+                  value={contactDraft.phone}
+                  onChange={(e) => setContactDraft(d => ({ ...d, phone: e.target.value }))}
+                  autoComplete="off"
+                  placeholder="03-..."
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-muted mb-1">סלולרי</label>
+                <input
+                  type="tel"
+                  value={contactDraft.mobile}
+                  onChange={(e) => setContactDraft(d => ({ ...d, mobile: e.target.value }))}
+                  autoComplete="off"
+                  placeholder="05..."
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-text-muted mb-1">אימייל</label>
+                <input
+                  type="text"
+                  value={contactDraft.email}
+                  onChange={(e) => setContactDraft(d => ({ ...d, email: e.target.value }))}
+                  autoComplete="off"
+                  placeholder="name@example.com"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-text-muted mt-3">רק שדות שמולאו יופיעו ב-PDF</p>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={handleContactSave}
+                className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
+              >
+                שמור
+              </button>
+              <button
+                onClick={handleContactClose}
+                className="flex-1 py-2.5 border border-border text-text-muted rounded-card text-sm font-bold hover:border-green-primary hover:text-green-primary transition-colors"
+              >
+                סגור
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <WizardHeader user={user} onLogout={onLogout} onAdmin={onAdmin} />
       <div className="max-w-2xl mx-auto px-4 py-5">
         <button onClick={onBack} className="text-sm text-text-muted hover:text-green-primary transition-colors mb-4">
