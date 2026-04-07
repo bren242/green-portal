@@ -262,6 +262,7 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
   const [generating, setGenerating] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [showEmailDialog, setShowEmailDialog] = useState(false)
 
   const dateStr = fmtDate()
 
@@ -288,8 +289,22 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
     return null
   }
 
-  const handleEmail = () => {
+  // Build and fire the mailto URI
+  const openMailto = () => {
     const settings = getAdminSettings()
+    const to = settings.deskEmailPrimary
+    const data = buildData()
+    const subject = encodeURIComponent(`הפניה לדסק — ${data.clientName} — ${dateStr}`)
+    const body = encodeURIComponent(buildEmailBody(data))
+    const ccParam = settings.deskEmailSecondary ? `&cc=${encodeURIComponent(settings.deskEmailSecondary)}` : ''
+    console.log('[DeskReferral] mailto → to:', to, '| cc:', settings.deskEmailSecondary || '(none)')
+    window.location.href = `mailto:${to}?subject=${subject}${ccParam}&body=${body}`
+  }
+
+  // "שלח לדסק" click — validate then show dialog
+  const handleEmailClick = () => {
+    const settings = getAdminSettings()
+    console.log('[DeskReferral] settings from localStorage:', settings)
     if (!settings.deskEmailPrimary) {
       setError('כתובת דסק לא מוגדרת — עדכן בממשק הניהול')
       return
@@ -297,12 +312,32 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
     const err = validate()
     if (err) { setError(err); return }
     setError(null)
+    setShowEmailDialog(true)
+  }
 
-    const data = buildData()
-    const subject = encodeURIComponent(`הפניה לדסק — ${data.clientName} — ${dateStr}`)
-    const body = encodeURIComponent(buildEmailBody(data))
-    const cc = settings.deskEmailSecondary ? `&cc=${encodeURIComponent(settings.deskEmailSecondary)}` : ''
-    window.location.href = `mailto:${settings.deskEmailPrimary}${cc}&subject=${subject}&body=${body}`
+  // Dialog: "כן" — generate + download PDF, then open mailto after 1s
+  const handleEmailWithPDF = async () => {
+    setShowEmailDialog(false)
+    setGenerating(true)
+    try {
+      const res = await generateDeskReferralPDF(buildData())
+      const a = document.createElement('a')
+      a.href = res.url
+      a.download = res.fileName
+      a.click()
+      if (onSavePDF) onSavePDF(res.pdfBytes, res.fileName)
+      URL.revokeObjectURL(res.url)
+      setTimeout(() => openMailto(), 1000)
+    } catch (e) {
+      setError('שגיאה ביצירת ה-PDF')
+    }
+    setGenerating(false)
+  }
+
+  // Dialog: "לא" — open mailto directly
+  const handleEmailWithoutPDF = () => {
+    setShowEmailDialog(false)
+    openMailto()
   }
 
   const handlePDF = async () => {
@@ -427,8 +462,9 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
           {/* Action buttons */}
           <div className="flex gap-3">
             <button
-              onClick={handleEmail}
-              className="flex-1 py-3 bg-gold text-white rounded-card text-sm font-bold hover:bg-gold/80 transition-colors shadow-card"
+              onClick={handleEmailClick}
+              disabled={generating}
+              className="flex-1 py-3 bg-gold text-white rounded-card text-sm font-bold hover:bg-gold/80 transition-colors shadow-card disabled:opacity-50"
             >
               שלח לדסק
             </button>
@@ -442,6 +478,36 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
           </div>
         </div>
       </div>
+
+      {/* Email dialog */}
+      {showEmailDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-card shadow-xl border border-border/50 p-6 max-w-xs w-full mx-4" dir="rtl">
+            <h3 className="text-base font-extrabold text-green-primary mb-1">שליחה לדסק</h3>
+            <p className="text-sm text-text-primary mb-6">רוצה לצרף את הסיכום כ-PDF?</p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleEmailWithPDF}
+                className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
+              >
+                כן
+              </button>
+              <button
+                onClick={handleEmailWithoutPDF}
+                className="flex-1 py-2.5 border-2 border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
+              >
+                לא
+              </button>
+            </div>
+            <button
+              onClick={() => setShowEmailDialog(false)}
+              className="mt-3 w-full text-xs text-text-muted hover:text-text-primary transition-colors text-center"
+            >
+              ביטול
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
