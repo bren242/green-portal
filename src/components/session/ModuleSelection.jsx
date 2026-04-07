@@ -150,7 +150,7 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
       <div className="space-y-3 mb-6">
         {modules.map((mod) => {
           const isCompleted = completedModules.includes(mod.id)
-          const isAvailable = mod.id === 'kyc' || mod.id === 'agreement' || mod.id === 'meeting' || mod.id === 'qualified' || mod.id === 'qualifiedAdvisor'
+          const isAvailable = mod.id === 'kyc' || mod.id === 'agreement' || mod.id === 'meeting' || mod.id === 'qualified' || mod.id === 'qualifiedAdvisor' || mod.id === 'deskReferral'
           const isFuture = !isAvailable
 
           return (

@@ -340,11 +340,13 @@ function QuestionsTab() {
 }
 
 function DeskSettingsTab() {
-  const [settings, setSettings] = useState(getAdminSettings())
+  const _init = getAdminSettings()
+  const [primary, setPrimary] = useState(_init.deskEmailPrimary || '')
+  const [secondary, setSecondary] = useState(_init.deskEmailSecondary || '')
   const [saved, setSaved] = useState(false)
 
   const handleSave = () => {
-    saveAdminSettings(settings)
+    saveAdminSettings({ deskEmailPrimary: primary, deskEmailSecondary: secondary })
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
@@ -361,8 +363,8 @@ function DeskSettingsTab() {
           <label className="block text-sm font-semibold text-text-primary mb-1">מייל ראשי (TO)</label>
           <input
             type="text"
-            value={settings.deskEmailPrimary || ''}
-            onChange={(e) => { setSettings(s => ({ ...s, deskEmailPrimary: e.target.value })); setSaved(false) }}
+            value={primary}
+            onChange={(e) => { setPrimary(e.target.value); setSaved(false) }}
             placeholder="desk@example.com"
             autoComplete="off"
             dir="ltr"
@@ -373,8 +375,8 @@ function DeskSettingsTab() {
           <label className="block text-sm font-semibold text-text-primary mb-1">מייל משני (CC) — אופציונלי</label>
           <input
             type="text"
-            value={settings.deskEmailSecondary || ''}
-            onChange={(e) => { setSettings(s => ({ ...s, deskEmailSecondary: e.target.value })); setSaved(false) }}
+            value={secondary}
+            onChange={(e) => { setSecondary(e.target.value); setSaved(false) }}
             placeholder="cc@example.com"
             autoComplete="off"
             dir="ltr"
