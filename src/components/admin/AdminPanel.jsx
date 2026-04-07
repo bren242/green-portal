@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { getUsersFull, addUser, updateUser, deleteUser } from '../../data/users'
 import { getQualifiedAmounts, saveQualifiedAmounts, DEFAULT_QUALIFIED_AMOUNTS } from '../../data/qualifiedAmounts'
 import { getAdminSettings, saveAdminSettings } from '../../data/adminSettings'
+import { getSignature, saveSignature, deleteSignature, getCompanyStamp, saveCompanyStamp, deleteCompanyStamp } from '../../data/signatures'
 
 export default function AdminPanel({ onBack }) {
   const [activeTab, setActiveTab] = useState('users')
@@ -10,6 +11,7 @@ export default function AdminPanel({ onBack }) {
     { id: 'users', label: 'משתמשים' },
     { id: 'qualified', label: 'סכומי כשיר' },
     { id: 'desk', label: 'דסק תפעול' },
+    { id: 'signatures', label: 'חתימות וחותמת' },
     { id: 'scoring', label: 'טבלת ניקוד' },
     { id: 'questions', label: 'שאלות סיכון' },
   ]
@@ -56,6 +58,7 @@ export default function AdminPanel({ onBack }) {
           {activeTab === 'users' && <UsersTab />}
           {activeTab === 'qualified' && <QualifiedAmountsTab />}
           {activeTab === 'desk' && <DeskSettingsTab />}
+          {activeTab === 'signatures' && <SignaturesTab />}
           {activeTab === 'scoring' && <ScoringTab />}
           {activeTab === 'questions' && <QuestionsTab />}
         </div>
@@ -335,6 +338,156 @@ function QuestionsTab() {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function SignaturesTab() {
+  const users = getUsersFull()
+
+  const initSigs = () => {
+    const m = {}
+    users.forEach(u => { m[u.id] = getSignature(u.id) })
+    return m
+  }
+
+  const [sigs, setSigs] = useState(initSigs)
+  const [stamp, setStamp] = useState(getCompanyStamp)
+  const [error, setError] = useState(null)
+
+  const MAX = 2 * 1024 * 1024
+
+  const readFile = (file, onDone) => {
+    if (!file) return
+    if (file.type !== 'image/png') { setError('קובץ חייב להיות PNG בלבד'); return }
+    if (file.size > MAX) { setError('קובץ גדול מדי — מקסימום 2MB'); return }
+    setError(null)
+    const reader = new FileReader()
+    reader.onload = (ev) => onDone(ev.target.result)
+    reader.readAsDataURL(file)
+  }
+
+  const handleSigUpload = (e, userId) => {
+    readFile(e.target.files[0], (b64) => {
+      saveSignature(userId, b64)
+      setSigs(prev => ({ ...prev, [userId]: b64 }))
+    })
+    e.target.value = ''
+  }
+
+  const handleSigDelete = (userId) => {
+    deleteSignature(userId)
+    setSigs(prev => ({ ...prev, [userId]: null }))
+  }
+
+  const handleStampUpload = (e) => {
+    readFile(e.target.files[0], (b64) => {
+      saveCompanyStamp(b64)
+      setStamp(b64)
+    })
+    e.target.value = ''
+  }
+
+  const handleStampDelete = () => {
+    deleteCompanyStamp()
+    setStamp(null)
+  }
+
+  return (
+    <div className="space-y-8" dir="rtl">
+      {error && (
+        <div className="bg-warning-bg border border-warning-border rounded-card p-3 text-sm text-warning-red text-center font-semibold">
+          {error}
+        </div>
+      )}
+
+      {/* ── Section 1: advisor signatures ── */}
+      <div>
+        <h2 className="text-lg font-bold text-green-primary mb-1">חתימות משווקים</h2>
+        <p className="text-sm text-text-muted mb-4">PNG בלבד, עד 2MB</p>
+        <div className="space-y-3">
+          {users.map(u => (
+            <div key={u.id} className="border border-border rounded-card p-4 flex items-center justify-between flex-row-reverse gap-4">
+              {/* Name */}
+              <div className="min-w-[100px]">
+                <div className="text-sm font-semibold text-text-primary">{u.name}</div>
+                <div className="text-xs text-text-muted">{u.username}</div>
+              </div>
+
+              {/* Preview or placeholder */}
+              <div className="flex-1 flex items-center justify-center">
+                {sigs[u.id] ? (
+                  <div className="border border-border rounded-lg p-2 bg-white inline-block">
+                    <img
+                      src={sigs[u.id]}
+                      alt={`חתימת ${u.name}`}
+                      style={{ width: 100, height: 50, objectFit: 'contain', display: 'block' }}
+                    />
+                  </div>
+                ) : (
+                  <span className="text-xs text-text-muted italic">לא הועלתה חתימה</span>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-2 shrink-0">
+                <label className="cursor-pointer px-3 py-1.5 bg-green-primary text-white rounded-lg text-xs font-semibold hover:bg-green-secondary transition-colors text-center">
+                  {sigs[u.id] ? 'החלף' : 'העלה חתימה'}
+                  <input type="file" accept="image/png" className="hidden" onChange={(e) => handleSigUpload(e, u.id)} />
+                </label>
+                {sigs[u.id] && (
+                  <button
+                    onClick={() => handleSigDelete(u.id)}
+                    className="px-3 py-1.5 border border-warning-border text-warning-red rounded-lg text-xs font-semibold hover:bg-warning-bg transition-colors"
+                  >
+                    מחק
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Section 2: company stamp ── */}
+      <div>
+        <h2 className="text-lg font-bold text-green-primary mb-1">חותמת GREEN</h2>
+        <p className="text-sm text-text-muted mb-4">PNG בלבד, עד 2MB</p>
+        <div className="border border-border rounded-card p-4 flex items-center justify-between flex-row-reverse gap-4">
+          <div className="min-w-[100px]">
+            <div className="text-sm font-semibold text-text-primary">חותמת חברה</div>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center">
+            {stamp ? (
+              <div className="border border-border rounded-lg p-2 bg-white inline-block">
+                <img
+                  src={stamp}
+                  alt="חותמת GREEN"
+                  style={{ width: 100, height: 50, objectFit: 'contain', display: 'block' }}
+                />
+              </div>
+            ) : (
+              <span className="text-xs text-text-muted italic">לא הועלתה חותמת</span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 shrink-0">
+            <label className="cursor-pointer px-3 py-1.5 bg-green-primary text-white rounded-lg text-xs font-semibold hover:bg-green-secondary transition-colors text-center">
+              {stamp ? 'החלף' : 'העלה חותמת'}
+              <input type="file" accept="image/png" className="hidden" onChange={handleStampUpload} />
+            </label>
+            {stamp && (
+              <button
+                onClick={handleStampDelete}
+                className="px-3 py-1.5 border border-warning-border text-warning-red rounded-lg text-xs font-semibold hover:bg-warning-bg transition-colors"
+              >
+                מחק
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
