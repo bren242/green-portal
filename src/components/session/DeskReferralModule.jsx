@@ -19,13 +19,13 @@ function createInstruction() {
   return { id: Date.now(), type: null, investmentType: '', manager: '', amount: '', action: '', from: '', to: '', notes: '' }
 }
 
-// ── Instruction card ──────────────────────────────────────────
-function InstructionCard({ inst, index, onChange, onRemove }) {
-  const RadioBtn = ({ name, value, current, label }) => (
+// ── Top-level helpers (outside InstructionCard to prevent remount) ────────────
+function CardRadio({ instId, name, value, current, label, onChange, inst }) {
+  return (
     <label className="flex items-center gap-1.5 cursor-pointer">
       <input
         type="radio"
-        name={`${name}_${inst.id}`}
+        name={`${name}_${instId}`}
         checked={current === value}
         onChange={() => onChange({ ...inst, [name]: value })}
         className="accent-green-primary w-3.5 h-3.5"
@@ -33,18 +33,23 @@ function InstructionCard({ inst, index, onChange, onRemove }) {
       <span className="text-sm text-text-primary">{label}</span>
     </label>
   )
+}
 
-  const Field = ({ field, placeholder, type = 'text' }) => (
+function CardField({ field, value, placeholder, type = 'text', onChange, inst }) {
+  return (
     <input
       type={type}
-      value={inst[field] || ''}
+      value={value || ''}
       onChange={(e) => onChange({ ...inst, [field]: e.target.value })}
       placeholder={placeholder}
       autoComplete="off"
       className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
     />
   )
+}
 
+// ── Instruction card ──────────────────────────────────────────
+function InstructionCard({ inst, index, onChange, onRemove }) {
   return (
     <div className="border border-border rounded-card bg-white overflow-hidden" dir="rtl">
       {/* Card header */}
@@ -100,18 +105,18 @@ function InstructionCard({ inst, index, onChange, onRemove }) {
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-2">סוג</label>
                 <div className="flex flex-wrap gap-4">
-                  <RadioBtn name="investmentType" value="portfolio" current={inst.investmentType} label="תיק השקעות" />
-                  <RadioBtn name="investmentType" value="fund" current={inst.investmentType} label="קרן השקעה" />
-                  <RadioBtn name="investmentType" value="savings_policy" current={inst.investmentType} label="פוליסת חיסכון" />
+                  <CardRadio instId={inst.id} name="investmentType" value="portfolio" current={inst.investmentType} label="תיק השקעות" onChange={onChange} inst={inst} />
+                  <CardRadio instId={inst.id} name="investmentType" value="fund" current={inst.investmentType} label="קרן השקעה" onChange={onChange} inst={inst} />
+                  <CardRadio instId={inst.id} name="investmentType" value="savings_policy" current={inst.investmentType} label="פוליסת חיסכון" onChange={onChange} inst={inst} />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">גוף מנהל</label>
-                <Field field="manager" placeholder="שם הגוף המנהל..." />
+                <CardField field="manager" value={inst.manager} placeholder="שם הגוף המנהל..." onChange={onChange} inst={inst} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">סכום</label>
-                <Field field="amount" placeholder="₪" type="text" />
+                <CardField field="amount" value={inst.amount} placeholder="₪" onChange={onChange} inst={inst} />
               </div>
             </>
           )}
@@ -120,20 +125,20 @@ function InstructionCard({ inst, index, onChange, onRemove }) {
             <>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">גוף מנהל</label>
-                <Field field="manager" placeholder="שם הגוף המנהל..." />
+                <CardField field="manager" value={inst.manager} placeholder="שם הגוף המנהל..." onChange={onChange} inst={inst} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-2">פעולה</label>
                 <div className="flex flex-wrap gap-4">
-                  <RadioBtn name="action" value="increase" current={inst.action} label="הגדלה" />
-                  <RadioBtn name="action" value="decrease" current={inst.action} label="הקטנה" />
-                  <RadioBtn name="action" value="redemption" current={inst.action} label="פדיון" />
-                  <RadioBtn name="action" value="change_track" current={inst.action} label="שינוי מסלול" />
+                  <CardRadio instId={inst.id} name="action" value="increase" current={inst.action} label="הגדלה" onChange={onChange} inst={inst} />
+                  <CardRadio instId={inst.id} name="action" value="decrease" current={inst.action} label="הקטנה" onChange={onChange} inst={inst} />
+                  <CardRadio instId={inst.id} name="action" value="redemption" current={inst.action} label="פדיון" onChange={onChange} inst={inst} />
+                  <CardRadio instId={inst.id} name="action" value="change_track" current={inst.action} label="שינוי מסלול" onChange={onChange} inst={inst} />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">סכום או אחוז</label>
-                <Field field="amount" placeholder="₪ / %" />
+                <CardField field="amount" value={inst.amount} placeholder="₪ / %" onChange={onChange} inst={inst} />
               </div>
             </>
           )}
@@ -142,15 +147,15 @@ function InstructionCard({ inst, index, onChange, onRemove }) {
             <>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">מאיפה</label>
-                <Field field="from" placeholder="מקור הכספים..." />
+                <CardField field="from" value={inst.from} placeholder="מקור הכספים..." onChange={onChange} inst={inst} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">לאיפה</label>
-                <Field field="to" placeholder="יעד הכספים..." />
+                <CardField field="to" value={inst.to} placeholder="יעד הכספים..." onChange={onChange} inst={inst} />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-text-muted mb-1">סכום</label>
-                <Field field="amount" placeholder="₪" />
+                <CardField field="amount" value={inst.amount} placeholder="₪" onChange={onChange} inst={inst} />
               </div>
             </>
           )}

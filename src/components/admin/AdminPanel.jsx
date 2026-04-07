@@ -349,21 +349,6 @@ function DeskSettingsTab() {
     setTimeout(() => setSaved(false), 2500)
   }
 
-  const Field = ({ label, field, placeholder }) => (
-    <div>
-      <label className="block text-sm font-semibold text-text-primary mb-1">{label}</label>
-      <input
-        type="text"
-        value={settings[field] || ''}
-        onChange={(e) => { setSettings(s => ({ ...s, [field]: e.target.value })); setSaved(false) }}
-        placeholder={placeholder}
-        autoComplete="off"
-        dir="ltr"
-        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
-      />
-    </div>
-  )
-
   return (
     <div className="space-y-6" dir="rtl">
       <div>
@@ -372,16 +357,30 @@ function DeskSettingsTab() {
       </div>
 
       <div className="space-y-4 max-w-md">
-        <Field
-          label="מייל ראשי (TO)"
-          field="deskEmailPrimary"
-          placeholder="desk@example.com"
-        />
-        <Field
-          label="מייל משני (CC) — אופציונלי"
-          field="deskEmailSecondary"
-          placeholder="cc@example.com"
-        />
+        <div>
+          <label className="block text-sm font-semibold text-text-primary mb-1">מייל ראשי (TO)</label>
+          <input
+            type="text"
+            value={settings.deskEmailPrimary || ''}
+            onChange={(e) => { setSettings(s => ({ ...s, deskEmailPrimary: e.target.value })); setSaved(false) }}
+            placeholder="desk@example.com"
+            autoComplete="off"
+            dir="ltr"
+            className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-text-primary mb-1">מייל משני (CC) — אופציונלי</label>
+          <input
+            type="text"
+            value={settings.deskEmailSecondary || ''}
+            onChange={(e) => { setSettings(s => ({ ...s, deskEmailSecondary: e.target.value })); setSaved(false) }}
+            placeholder="cc@example.com"
+            autoComplete="off"
+            dir="ltr"
+            className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
