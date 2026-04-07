@@ -62,6 +62,8 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
 
   const handleGenerate = async () => {
     // Validation
+    console.log('[MeetingSummary] topics:', topics)
+    console.log('[MeetingSummary] meetingReason:', meetingReason, 'meetingType:', meetingType, 'meetingInitiator:', meetingInitiator, 'meetingDuration:', meetingDuration)
     const missing = []
     if (!meetingReason) missing.push('סיבת הפגישה')
     if (!meetingType) missing.push('אופן הפגישה')

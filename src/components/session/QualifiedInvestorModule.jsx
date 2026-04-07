@@ -10,7 +10,11 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
 
   // Form state — which checkbox is selected
   const [selectedOption, setSelectedOption] = useState(null) // 1, 2, or 3
-  const amounts = useMemo(() => getQualifiedAmounts(), [])
+  const amounts = useMemo(() => {
+    const a = getQualifiedAmounts()
+    console.log('[QualifiedInvestor] amounts loaded:', a)
+    return a
+  }, [])
 
   const buildData = () => ({
     clientName: session.clientA?.fullName || '',
