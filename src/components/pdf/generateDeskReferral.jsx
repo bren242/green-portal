@@ -200,22 +200,17 @@ const DeskReferralDoc = ({ data }) => {
         ))}
 
         {/* Signature area */}
-        {(advisorSig || stamp) ? (
-          <View style={{ marginTop: 16, flexDirection: 'row-reverse', gap: 24, alignItems: 'flex-end' }}>
-            {advisorSig ? (
-              <View style={{ alignItems: 'center' }}>
-                <Image src={advisorSig} style={{ height: 50 }} />
-                <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.primary, width: '100%', marginTop: 4 }} />
-                <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center', marginTop: 2 }}>{'חתימת המשווק'}</Text>
-              </View>
-            ) : null}
-            {stamp ? (
-              <View style={{ alignItems: 'center' }}>
-                <Image src={stamp} style={{ height: 50 }} />
-              </View>
-            ) : null}
-          </View>
-        ) : null}
+        <View style={{ marginTop: 20 }}>
+          {/* Images side-by-side, then the line + label */}
+          {(advisorSig || stamp) ? (
+            <View style={{ flexDirection: 'row-reverse', gap: 12, alignItems: 'flex-end', marginBottom: 4 }}>
+              {advisorSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
+              {stamp ? <Image src={stamp} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
+            </View>
+          ) : null}
+          <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.primary, width: '60%', marginBottom: 3 }} />
+          <Text style={{ fontSize: 8, color: C.muted, textAlign: 'right' }}>{'חתימת המשווק'}</Text>
+        </View>
 
         {/* Footer */}
         <View style={{ position: 'absolute', bottom: 20, left: 40, right: 40, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 6, flexDirection: 'row-reverse', justifyContent: 'space-between' }}>

@@ -208,30 +208,29 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
         {/* ── Spacer to push signatures down ── */}
         <View style={{ flex: 1 }} />
 
-        {/* Signature images — styled only */}
-        {s ? (
-          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 16, marginBottom: 0 }}>
-            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 10 }}>
-              {advisorSig ? <Image src={advisorSig} style={{ height: 50 }} /> : null}
-            </View>
-            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 10 }}>
-              {stamp ? <Image src={stamp} style={{ height: 50 }} /> : null}
-            </View>
-          </View>
-        ) : null}
-
         {/* ── Signatures ── */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: s ? 4 : 10 }}>
-          <SignLine
-            label={'\u05EA\u05D0\u05E8\u05D9\u05DA'}
-            value={s ? today() : null}
-            styled={s}
-          />
-          <SignLine
-            label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7/\u05D4'}
-            value={null}
-            styled={s}
-          />
+        <View style={{ marginTop: s ? 14 : 10 }}>
+          {/* Sig + stamp: both side-by-side in right half (above date line) */}
+          {s && (advisorSig || stamp) ? (
+            <View style={{ flexDirection: 'row-reverse', marginBottom: 4 }}>
+              <View style={{ width: '50%', flexDirection: 'row-reverse', justifyContent: 'center', gap: 8, paddingHorizontal: 10 }}>
+                {advisorSig ? <Image src={advisorSig} style={{ width: 100, height: 42, objectFit: 'contain' }} /> : null}
+                {stamp ? <Image src={stamp} style={{ width: 100, height: 42, objectFit: 'contain' }} /> : null}
+              </View>
+            </View>
+          ) : null}
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
+            <SignLine
+              label={'\u05EA\u05D0\u05E8\u05D9\u05DA'}
+              value={s ? today() : null}
+              styled={s}
+            />
+            <SignLine
+              label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7/\u05D4'}
+              value={null}
+              styled={s}
+            />
+          </View>
         </View>
       </Page>
     </Document>

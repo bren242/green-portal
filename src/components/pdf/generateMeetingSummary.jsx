@@ -453,22 +453,22 @@ const MeetingSummaryDoc = ({ data, styled }) => {
         {/* Spacer to push signatures to bottom */}
         {!s && <View style={{ flex: 1 }} />}
 
-        {/* Signature images — styled only, above the signature lines */}
-        {s ? (
-          <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 20 }}>
-            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
-              {advisorSig ? <Image src={advisorSig} style={{ height: 50 }} /> : null}
-            </View>
-            <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
-              {stamp ? <Image src={stamp} style={{ height: 50 }} /> : null}
-            </View>
-          </View>
-        ) : null}
-
-        {/* Signatures: 50% each, symmetric, label below line */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 6 : 4 }}>
+        {/* Signatures: client block + advisor block with sig/stamp images */}
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 16 : 4 }}>
           <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7'} styled={s} />
-          <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'} styled={s} />
+          {/* Advisor block — images side-by-side above the line */}
+          <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
+            {s && (advisorSig || stamp) ? (
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 8, width: '100%', alignItems: 'flex-end', marginBottom: 2 }}>
+                {advisorSig ? <Image src={advisorSig} style={{ width: 110, height: 44, objectFit: 'contain' }} /> : null}
+                {stamp ? <Image src={stamp} style={{ width: 110, height: 44, objectFit: 'contain' }} /> : null}
+              </View>
+            ) : (
+              <View style={{ height: s ? 40 : 24 }} />
+            )}
+            <View style={{ borderBottomWidth: 1, borderBottomColor: s ? C.primary : C.black, width: '100%', marginBottom: 2 }} />
+            <Text style={{ fontSize: s ? 9 : 7.5, color: C.black, textAlign: 'center', fontWeight: 'bold' }}>{'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'}</Text>
+          </View>
         </View>
 
         <PageFooter />
