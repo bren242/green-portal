@@ -84,9 +84,11 @@ export default function Wizard({ user, onLogout, onAdmin, clientData, onSavePDF,
   }
 
   // When session provides advisor data, use it for PDF generation instead of login user
+  // IMPORTANT: id must also be overridden so getSignature() uses the advisor's signature, not the logged-in user's
   const effectiveUser = hasSessionData && clientData.advisor
-    ? { ...user, name: clientData.advisor.name, idNumber: clientData.advisor.idNumber, license: clientData.advisor.license }
+    ? { ...user, id: clientData.advisor.id, name: clientData.advisor.name, idNumber: clientData.advisor.idNumber, license: clientData.advisor.license }
     : user
+  console.log('[Wizard] signature key:', effectiveUser.id, '— advisor:', clientData.advisor?.name || 'none')
 
   const stepProps = {
     formData,

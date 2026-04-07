@@ -10,6 +10,7 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onSa
 
   // Build clientData for the agreement PDF
   const buildAgreementData = () => ({
+    advisorUserId: session.advisor?.id || '',
     advisorName: session.advisor?.name || '',
     advisorId: session.advisor?.idNumber || '',
     advisorLicense: session.advisor?.license || '',

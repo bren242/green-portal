@@ -3,7 +3,7 @@ import { Document, Page, Text, View, Image, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
 
 import { logoPng } from '../../assets/logoBase64'
-import { getSignature, getCompanyStamp } from '../../data/signatures'
+import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
 import {
   C, coverPageStyle, contentPageStyle,
   PageHeader, PageFooter, SectionTitle, SectionGap,
@@ -680,8 +680,8 @@ const KYCDocument = ({ formData, user }) => {
           {/* Signature images */}
           {(advisorSig || stamp) ? (
             <View style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 8, alignItems: 'flex-end' }}>
-              {advisorSig ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
-              {stamp ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+              {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+              {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
             </View>
           ) : null}
           <SignatureLine label="חתימת בעל הרישיון" />

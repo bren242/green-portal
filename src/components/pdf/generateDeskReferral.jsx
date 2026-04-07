@@ -4,7 +4,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
-import { getSignature, getCompanyStamp } from '../../data/signatures'
+import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
 
 Font.register({
   family: 'Assistant',
@@ -204,8 +204,8 @@ const DeskReferralDoc = ({ data }) => {
           {/* Images side-by-side, then the line + label */}
           {(advisorSig || stamp) ? (
             <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'flex-end', marginBottom: 4 }}>
-              {advisorSig ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
-              {stamp ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+              {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+              {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
             </View>
           ) : null}
           <View style={{ borderBottomWidth: 0.5, borderBottomColor: C.primary, width: '60%', marginBottom: 3 }} />

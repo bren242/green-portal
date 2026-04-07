@@ -5,8 +5,19 @@
 
 const _ls = typeof localStorage !== 'undefined' ? localStorage : null
 
+// Validates a base64 data URL before passing to react-pdf <Image>
+// Prevents "Incomplete or corrupt PNG file" crash on invalid/truncated data
+export function isValidImageSrc(src) {
+  return typeof src === 'string' &&
+    src.startsWith('data:image/') &&
+    src.includes('base64,') &&
+    src.length > 200
+}
+
 export function getSignature(userId) {
-  return _ls ? _ls.getItem(`signature_${userId}`) || null : null
+  const val = _ls ? _ls.getItem(`signature_${userId}`) || null : null
+  console.log(`[signatures] getSignature(${userId}) →`, val ? `${val.length} chars` : 'null')
+  return val
 }
 
 export function saveSignature(userId, base64) {

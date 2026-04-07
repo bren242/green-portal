@@ -9,6 +9,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
+import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -166,7 +167,7 @@ const SignBlock = ({ label, dateValue }) => (
 // ── Signature Row (multiple signers) ──────────────────────────
 const SignRow = ({ signers, dateValue }) => (
   <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20, marginBottom: 8 }}>
-    {signers.map((s, i) => (
+    {(signers || []).map((s, i) => (
       <SignBlock key={i} label={s} dateValue={dateValue} />
     ))}
   </View>
@@ -256,8 +257,10 @@ const DISCLOSURE_ENTITIES = [
 //  MAIN DOCUMENT — supports both print and styled modes
 // ════════════════════════════════════════════════════════════════
 const MarketingAgreementDoc = ({ data, styled }) => {
-  const d = data
+  const d = data || {}
   const dateVal = styled ? fmtDateAuto() : null
+  const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const stamp = styled ? getCompanyStamp() : null
 
   return (
     <Document>
@@ -496,8 +499,16 @@ const MarketingAgreementDoc = ({ data, styled }) => {
           ולראיה באו הצדדים על החתום:
         </Para>
 
+        {/* Advisor sig + stamp above GREEN signature block */}
+        {styled && (advisorSig || stamp) ? (
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', gap: 8, marginTop: 16, marginBottom: 2 }}>
+            {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+            {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+          </View>
+        ) : null}
+
         {/* 3 signatures side by side */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: styled && (advisorSig || stamp) ? 4 : 16 }}>
           <SignBlock label="לקוח ב'" dateValue={dateVal} />
           <SignBlock label="לקוח א'" dateValue={dateVal} />
           <SignBlock label={'גרין סוכנות לביטוח פנסיוני\nושיווק השקעות בע"מ'} dateValue={dateVal} />
