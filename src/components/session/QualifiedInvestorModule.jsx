@@ -10,11 +10,7 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
 
   // Form state — which checkbox is selected
   const [selectedOption, setSelectedOption] = useState(null) // 1, 2, or 3
-  const amounts = useMemo(() => {
-    const a = getQualifiedAmounts()
-    console.log('[QualifiedInvestor] amounts loaded:', a)
-    return a
-  }, [])
+  const amounts = useMemo(() => getQualifiedAmounts(), [])
 
   const buildData = () => ({
     clientName: session.clientA?.fullName || '',
@@ -32,15 +28,10 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
     setGenerating(true)
     setError(null)
     try {
-      console.log('[QualifiedInvestor] amounts:', amounts)
-      console.log('[QualifiedInvestor] selectedOption:', selectedOption)
       const data = buildData()
-      console.log('[QualifiedInvestor] data:', data)
       const res = await generateQualifiedInvestorStyled(data)
       setResult(res)
     } catch (err) {
-      console.error('[QualifiedInvestor] Full error:', err)
-      console.error('[QualifiedInvestor] Stack:', err.stack)
       setError(`שגיאה ביצירת ההצהרה: ${err.message}`)
     }
     setGenerating(false)
