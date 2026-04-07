@@ -46,7 +46,8 @@ src/
 │   │   ├── AgreementModule.jsx
 │   │   ├── QualifiedInvestorModule.jsx
 │   │   ├── QualifiedAdvisorModule.jsx
-│   │   └── MeetingSummaryModule.jsx
+│   │   ├── MeetingSummaryModule.jsx
+│   │   └── DeskReferralModule.jsx
 │   ├── wizard/
 │   │   ├── Wizard.jsx             — ויזארד KYC (6 חלקים)
 │   │   └── WizardHeader.jsx
@@ -57,11 +58,13 @@ src/
 │       ├── generateMarketingAgreement.jsx  — הסכם (3 גרסאות)
 │       ├── generateQualifiedInvestor.jsx
 │       ├── generateQualifiedAdvisor.jsx
-│       └── generateMeetingSummary.jsx
+│       ├── generateMeetingSummary.jsx
+│       └── generateDeskReferral.jsx
 ├── data/
 │   ├── users.js               — משתמשים (localStorage)
 │   ├── advisors.js            — נתיבים, מודולים, טפסים ידניים
 │   ├── qualifiedAmounts.js    — סכומי כשיר (localStorage)
+│   ├── adminSettings.js       — הגדרות אדמין: מייל דסק (localStorage)
 │   └── formSchema.js          — סכמת שאלון KYC
 ├── utils/
 │   └── mergePDFs.js           — מיזוג PDF לקיט
@@ -115,9 +118,19 @@ Login → בחירת משווק → סוג לקוח → פרטי לקוח → מ
 ### 5. סיכום פגישה — עובד
 - סיבת פגישה, אופן, יוזם, משך
 - טבלת נושאים (כן/לא) — 5 חובה + "אחר" אופציונלי
+- פופאפ פרטי יצירת קשר כאשר נושא "פרטי קשר" מסומן כן
 - סיכום, המלצה, החלטה, משימות
 - ולידציה לפני הפקה
 - styled + blank
+
+### 6. הפניה לדסק תפעול — עובד
+- 4 סוגי הוראה: השקעה חדשה, טיפול בהשקעה קיימת, העברת כספים, אחר
+- כפתורי tile לבחירת סוג, עם שינוי סוג גמיש
+- ולידציה: לא שולח אם אין הוראה מלאה
+- שלח לדסק: פותח mailto עם גוף מייל עברי מובנה
+- הפק PDF: DeskReferralPDF עם RTL, צבעי GREEN, מספור הוראות
+- הגדרות מייל באדמין (TO + CC, ב-localStorage)
+- קבצים: `DeskReferralModule.jsx`, `generateDeskReferral.jsx`, `adminSettings.js`
 
 ### טפסים ידניים
 כל 5 הטפסים זמינים להורדה ידנית (שחור-לבן, ללא נתוני לקוח) מדף הלוגין ומדף המודולים.
@@ -132,17 +145,16 @@ Login → בחירת משווק → סוג לקוח → פרטי לקוח → מ
 | ביצועים תחת עומס | לא נבדק |
 | Responsive — מובייל | חלקי (Tailwind responsive אבל לא נבדק לעומק) |
 | חתימות דיגיטליות | לא מיושם (PNG + jsPDF — תוכנן לעתיד) |
-| טופס הפניה לדסק | לא מיושם (mailto — תוכנן) |
+| טופס הפניה לדסק | ✅ מיושם (mailto + PDF) |
 | גילוי נאות באדמין | לא מיושם (רשימת זיקות — תוכנן) |
 
 ---
 
 ## הצעד הבא
 
-לפי STATUS.md:
 - סבב ביקורת KYC שלישי (ממתין ליובל)
-- טופס הפניה לדסק (mailto)
-- חתימות דיגיטליות (PNG)
+- גילוי נאות באדמין (רשימת זיקות — עדכון מדי פעם)
+- חתימות דיגיטליות (PNG — לעתיד)
 
 ---
 
