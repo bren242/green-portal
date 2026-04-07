@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import WizardHeader from '../wizard/WizardHeader'
 import { generateQualifiedInvestorStyled } from '../pdf/generateQualifiedInvestor'
+import { getQualifiedAmounts } from '../../data/qualifiedAmounts'
 
 export default function QualifiedInvestorModule({ user, session, onLogout, onAdmin, onSavePDF, onComplete, onBack }) {
   const [generating, setGenerating] = useState(false)
@@ -9,6 +10,7 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
 
   // Form state — which checkbox is selected
   const [selectedOption, setSelectedOption] = useState(null) // 1, 2, or 3
+  const amounts = useMemo(() => getQualifiedAmounts(), [])
 
   const buildData = () => ({
     clientName: session.clientA?.fullName || '',
@@ -31,7 +33,7 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
       setResult(res)
     } catch (err) {
       console.error('Error generating qualified investor declaration:', err)
-      setError('שגיאה ביצירת ההצהרה')
+      setError(`שגיאה ביצירת ההצהרה: ${err.message}`)
     }
     setGenerating(false)
   }
@@ -108,7 +110,7 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
                 <span className="font-semibold text-text-primary">{session.clientA?.fullName}</span>
               </div>
               <div>
-                <span className="text-text-muted text-xs block">ת.ז</span>
+                <span className="text-text-muted text-xs block">תעודת זהות</span>
                 <span className="font-semibold text-text-primary">{session.clientA?.idNumber}</span>
               </div>
             </div>
@@ -119,9 +121,9 @@ export default function QualifiedInvestorModule({ user, session, onLogout, onAdm
             <label className="block text-sm font-semibold text-text-primary mb-3">תנאי כשירות (בחר אחד):</label>
 
             {[
-              { value: 1, label: 'נכסים נזילים מעל הסף הנדרש' },
-              { value: 2, label: 'הכנסה שנתית מעל הסף הנדרש' },
-              { value: 3, label: 'שילוב נכסים נזילים + הכנסה שנתית' },
+              { value: 1, label: `נכסים נזילים מעל ${amounts.amount1} מיליון ש"ח` },
+              { value: 2, label: `הכנסה שנתית מעל ${amounts.amount2} מיליון ש"ח (או תא משפחתי מעל ${amounts.amount3} מיליון ש"ח)` },
+              { value: 3, label: `נכסים נזילים מעל ${amounts.amount4} מיליון ש"ח + הכנסה שנתית מעל ${amounts.amount5} ש"ח` },
             ].map((opt) => (
               <label
                 key={opt.value}
