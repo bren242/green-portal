@@ -312,7 +312,7 @@ export default function DeskReferralModule({ user, session, onLogout, onAdmin, o
     const body = encodeURIComponent(buildEmailBody(data))
     const ccParam = settings.deskEmailSecondary ? `&cc=${encodeURIComponent(settings.deskEmailSecondary)}` : ''
     console.log('[DeskReferral] mailto → to:', to, '| cc:', settings.deskEmailSecondary || '(none)')
-    window.location.href = `mailto:${to}?subject=${subject}${ccParam}&body=${body}`
+    window.open(`mailto:${to}?subject=${subject}${ccParam}&body=${body}`, '_blank')
   }
 
   // "שלח לדסק" click — validate then show dialog
