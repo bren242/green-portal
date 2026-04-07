@@ -30,6 +30,7 @@ export const ALL_MODULES = [
   { id: 'qualified', name: 'הצהרת לקוח כשיר' },
   { id: 'qualifiedAdvisor', name: 'לקוח כשיר — חוק הייעוץ' },
   { id: 'meeting', name: 'סיכום פגישה' },
+  { id: 'deskReferral', name: 'הפניה לדסק תפעול' },
 ]
 
 // Blank forms available for manual printing

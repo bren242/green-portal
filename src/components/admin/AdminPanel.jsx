@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { getUsersFull, addUser, updateUser, deleteUser } from '../../data/users'
 import { getQualifiedAmounts, saveQualifiedAmounts, DEFAULT_QUALIFIED_AMOUNTS } from '../../data/qualifiedAmounts'
+import { getAdminSettings, saveAdminSettings } from '../../data/adminSettings'
 
 export default function AdminPanel({ onBack }) {
   const [activeTab, setActiveTab] = useState('users')
@@ -8,6 +9,7 @@ export default function AdminPanel({ onBack }) {
   const tabs = [
     { id: 'users', label: 'משתמשים' },
     { id: 'qualified', label: 'סכומי כשיר' },
+    { id: 'desk', label: 'דסק תפעול' },
     { id: 'scoring', label: 'טבלת ניקוד' },
     { id: 'questions', label: 'שאלות סיכון' },
   ]
@@ -53,6 +55,7 @@ export default function AdminPanel({ onBack }) {
         <div className="bg-white rounded-card shadow-card p-6">
           {activeTab === 'users' && <UsersTab />}
           {activeTab === 'qualified' && <QualifiedAmountsTab />}
+          {activeTab === 'desk' && <DeskSettingsTab />}
           {activeTab === 'scoring' && <ScoringTab />}
           {activeTab === 'questions' && <QuestionsTab />}
         </div>
@@ -332,6 +335,66 @@ function QuestionsTab() {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function DeskSettingsTab() {
+  const [settings, setSettings] = useState(getAdminSettings())
+  const [saved, setSaved] = useState(false)
+
+  const handleSave = () => {
+    saveAdminSettings(settings)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
+  }
+
+  const Field = ({ label, field, placeholder }) => (
+    <div>
+      <label className="block text-sm font-semibold text-text-primary mb-1">{label}</label>
+      <input
+        type="text"
+        value={settings[field] || ''}
+        onChange={(e) => { setSettings(s => ({ ...s, [field]: e.target.value })); setSaved(false) }}
+        placeholder={placeholder}
+        autoComplete="off"
+        dir="ltr"
+        className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+      />
+    </div>
+  )
+
+  return (
+    <div className="space-y-6" dir="rtl">
+      <div>
+        <h2 className="text-lg font-bold text-green-primary mb-1">הגדרות דסק תפעול</h2>
+        <p className="text-sm text-text-muted">כתובות המייל לשליחת הפניות לדסק.</p>
+      </div>
+
+      <div className="space-y-4 max-w-md">
+        <Field
+          label="מייל ראשי (TO)"
+          field="deskEmailPrimary"
+          placeholder="desk@example.com"
+        />
+        <Field
+          label="מייל משני (CC) — אופציונלי"
+          field="deskEmailSecondary"
+          placeholder="cc@example.com"
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={handleSave}
+          className="px-6 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
+        >
+          שמור
+        </button>
+        {saved && (
+          <span className="text-sm text-positive font-semibold">נשמר</span>
+        )}
+      </div>
     </div>
   )
 }
