@@ -213,7 +213,7 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
           {/* Sig + stamp: both side-by-side in right half (above date line) */}
           {s && (advisorSig || stamp) ? (
             <View style={{ flexDirection: 'row-reverse', marginBottom: 4 }}>
-              <View style={{ width: '50%', flexDirection: 'row-reverse', justifyContent: 'center', gap: 8, paddingHorizontal: 10 }}>
+              <View style={{ width: '50%', flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, paddingHorizontal: 10 }}>
                 {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
                 {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
               </View>

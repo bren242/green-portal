@@ -679,7 +679,7 @@ const KYCDocument = ({ formData, user }) => {
           </Text>
           {/* Signature images */}
           {(advisorSig || stamp) ? (
-            <View style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 8, alignItems: 'flex-end' }}>
+            <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 8, alignItems: 'flex-end' }}>
               {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
               {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
             </View>

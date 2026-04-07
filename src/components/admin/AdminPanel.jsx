@@ -359,11 +359,26 @@ function SignaturesTab() {
 
   const readFile = (file, onDone) => {
     if (!file) return
-    if (file.type !== 'image/png') { setError('קובץ חייב להיות PNG בלבד'); return }
+    if (!file.type.startsWith('image/')) { setError('קובץ חייב להיות תמונה (PNG/JPG)'); return }
     if (file.size > MAX) { setError('קובץ גדול מדי — מקסימום 2MB'); return }
     setError(null)
     const reader = new FileReader()
-    reader.onload = (ev) => onDone(ev.target.result)
+    reader.onload = (ev) => {
+      // Normalize through canvas → standard PNG, max 500px wide
+      // Prevents exotic PNG formats (16-bit, CMYK) from crashing react-pdf
+      const img = new window.Image()
+      img.onload = () => {
+        const MAX_W = 500
+        const scale = img.width > MAX_W ? MAX_W / img.width : 1
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        onDone(canvas.toDataURL('image/png'))
+      }
+      img.onerror = () => setError('קובץ התמונה פגום')
+      img.src = ev.target.result
+    }
     reader.readAsDataURL(file)
   }
 

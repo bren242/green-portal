@@ -6,12 +6,15 @@
 const _ls = typeof localStorage !== 'undefined' ? localStorage : null
 
 // Validates a base64 data URL before passing to react-pdf <Image>
-// Prevents "Incomplete or corrupt PNG file" crash on invalid/truncated data
+// Checks actual image magic bytes — not just string format
+// PNG base64 always starts with "iVBOR", JPEG with "/9j/"
 export function isValidImageSrc(src) {
-  return typeof src === 'string' &&
-    src.startsWith('data:image/') &&
-    src.includes('base64,') &&
-    src.length > 200
+  if (!src || typeof src !== 'string') return false
+  const idx = src.indexOf('base64,')
+  if (idx === -1) return false
+  const b64 = src.slice(idx + 7)
+  if (b64.length < 100) return false
+  return b64.startsWith('iVBOR') || b64.startsWith('/9j/')
 }
 
 export function getSignature(userId) {

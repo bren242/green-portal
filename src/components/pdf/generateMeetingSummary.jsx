@@ -459,7 +459,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
           {/* Advisor block — images side-by-side above the line */}
           <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
             {s && (advisorSig || stamp) ? (
-              <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 8, width: '100%', alignItems: 'flex-end', marginBottom: 2 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, width: '100%', alignItems: 'flex-end', marginBottom: 2 }}>
                 {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
                 {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
               </View>
