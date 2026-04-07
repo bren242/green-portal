@@ -16,7 +16,7 @@ const fmtDate = () => {
 }
 
 function createInstruction() {
-  return { id: Date.now(), type: null, investmentType: '', manager: '', amount: '', action: '', from: '', to: '', notes: '' }
+  return { id: Date.now(), type: null, investmentType: '', manager: '', amount: '', action: '', from: '', to: '', notes: '', extraNotes: '' }
 }
 
 // ── Top-level helpers (outside InstructionCard to prevent remount) ────────────
@@ -173,6 +173,19 @@ function InstructionCard({ inst, index, onChange, onRemove }) {
               />
             </div>
           )}
+
+          {/* הערות נוספות — אופציונלי, לכל סוג */}
+          <div className="pt-1">
+            <label className="block text-xs font-semibold text-text-muted mb-1">הערות נוספות</label>
+            <textarea
+              value={inst.extraNotes || ''}
+              onChange={(e) => onChange({ ...inst, extraNotes: e.target.value })}
+              rows={2}
+              autoComplete="off"
+              placeholder="פרטים נוספים..."
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary resize-none"
+            />
+          </div>
         </div>
       )}
     </div>
@@ -248,6 +261,7 @@ function buildEmailBody(data) {
     } else if (inst.type === 'other') {
       body += `   ${inst.notes}\n`
     }
+    if (inst.extraNotes?.trim()) body += `   הערות: ${inst.extraNotes}\n`
     body += '\n'
   })
 

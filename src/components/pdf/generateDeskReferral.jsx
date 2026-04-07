@@ -154,6 +154,11 @@ const InstructionBlock = ({ instruction, index }) => {
           </Text>
         </View>
       )}
+      {instruction.extraNotes ? (
+        <View style={{ marginTop: 4, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 4 }}>
+          <FieldRow label={'הערות'} value={instruction.extraNotes} />
+        </View>
+      ) : null}
     </View>
   )
 }
