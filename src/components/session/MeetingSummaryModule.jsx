@@ -29,12 +29,37 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
   const [decision, setDecision] = useState('')
   const [tasks, setTasks] = useState('')
 
+  // Contact update popup
+  const [showContactPopup, setShowContactPopup] = useState(false)
+  const [contactAddress, setContactAddress] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactMobile, setContactMobile] = useState('')
+  const [contactDraft, setContactDraft] = useState({ address: '', phone: '', email: '', mobile: '' })
+
   const setTopic = (idx, val) => {
     setTopics((prev) => {
       const next = [...prev]
       next[idx] = next[idx] === val ? null : val
       return next
     })
+    // Open contact popup when "שינויים בפרטים אישיים" is checked yes
+    if (idx === 0 && val === 'yes') {
+      setContactDraft({ address: contactAddress, phone: contactPhone, email: contactEmail, mobile: contactMobile })
+      setShowContactPopup(true)
+    }
+  }
+
+  const handleContactSave = () => {
+    setContactAddress(contactDraft.address)
+    setContactPhone(contactDraft.phone)
+    setContactEmail(contactDraft.email)
+    setContactMobile(contactDraft.mobile)
+    setShowContactPopup(false)
+  }
+
+  const handleContactClose = () => {
+    setShowContactPopup(false)
   }
 
   const buildMeetingData = () => ({
@@ -43,10 +68,10 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
     advisorName: session.advisor?.name || '',
     advisorId: session.advisor?.idNumber || '',
     advisorLicense: session.advisor?.license || '',
-    address: session.clientA?.address || '',
-    phone: session.clientA?.phone || '',
-    email: session.clientA?.email || '',
-    mobile: session.clientA?.phone || '',
+    address: contactAddress || '',
+    phone: contactPhone || '',
+    email: contactEmail || '',
+    mobile: contactMobile || '',
     meetingReason,
     meetingType,
     meetingInitiator,
@@ -122,6 +147,82 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
     </label>
   )
 
+  const ContactPopup = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-white rounded-card shadow-metric w-full max-w-md p-6" dir="rtl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-base font-extrabold text-green-primary">עדכון פרטי התקשרות</h3>
+          <div className="h-0.5 flex-1 mx-4 bg-gold/40 rounded-full" />
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-semibold text-text-muted mb-1">כתובת</label>
+            <input
+              type="text"
+              value={contactDraft.address}
+              onChange={(e) => setContactDraft(d => ({ ...d, address: e.target.value }))}
+              autoComplete="off"
+              placeholder="רחוב, עיר..."
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-text-muted mb-1">טלפון</label>
+            <input
+              type="tel"
+              value={contactDraft.phone}
+              onChange={(e) => setContactDraft(d => ({ ...d, phone: e.target.value }))}
+              autoComplete="off"
+              placeholder="03-..."
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-text-muted mb-1">סלולרי</label>
+            <input
+              type="tel"
+              value={contactDraft.mobile}
+              onChange={(e) => setContactDraft(d => ({ ...d, mobile: e.target.value }))}
+              autoComplete="off"
+              placeholder="05..."
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-text-muted mb-1">אימייל</label>
+            <input
+              type="text"
+              value={contactDraft.email}
+              onChange={(e) => setContactDraft(d => ({ ...d, email: e.target.value }))}
+              autoComplete="off"
+              placeholder="name@example.com"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
+            />
+          </div>
+        </div>
+
+        <p className="text-xs text-text-muted mt-3">רק שדות שמולאו יופיעו ב-PDF</p>
+
+        <div className="flex gap-3 mt-5">
+          <button
+            onClick={handleContactSave}
+            className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
+          >
+            שמור
+          </button>
+          <button
+            onClick={handleContactClose}
+            className="flex-1 py-2.5 border border-border text-text-muted rounded-card text-sm font-bold hover:border-green-primary hover:text-green-primary transition-colors"
+          >
+            סגור
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
   if (result) {
     return (
       <div className="min-h-screen bg-surface-offwhite">
@@ -152,6 +253,7 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
 
   return (
     <div className="min-h-screen bg-surface-offwhite">
+      {showContactPopup && <ContactPopup />}
       <WizardHeader user={user} onLogout={onLogout} onAdmin={onAdmin} />
       <div className="max-w-2xl mx-auto px-4 py-5">
         <button onClick={onBack} className="text-sm text-text-muted hover:text-green-primary transition-colors mb-4">
@@ -242,7 +344,21 @@ export default function MeetingSummaryModule({ user, session, onLogout, onAdmin,
               </div>
               {TOPIC_LABELS.map((label, i) => (
                 <div key={i} className={`grid grid-cols-[1fr_auto_auto] border-t border-border/50 ${i % 2 === 0 ? 'bg-surface-light' : ''}`}>
-                  <div className="py-2.5 px-3 text-sm text-text-primary">{label}</div>
+                  <div className="py-2.5 px-3 text-sm text-text-primary flex items-center gap-2">
+                    {label}
+                    {i === 0 && topics[0] === 'yes' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setContactDraft({ address: contactAddress, phone: contactPhone, email: contactEmail, mobile: contactMobile })
+                          setShowContactPopup(true)
+                        }}
+                        className="text-xs text-gold hover:text-gold/70 font-semibold underline underline-offset-2 transition-colors"
+                      >
+                        {contactAddress || contactPhone || contactEmail || contactMobile ? 'ערוך פרטים' : 'הוסף פרטים'}
+                      </button>
+                    )}
+                  </div>
                   <div className="py-2.5 px-3 w-14 flex items-center justify-center">
                     <input
                       type="checkbox"
