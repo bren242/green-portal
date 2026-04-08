@@ -144,7 +144,7 @@ Login → בחירת משווק → סוג לקוח → פרטי לקוח → מ
 | תאימות דפדפנים | נבדק רק Chrome |
 | ביצועים תחת עומס | לא נבדק |
 | Responsive — מובייל | חלקי (Tailwind responsive אבל לא נבדק לעומק) |
-| חתימות דיגיטליות | לא מיושם (PNG + jsPDF — תוכנן לעתיד) |
+| חתימות דיגיטליות | ✅ מיושם (PNG base64, localStorage, normalizeImage) |
 | טופס הפניה לדסק | ✅ מיושם (mailto + PDF) |
 | גילוי נאות באדמין | לא מיושם (רשימת זיקות — תוכנן) |
 
@@ -152,36 +152,39 @@ Login → בחירת משווק → סוג לקוח → פרטי לקוח → מ
 
 ## הצעד הבא
 
+- אימות שהסכם שיווק עובד אחרי Font.reset() fix (ממתין לבדיקה)
 - סבב ביקורת KYC שלישי (ממתין ליובל)
 - גילוי נאות באדמין (רשימת זיקות — עדכון מדי פעם)
-- חתימות דיגיטליות (PNG — לעתיד)
 
 ---
 
 ## היסטוריית תיקונים
 
-### 08/04/2026 — תיקוני באגים (4 פריטים)
+### 08/04/2026 — תיקוני באגים + חתימה/חותמת בהסכם שיווק
 
-**1. חתימת יובל — PNG corruption**
-- `getSignature(2)` החזיר תמונה שעברה `isValidImageSrc` אבל react-pdf זרק "Incomplete or corrupt PNG"
-- **תיקון**: נוספו `normalizeImage()` ו-`normalizeAllStored()` ב-`signatures.js` — נרמול async דרך canvas ל-8bit RGBA PNG
+**1. חתימת יובל — JPEG stored as PNG**
+- `normalizeImage()` ב-`signatures.js` מזהה MIME mismatch לפי magic bytes: `/9j/` = JPEG, `iVBOR` = PNG
+- מתקן את ה-MIME type לפני טעינה, ואז מנרמל דרך canvas ל-PNG תקני
 - AdminPanel מנרמל אוטומטית את כל החתימות הקיימות בטעינה
-- קבצים: `src/data/signatures.js`, `src/components/admin/AdminPanel.jsx`
 
-**2. הסכם שיווק — Cannot read properties of undefined (reading id)**
-- גרסת ההדפסה (blank) בשורה 1023 הפעילה `.map()` על `DISCLOSURE_ENTITIES` בלי `.filter(Boolean)` — crash אם יש ערך null
-- **תיקון**: נוסף `.filter(Boolean)` + `|| ''` guard (הגרסה הסטיילד כבר הייתה תקינה)
-- קובץ: `src/components/pdf/generateMarketingAgreement.jsx`
+**2. users.js — null guards**
+- `loadUsers()`, `getUsers()`, `getUsersFull()`, `getAdvisors()` — כולם מסננים `.filter((u) => u && u.id)` למניעת crash ממערך corrupted
 
-**3. הסכם שיווק — Invalid string child outside Text (potential)**
-- `{d.isEligible && (...)}` יכול להחזיר ערך non-boolean (0, '') ישירות ל-Document
-- **תיקון**: שונה ל-`{!!d.isEligible && (...)}`
-- קובץ: `src/components/pdf/generateMarketingAgreement.jsx`
+**3. הסכם שיווק — ריסט לגרסה עובדת + חתימה/חותמת**
+- **גישה**: ריסט ל-commit `9413033` (גרסה אחרונה עובדת) + 4 שינויים ממוקדים בלבד
+- import של `getSignature`, `getCompanyStamp`, `isValidImageSrc`
+- guard על `signers || []` ב-SignRow
+- אתחול `advisorSig` + `stamp` בתחילת הקומפוננטה
+- החלפת SignBlock השלישי בבלוק GREEN מותאם עם IIFE (כמו MeetingSummary)
+- חתימה+חותמת מופיעים **רק מעל שורת החתימה של GREEN**, לא מעל כל הבלוקים
 
 **4. לקוח כשיר — חוק הייעוץ — QualifiedAdvisorModule**
-- **נבדק לעומק, הflow תקין**: conditions → questionnaire (אם "אחר") → PDF
-- כל 8 השאלות מוצגות, כל הדאטה עוברת ל-buildData() ומשם ל-PDF
-- לא נמצא באג — ממתין לשחזור מדויק אם הבעיה חוזרת
+- נבדק לעומק, הflow תקין — ממתין לשחזור אם הבעיה חוזרת
+
+**5. הסכם שיווק — bidi glyph.id crash (react-pdf #3050)**
+- Font cache corruption כשמריצים שני PDF renders באותו session
+- **פתרון**: `Font.reset()` לפני כל `pdf().toBlob()` — מנקה glyph data בלי למחוק רישומי פונטים
+- `Font.clear()` לא מתאים — מוחק גם built-in fonts (Helvetica וכו')
 
 ---
 

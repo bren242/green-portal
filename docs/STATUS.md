@@ -1,6 +1,6 @@
 # GREEN Portal — סטטוס פרויקט
 
-## תאריך עדכון: 07/04/2026
+## תאריך עדכון: 08/04/2026
 
 ## קבצים חשובים
 
@@ -23,6 +23,7 @@
 | src/components/session/MeetingSummaryModule.jsx | סיכום פגישה |
 | src/components/session/QualifiedInvestorModule.jsx | הצהרת משקיע כשיר |
 | src/components/session/QualifiedAdvisorModule.jsx | לקוח כשיר חוק הייעוץ |
+| src/components/session/DeskReferralModule.jsx | הפניה לדסק תפעול |
 
 ### יצירת PDF
 | קובץ | תפקיד |
@@ -34,6 +35,12 @@
 | src/components/pdf/generateMeetingSummary.jsx | סיכום פגישה (styled + blank) |
 | src/components/pdf/generateQualifiedInvestor.jsx | הצהרת כשיר (styled + blank) |
 | src/components/pdf/generateQualifiedAdvisor.jsx | כשיר חוק הייעוץ (styled + blank) |
+| src/components/pdf/generateDeskReferral.jsx | הפניה לדסק (styled + blank) |
+
+### חתימות
+| קובץ | תפקיד |
+|---|---|
+| src/data/signatures.js | חתימות משווק + חותמת חברה (localStorage, normalizeImage) |
 
 ### נתונים ואדמין
 | קובץ | תפקיד |
@@ -41,9 +48,10 @@
 | src/data/users.js | ניהול משתמשים (localStorage) |
 | src/data/advisors.js | הגדרות נתיבים ומודולים |
 | src/data/qualifiedAmounts.js | סכומי כשיר (localStorage, עדכון אדמין) |
+| src/data/adminSettings.js | הגדרות אדמין: מייל דסק (localStorage) |
 | src/data/formSchema.js | סכמת שאלון KYC |
 | src/utils/mergePDFs.js | מיזוג PDF לקיט |
-| src/components/admin/AdminPanel.jsx | פאנל ניהול |
+| src/components/admin/AdminPanel.jsx | פאנל ניהול (משתמשים, סכומים, חתימות, מייל דסק) |
 
 ---
 
@@ -81,11 +89,12 @@ login → משווק → קיים → קרן → פרטים → מודולים:
 
 | מודול | סטטוס | הערות |
 |---|---|---|
-| הסכם שיווק | ✅ עובד | styled + blank + print. טקסט משפטי AS IS. NumPara pattern לכל סעיפים ממוספרים (RTL-safe) |
-| איפיון צרכים (KYC) | ✅ v3 מאושר | ויזארד מלא, סקורינג סיכון, styled + blank. ראה KYC v3 למטה |
-| סיכום פגישה | ✅ עובד | styled + blank. תוקן crash של direction:rtl |
-| הצהרת משקיע כשיר | ✅ עובד | styled + blank. סכומים מאדמין |
-| לקוח כשיר חוק הייעוץ | ✅ עובד | styled + blank. שאלון מורחב רק כש"אחר" נבחר |
+| הסכם שיווק | ✅ עובד | styled + blank + print. טקסט משפטי AS IS. NumPara pattern. חתימה+חותמת GREEN. Font.reset() בין renders |
+| איפיון צרכים (KYC) | ✅ v3 מאושר | ויזארד מלא, סקורינג סיכון, styled + blank. חתימה+חותמת |
+| סיכום פגישה | ✅ עובד | styled + blank. ולידציה + פופאפ פרטי קשר. חתימה+חותמת |
+| הצהרת משקיע כשיר | ✅ עובד | styled + blank. סכומים מאדמין מוצגים. חתימה+חותמת |
+| לקוח כשיר חוק הייעוץ | ✅ עובד | styled + blank. שאלון מורחב רק כש"אחר" נבחר. חתימה+חותמת |
+| הפניה לדסק תפעול | ✅ עובד | mailto + PDF. 4 סוגי הוראה. מייל דסק מאדמין |
 
 ## טפסים ידניים
 כל 5 הטפסים זמינים מעמוד הלוגין ומעמוד המודולים:
@@ -109,14 +118,25 @@ login → משווק → קיים → קרן → פרטים → מודולים:
 5. **הסכם שיווק — bold על מילים לא נכונות** — שוטחו כל Text-in-Text (nested bold) לטקסט שטוח
 6. **הסכם שיווק — מספרים נדחפים לסוף שורה** — כל סעיף ממוספר (1., 2.1, 15.3, i., א.) הומר ל-NumPara pattern (View row-reverse + שני Text נפרדים)
 
+## בעיות שתוקנו (08/04/2026)
+
+7. **חתימות וחותמת** — ממשק ניהול באדמין + שתילה בכל הטפסים (KYC, הסכם, סיכום, כשיר)
+8. **חתימת JPEG שנשמרה כ-PNG** — `normalizeImage()` מזהה magic bytes (`/9j/` = JPEG, `iVBOR` = PNG) ומתקן MIME לפני טעינה
+9. **users.js null guards** — `.filter((u) => u && u.id)` בכל פונקציות המשתמשים למניעת crash מ-localStorage corrupted
+10. **הסכם שיווק — bidi glyph.id crash (react-pdf #3050)** — Font cache corruption בין renders. פתרון: `Font.reset()` לפני כל `pdf().toBlob()` מנקה glyph data בלי למחוק רישום פונטים
+11. **הסכם שיווק — חתימה+חותמת במיקום שגוי** — ריסט לגרסה עובדת + IIFE pattern לבלוק GREEN בלבד
+12. **סיכום פגישה — ולידציה + פופאפ פרטים** — ולידציה לפני הפקה, פופאפ פרטי יצירת קשר
+13. **הפניה לדסק תפעול** — מודול מלא: 4 סוגי הוראה, mailto, PDF, מייל דסק מאדמין
+
 ---
 
 ## מה עובד ✅
 - כל 4 נתיבי Flow
-- כל 5 המודולים
+- כל 6 המודולים (כולל הפניה לדסק)
 - כל 5 הטפסים הידניים
+- חתימות משווק + חותמת חברה בכל הטפסים
 - מיזוג PDF לקיט
-- פאנל אדמין (משתמשים + סכומי כשיר)
+- פאנל אדמין (משתמשים + סכומי כשיר + חתימות + מייל דסק)
 - Inactivity timeout (10 דקות)
 - autocomplete="off" על כל השדות
 - נתוני אדמין שורדים רענון (localStorage)
@@ -152,8 +172,7 @@ login → משווק → קיים → קרן → פרטים → מודולים:
 - עימוד — אפס חתכים באמצע נושאים (wrap={false} על כל בלוק)
 
 ### מה נשאר בפרויקט KYCGREEN:
-- טופס הפניה לדסק (mailto)
-- חתימות דיגיטליות (PNG + jsPDF)
+- גילוי נאות באדמין (רשימת זיקות — עדכון מדי פעם)
 - סרטון Remotion
 - סבב ביקורת KYC שלישי (ממתין ליובל)
 
