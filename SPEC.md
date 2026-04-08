@@ -158,6 +158,33 @@ Login → בחירת משווק → סוג לקוח → פרטי לקוח → מ
 
 ---
 
+## היסטוריית תיקונים
+
+### 08/04/2026 — תיקוני באגים (4 פריטים)
+
+**1. חתימת יובל — PNG corruption**
+- `getSignature(2)` החזיר תמונה שעברה `isValidImageSrc` אבל react-pdf זרק "Incomplete or corrupt PNG"
+- **תיקון**: נוספו `normalizeImage()` ו-`normalizeAllStored()` ב-`signatures.js` — נרמול async דרך canvas ל-8bit RGBA PNG
+- AdminPanel מנרמל אוטומטית את כל החתימות הקיימות בטעינה
+- קבצים: `src/data/signatures.js`, `src/components/admin/AdminPanel.jsx`
+
+**2. הסכם שיווק — Cannot read properties of undefined (reading id)**
+- גרסת ההדפסה (blank) בשורה 1023 הפעילה `.map()` על `DISCLOSURE_ENTITIES` בלי `.filter(Boolean)` — crash אם יש ערך null
+- **תיקון**: נוסף `.filter(Boolean)` + `|| ''` guard (הגרסה הסטיילד כבר הייתה תקינה)
+- קובץ: `src/components/pdf/generateMarketingAgreement.jsx`
+
+**3. הסכם שיווק — Invalid string child outside Text (potential)**
+- `{d.isEligible && (...)}` יכול להחזיר ערך non-boolean (0, '') ישירות ל-Document
+- **תיקון**: שונה ל-`{!!d.isEligible && (...)}`
+- קובץ: `src/components/pdf/generateMarketingAgreement.jsx`
+
+**4. לקוח כשיר — חוק הייעוץ — QualifiedAdvisorModule**
+- **נבדק לעומק, הflow תקין**: conditions → questionnaire (אם "אחר") → PDF
+- כל 8 השאלות מוצגות, כל הדאטה עוברת ל-buildData() ומשם ל-PDF
+- לא נמצא באג — ממתין לשחזור מדויק אם הבעיה חוזרת
+
+---
+
 ## החלטות עיצוביות חשובות
 
 ### 1. Client-side only — אפס backend

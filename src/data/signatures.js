@@ -23,6 +23,46 @@ export function getSignature(userId) {
   return val
 }
 
+// Re-normalizes a base64 data URL through canvas → standard 8-bit RGBA PNG
+// Fixes corrupt/exotic PNGs that pass isValidImageSrc but crash react-pdf
+export function normalizeImage(base64) {
+  return new Promise((resolve, reject) => {
+    if (!base64 || typeof base64 !== 'string') { resolve(null); return }
+    const img = new window.Image()
+    img.onload = () => {
+      try {
+        const MAX_W = 500
+        const scale = img.width > MAX_W ? MAX_W / img.width : 1
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/png'))
+      } catch (e) {
+        console.warn('[signatures] normalizeImage failed:', e)
+        resolve(null)
+      }
+    }
+    img.onerror = () => { resolve(null) }
+    img.src = base64
+  })
+}
+
+// Re-normalize all stored signatures + stamp — call once on admin mount
+export async function normalizeAllStored() {
+  if (!_ls) return
+  const keys = ['signature_1', 'signature_2', 'signature_3', 'companyStamp']
+  for (const key of keys) {
+    const val = _ls.getItem(key)
+    if (!val) continue
+    const normalized = await normalizeImage(val)
+    if (normalized && normalized !== val) {
+      _ls.setItem(key, normalized)
+      console.log(`[signatures] re-normalized ${key}`)
+    }
+  }
+}
+
 export function saveSignature(userId, base64) {
   if (_ls) _ls.setItem(`signature_${userId}`, base64)
 }

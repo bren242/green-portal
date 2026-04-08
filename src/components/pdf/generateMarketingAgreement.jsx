@@ -607,7 +607,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 8: השקעות בסיכון מיוחד (conditional) ═══════════════════ */}
-      {d.isEligible && (
+      {!!d.isEligible && (
         <Page size="A4" style={pageStyle}>
           <PageHeader styled={styled} />
 
@@ -1020,8 +1020,8 @@ const BlankMarketingAgreementDoc = () => (
 
       {/* Entity table */}
       <View style={{ borderWidth: 1, borderColor: C.primary, borderRadius: 2, marginTop: 6 }}>
-        {DISCLOSURE_ENTITIES.map(([right, left], i) => (
-          <TwoColRow key={i} right={right} left={left} even={i % 2 === 0} />
+        {DISCLOSURE_ENTITIES.filter(Boolean).map(([right, left], i) => (
+          <TwoColRow key={i} right={right || ''} left={left || ''} even={i % 2 === 0} />
         ))}
       </View>
 

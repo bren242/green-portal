@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getUsersFull, addUser, updateUser, deleteUser } from '../../data/users'
 import { getQualifiedAmounts, saveQualifiedAmounts, DEFAULT_QUALIFIED_AMOUNTS } from '../../data/qualifiedAmounts'
 import { getAdminSettings, saveAdminSettings } from '../../data/adminSettings'
-import { getSignature, saveSignature, deleteSignature, getCompanyStamp, saveCompanyStamp, deleteCompanyStamp } from '../../data/signatures'
+import { getSignature, saveSignature, deleteSignature, getCompanyStamp, saveCompanyStamp, deleteCompanyStamp, normalizeAllStored } from '../../data/signatures'
 
 export default function AdminPanel({ onBack }) {
   const [activeTab, setActiveTab] = useState('users')
@@ -354,6 +354,17 @@ function SignaturesTab() {
   const [sigs, setSigs] = useState(initSigs)
   const [stamp, setStamp] = useState(getCompanyStamp)
   const [error, setError] = useState(null)
+
+  // Auto-normalize all stored signatures on mount (fixes corrupt PNGs from pre-normalization era)
+  useEffect(() => {
+    normalizeAllStored().then(() => {
+      // Refresh state with normalized values
+      const m = {}
+      users.forEach(u => { m[u.id] = getSignature(u.id) })
+      setSigs(m)
+      setStamp(getCompanyStamp())
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const MAX = 2 * 1024 * 1024
 
