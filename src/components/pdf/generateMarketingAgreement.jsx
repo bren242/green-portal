@@ -250,7 +250,7 @@ const DISCLOSURE_ENTITIES = [
   ['Hazavim Long, LP', 'Pagaya RE Management GP LLC'],
   ['Hazavim (Cayman), LP', '(העוגן) The Phoenix Anchor Fund L.P'],
   ['Hazavim Bond L.P', 'KYC Investment בע"מ'],
-  ['Pagaya Auto Loans Manager L.P', ''],
+  ['Pagaya Auto Loans Manager L.P', ' '],
 ]
 
 // ════════════════════════════════════════════════════════════════
@@ -509,16 +509,17 @@ const MarketingAgreementDoc = ({ data, styled }) => {
               const hasValidSig = advisorSig && isValidImageSrc(advisorSig)
               const hasValidStamp = stamp && isValidImageSrc(stamp)
               return (hasValidSig || hasValidStamp) ? (
-                <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, alignItems: 'flex-end', marginBottom: 2, width: '100%' }}>
-                  {hasValidSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
-                  {hasValidStamp ? <Image src={stamp} style={{ width: 100, height: 40, objectFit: 'contain' }} /> : null}
+                <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', alignItems: 'flex-end', marginBottom: 2, width: '100%' }}>
+                  {hasValidSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain', marginHorizontal: 2 }} /> : null}
+                  {hasValidStamp ? <Image src={stamp} style={{ width: 100, height: 40, objectFit: 'contain', marginHorizontal: 2 }} /> : null}
                 </View>
               ) : (
                 <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
               )
             })()}
             <View style={{ width: 160, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 3 }} />
-            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center' }}>{'גרין סוכנות לביטוח פנסיוני\nושיווק השקעות בע"מ'}</Text>
+            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center' }}>גרין סוכנות לביטוח פנסיוני</Text>
+            <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center' }}>ושיווק השקעות בע"מ</Text>
             <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 6, width: 160 }}>
               {dateVal ? (
                 <Text style={{ fontSize: 8, color: C.black, flex: 1, textAlign: 'center' }}>{dateVal}</Text>
@@ -593,7 +594,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         </NumPara>
 
         {/* Signature after option i */}
-        {d.compensationModel === 'i' && (
+        {!!(d.compensationModel === 'i') && (
           <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 6, marginBottom: 12 }}>
             <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
           </View>
