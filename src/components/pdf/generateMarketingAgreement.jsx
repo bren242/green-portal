@@ -259,8 +259,8 @@ const DISCLOSURE_ENTITIES = [
 const MarketingAgreementDoc = ({ data, styled }) => {
   const d = data || {}
   const dateVal = styled ? fmtDateAuto() : null
-  const advisorSig = styled && d.advisorUserId && !d._skipImages ? getSignature(d.advisorUserId) : null
-  const stamp = styled && !d._skipImages ? getCompanyStamp() : null
+  const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const stamp = styled ? getCompanyStamp() : null
 
   return (
     <Document>
@@ -1180,8 +1180,23 @@ const BlankMarketingAgreementDoc = () => (
 //  EXPORTS
 // ══════════════════════════════════════════════════════════════
 
+// Reset font cache before each render — prevents bidi glyph.id crash (react-pdf #3050)
+// When two PDFs render in the same session, the font cache can become corrupted
+function resetFonts() {
+  Font.clear()
+  Font.register({
+    family: 'Assistant',
+    fonts: [
+      { src: '/fonts/Assistant-Regular.ttf', fontWeight: 'normal' },
+      { src: '/fonts/Assistant-Bold.ttf', fontWeight: 'bold' },
+    ],
+  })
+  Font.registerHyphenationCallback((word) => [word])
+}
+
 /** גרסת הדפסה — שחור-לבן, קווים נקיים, ללא רקעים */
 export async function generateMarketingAgreement(clientData) {
+  resetFonts()
   const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
@@ -1198,14 +1213,8 @@ export async function generateMarketingAgreement(clientData) {
 
 /** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
 export async function generateMarketingAgreementStyled(clientData) {
-  let blob
-  try {
-    blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
-  } catch (err) {
-    console.warn('[MarketingAgreement] render failed, retrying without images:', err.message)
-    const safeData = { ...clientData, _skipImages: true }
-    blob = await pdf(<MarketingAgreementDoc data={safeData} styled={true} />).toBlob()
-  }
+  resetFonts()
+  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'
@@ -1221,6 +1230,7 @@ export async function generateMarketingAgreementStyled(clientData) {
 
 /** גרסה ידנית — טופס ריק להדפסה ומילוי ביד */
 export async function generateMarketingAgreementBlank() {
+  resetFonts()
   const blob = await pdf(<BlankMarketingAgreementDoc />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
