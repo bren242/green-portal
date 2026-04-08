@@ -261,6 +261,8 @@ const MarketingAgreementDoc = ({ data, styled }) => {
   const dateVal = styled ? fmtDateAuto() : null
   const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
   const stamp = styled ? getCompanyStamp() : null
+  console.log('[MarketingAgreementDoc] data:', JSON.stringify({ advisorUserId: d.advisorUserId, advisorName: d.advisorName, advisorId: d.advisorId }))
+  console.log('[MarketingAgreementDoc] advisorSig:', advisorSig ? `${advisorSig.length} chars` : 'null', '| stamp:', stamp ? `${stamp.length} chars` : 'null')
 
   return (
     <Document>

@@ -37,7 +37,12 @@ const DEFAULT_USERS = [
 function loadUsers() {
   try {
     const stored = localStorage.getItem(LS_KEY)
-    if (stored) return JSON.parse(stored)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      // Guard: filter out any null/undefined entries that could corrupt .map() calls
+      const valid = Array.isArray(parsed) ? parsed.filter((u) => u && u.id) : null
+      if (valid && valid.length > 0) return valid
+    }
   } catch (e) {
     console.warn('Failed to load users from localStorage:', e)
   }
@@ -55,11 +60,11 @@ function saveUsers() {
 let users = loadUsers()
 
 export function getUsers() {
-  return users.map((u) => ({ ...u, password: undefined }))
+  return users.filter((u) => u && u.id).map((u) => ({ ...u, password: undefined }))
 }
 
 export function getUsersFull() {
-  return [...users]
+  return users.filter((u) => u && u.id)
 }
 
 export function authenticate(username, password) {
@@ -90,7 +95,8 @@ export function deleteUser(id) {
 
 // Get all advisors (for session advisor selector)
 export function getAdvisors() {
-  return users.map((u) => ({
+  console.log('[users] getAdvisors — raw users:', JSON.stringify(users.map(u => u?.id)))
+  return users.filter((u) => u && u.id).map((u) => ({
     id: u.id,
     name: u.name,
     idNumber: u.idNumber || '',
