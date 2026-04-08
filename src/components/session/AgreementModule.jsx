@@ -32,8 +32,6 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onSa
     setError(null)
     try {
       const data = buildAgreementData()
-      console.log('[AgreementModule] buildAgreementData →', JSON.stringify({ advisorUserId: data.advisorUserId, advisorName: data.advisorName, advisorId: data.advisorId, advisorLicense: data.advisorLicense }))
-      console.log('[AgreementModule] session.advisor →', JSON.stringify(session.advisor))
       const res = await generateMarketingAgreementStyled(data)
       setResult(res)
     } catch (err) {

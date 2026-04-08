@@ -95,7 +95,6 @@ export function deleteUser(id) {
 
 // Get all advisors (for session advisor selector)
 export function getAdvisors() {
-  console.log('[users] getAdvisors — raw users:', JSON.stringify(users.map(u => u?.id)))
   return users.filter((u) => u && u.id).map((u) => ({
     id: u.id,
     name: u.name,
