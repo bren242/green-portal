@@ -260,17 +260,24 @@ const DISCLOSURE_ENTITIES = [
 //  MAIN DOCUMENT — supports both print and styled modes
 // ════════════════════════════════════════════════════════════════
 const MarketingAgreementDoc = ({ data, styled }) => {
+  console.log('[MarketingAgreementDoc] === RENDER START ===')
+  console.log('[MarketingAgreementDoc] data type:', typeof data, '| data:', JSON.stringify(data, null, 0)?.slice(0, 300))
   const d = data || {}
+  console.log('[MarketingAgreementDoc] d keys:', Object.keys(d))
   const dateVal = styled ? fmtDateAuto() : null
+  console.log('[MarketingAgreementDoc] dateVal:', dateVal)
   const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  console.log('[MarketingAgreementDoc] getSignature done')
   const stamp = styled ? getCompanyStamp() : null
-  console.log('[MarketingAgreementDoc] data:', JSON.stringify({ advisorUserId: d.advisorUserId, advisorName: d.advisorName, advisorId: d.advisorId }))
+  console.log('[MarketingAgreementDoc] getCompanyStamp done')
   console.log('[MarketingAgreementDoc] advisorSig:', advisorSig ? `${advisorSig.length} chars` : 'null', '| stamp:', stamp ? `${stamp.length} chars` : 'null')
+  console.log('[MarketingAgreementDoc] about to return JSX...')
 
   return (
     <Document>
 
       {/* ═══════════════════ PAGE 1: COVER + PARTIES ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 1 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -381,6 +388,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 2: CLAUSES 1-4 ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 2 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -432,6 +440,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 3: CLAUSES 5-12 ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 3 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -473,6 +482,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 4: CLAUSES 13-15 + SIGNATURES ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 4 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -523,6 +533,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 5: נספח א׳ — גילוי נאות ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 5 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -548,6 +559,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 6: המשך נספח א׳ + חתימה ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 6 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -568,6 +580,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 7: נספח ד׳ — תגמול ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 7 render')}
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -613,6 +626,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 8: השקעות בסיכון מיוחד (conditional) ═══════════════════ */}
+      {console.log('[MarketingAgreementDoc] PAGE 8 check, isEligible:', d.isEligible)}
       {!!d.isEligible && (
         <Page size="A4" style={pageStyle}>
           <PageHeader styled={styled} />
