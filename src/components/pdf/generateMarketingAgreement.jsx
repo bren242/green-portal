@@ -259,8 +259,11 @@ const DISCLOSURE_ENTITIES = [
 const MarketingAgreementDoc = ({ data, styled }) => {
   const d = data || {}
   const dateVal = styled ? fmtDateAuto() : null
-  const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
-  const stamp = styled ? getCompanyStamp() : null
+  // Double-guard: only use image if isValidImageSrc passes (checks magic bytes)
+  const rawSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const rawStamp = styled ? getCompanyStamp() : null
+  const advisorSig = rawSig && isValidImageSrc(rawSig) ? rawSig : null
+  const stamp = rawStamp && isValidImageSrc(rawStamp) ? rawStamp : null
 
   return (
     <Document>
@@ -510,10 +513,10 @@ const MarketingAgreementDoc = ({ data, styled }) => {
 
           {/* GREEN advisor block — with sig+stamp above line */}
           <View style={{ alignItems: 'center', width: 160 }}>
-            {styled && (advisorSig || stamp) ? (
+            {(advisorSig || stamp) ? (
               <View style={{ flexDirection: 'row-reverse', gap: 4, alignItems: 'flex-end', marginBottom: 4, justifyContent: 'center', width: '100%' }}>
-                {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
-                {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 100, height: 40, objectFit: 'contain' }} /> : null}
+                {advisorSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
+                {stamp ? <Image src={stamp} style={{ width: 100, height: 40, objectFit: 'contain' }} /> : null}
               </View>
             ) : (
               <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
@@ -1204,7 +1207,13 @@ export async function generateMarketingAgreement(clientData) {
 
 /** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
 export async function generateMarketingAgreementStyled(clientData) {
-  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  let blob
+  try {
+    blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  } catch (err) {
+    console.error('[MarketingAgreement] PDF render FAILED:', err.message, '\nstack:', err.stack)
+    throw err
+  }
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'

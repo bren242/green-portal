@@ -32,11 +32,15 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onSa
     setError(null)
     try {
       const data = buildAgreementData()
+      console.log('[AgreementModule] data before PDF:', JSON.stringify(data))
+      console.log('[AgreementModule] session.advisor:', JSON.stringify(session.advisor))
+      console.log('[AgreementModule] session.completedModules:', JSON.stringify(session.completedModules))
       const res = await generateMarketingAgreementStyled(data)
       setResult(res)
     } catch (err) {
-      console.error('Error generating agreement:', err)
-      setError('שגיאה ביצירת ההסכם')
+      console.error('[AgreementModule] CRASH:', err.message)
+      console.error('[AgreementModule] stack:', err.stack)
+      setError('שגיאה ביצירת ההסכם: ' + err.message)
     }
     setGenerating(false)
   }
