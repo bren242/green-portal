@@ -1180,18 +1180,12 @@ const BlankMarketingAgreementDoc = () => (
 //  EXPORTS
 // ══════════════════════════════════════════════════════════════
 
-// Reset font cache before each render — prevents bidi glyph.id crash (react-pdf #3050)
-// When two PDFs render in the same session, the font cache can become corrupted
+// Reset font DATA cache before each render — prevents bidi glyph.id crash (react-pdf #3050)
+// When two PDFs render in the same session, the glyph cache can become corrupted.
+// Font.reset() sets data=null on all registered fonts, forcing re-load without
+// removing the registrations (unlike Font.clear() which deletes built-in fonts too).
 function resetFonts() {
-  Font.clear()
-  Font.register({
-    family: 'Assistant',
-    fonts: [
-      { src: '/fonts/Assistant-Regular.ttf', fontWeight: 'normal' },
-      { src: '/fonts/Assistant-Bold.ttf', fontWeight: 'bold' },
-    ],
-  })
-  Font.registerHyphenationCallback((word) => [word])
+  Font.reset()
 }
 
 /** גרסת הדפסה — שחור-לבן, קווים נקיים, ללא רקעים */
