@@ -32,9 +32,6 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onSa
     setError(null)
     try {
       const data = buildAgreementData()
-      console.log('[AgreementModule] data before PDF:', JSON.stringify(data))
-      console.log('[AgreementModule] session.advisor:', JSON.stringify(session.advisor))
-      console.log('[AgreementModule] session.completedModules:', JSON.stringify(session.completedModules))
       const res = await generateMarketingAgreementStyled(data)
       setResult(res)
     } catch (err) {

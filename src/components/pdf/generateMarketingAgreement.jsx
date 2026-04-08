@@ -259,8 +259,8 @@ const DISCLOSURE_ENTITIES = [
 const MarketingAgreementDoc = ({ data, styled }) => {
   const d = data || {}
   const dateVal = styled ? fmtDateAuto() : null
-  const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
-  const stamp = styled ? getCompanyStamp() : null
+  const advisorSig = styled && d.advisorUserId && !d._skipImages ? getSignature(d.advisorUserId) : null
+  const stamp = styled && !d._skipImages ? getCompanyStamp() : null
 
   return (
     <Document>
@@ -623,7 +623,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 8: השקעות בסיכון מיוחד (conditional) ═══════════════════ */}
-      {d.isEligible && (
+      {!!d.isEligible && (
         <Page size="A4" style={pageStyle}>
           <PageHeader styled={styled} />
 
@@ -1197,7 +1197,14 @@ export async function generateMarketingAgreement(clientData) {
 
 /** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
 export async function generateMarketingAgreementStyled(clientData) {
-  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  let blob
+  try {
+    blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  } catch (err) {
+    console.warn('[MarketingAgreement] render failed, retrying without images:', err.message)
+    const safeData = { ...clientData, _skipImages: true }
+    blob = await pdf(<MarketingAgreementDoc data={safeData} styled={true} />).toBlob()
+  }
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'
