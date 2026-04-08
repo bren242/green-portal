@@ -259,17 +259,13 @@ const DISCLOSURE_ENTITIES = [
 const MarketingAgreementDoc = ({ data, styled }) => {
   const d = data || {}
   const dateVal = styled ? fmtDateAuto() : null
-  // Double-guard: only use image if isValidImageSrc passes (checks magic bytes)
-  const rawSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
-  const rawStamp = styled ? getCompanyStamp() : null
-  const advisorSig = rawSig && isValidImageSrc(rawSig) ? rawSig : null
-  const stamp = rawStamp && isValidImageSrc(rawStamp) ? rawStamp : null
+  const advisorSig = styled && d.advisorUserId ? getSignature(d.advisorUserId) : null
+  const stamp = styled ? getCompanyStamp() : null
 
   return (
     <Document>
 
       {/* ═══════════════════ PAGE 1: COVER + PARTIES ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -380,7 +376,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 2: CLAUSES 1-4 ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -432,7 +427,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 3: CLAUSES 5-12 ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -474,7 +468,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 4: CLAUSES 13-15 + SIGNATURES ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -506,21 +499,24 @@ const MarketingAgreementDoc = ({ data, styled }) => {
           ולראיה באו הצדדים על החתום:
         </Para>
 
-        {/* 3 signatures side by side — images only inside GREEN block */}
+        {/* 3 signatures side by side — advisor block includes sig+stamp images */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16, alignItems: 'flex-end' }}>
           <SignBlock label="לקוח ב'" dateValue={dateVal} />
           <SignBlock label="לקוח א'" dateValue={dateVal} />
-
-          {/* GREEN advisor block — with sig+stamp above line */}
+          {/* GREEN advisor block */}
           <View style={{ alignItems: 'center', width: 160 }}>
-            {(advisorSig || stamp) ? (
-              <View style={{ flexDirection: 'row-reverse', gap: 4, alignItems: 'flex-end', marginBottom: 4, justifyContent: 'center', width: '100%' }}>
-                {advisorSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
-                {stamp ? <Image src={stamp} style={{ width: 100, height: 40, objectFit: 'contain' }} /> : null}
-              </View>
-            ) : (
-              <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
-            )}
+            {(() => {
+              const hasValidSig = advisorSig && isValidImageSrc(advisorSig)
+              const hasValidStamp = stamp && isValidImageSrc(stamp)
+              return (hasValidSig || hasValidStamp) ? (
+                <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, alignItems: 'flex-end', marginBottom: 2, width: '100%' }}>
+                  {hasValidSig ? <Image src={advisorSig} style={{ width: 120, height: 50, objectFit: 'contain' }} /> : null}
+                  {hasValidStamp ? <Image src={stamp} style={{ width: 100, height: 40, objectFit: 'contain' }} /> : null}
+                </View>
+              ) : (
+                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>X</Text>
+              )
+            })()}
             <View style={{ width: 160, borderBottomWidth: 1, borderBottomColor: C.black, marginBottom: 3 }} />
             <Text style={{ fontSize: 8, color: C.muted, textAlign: 'center' }}>{'גרין סוכנות לביטוח פנסיוני\nושיווק השקעות בע"מ'}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 6, width: 160 }}>
@@ -538,7 +534,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 5: נספח א׳ — גילוי נאות ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -553,10 +548,9 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         </Para>
 
         {/* Entity table */}
-
         <View style={{ borderWidth: 1, borderColor: styled ? C.gold : C.primary, borderRadius: 2, marginTop: 6 }}>
-          {DISCLOSURE_ENTITIES.filter(Boolean).map(([right, left], i) => (
-            <TwoColRow key={i} right={right || ''} left={left || ''} even={i % 2 === 0} />
+          {DISCLOSURE_ENTITIES.map(([right, left], i) => (
+            <TwoColRow key={i} right={right} left={left} even={i % 2 === 0} />
           ))}
         </View>
 
@@ -564,7 +558,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 6: המשך נספח א׳ + חתימה ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -585,7 +578,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 7: נספח ד׳ — תגמול ═══════════════════ */}
-
       <Page size="A4" style={pageStyle}>
         <PageHeader styled={styled} />
 
@@ -631,8 +623,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
       </Page>
 
       {/* ═══════════════════ PAGE 8: השקעות בסיכון מיוחד (conditional) ═══════════════════ */}
-
-      {!!d.isEligible && (
+      {d.isEligible && (
         <Page size="A4" style={pageStyle}>
           <PageHeader styled={styled} />
 
@@ -1044,10 +1035,9 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Entity table */}
-
       <View style={{ borderWidth: 1, borderColor: C.primary, borderRadius: 2, marginTop: 6 }}>
-        {DISCLOSURE_ENTITIES.filter(Boolean).map(([right, left], i) => (
-          <TwoColRow key={i} right={right || ''} left={left || ''} even={i % 2 === 0} />
+        {DISCLOSURE_ENTITIES.map(([right, left], i) => (
+          <TwoColRow key={i} right={right} left={left} even={i % 2 === 0} />
         ))}
       </View>
 
@@ -1207,13 +1197,7 @@ export async function generateMarketingAgreement(clientData) {
 
 /** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
 export async function generateMarketingAgreementStyled(clientData) {
-  let blob
-  try {
-    blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
-  } catch (err) {
-    console.error('[MarketingAgreement] PDF render FAILED:', err.message, '\nstack:', err.stack)
-    throw err
-  }
+  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'
