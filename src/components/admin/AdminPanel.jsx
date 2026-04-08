@@ -354,17 +354,30 @@ function SignaturesTab() {
   const [sigs, setSigs] = useState(initSigs)
   const [stamp, setStamp] = useState(getCompanyStamp)
   const [error, setError] = useState(null)
+  const [normalizing, setNormalizing] = useState(false)
+  const [normalizeMsg, setNormalizeMsg] = useState(null)
+
+  const refreshState = () => {
+    const m = {}
+    users.forEach(u => { m[u.id] = getSignature(u.id) })
+    setSigs(m)
+    setStamp(getCompanyStamp())
+  }
 
   // Auto-normalize all stored signatures on mount (fixes corrupt PNGs from pre-normalization era)
   useEffect(() => {
-    normalizeAllStored().then(() => {
-      // Refresh state with normalized values
-      const m = {}
-      users.forEach(u => { m[u.id] = getSignature(u.id) })
-      setSigs(m)
-      setStamp(getCompanyStamp())
-    })
+    normalizeAllStored().then(refreshState)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleNormalizeAll = async () => {
+    setNormalizing(true)
+    setNormalizeMsg(null)
+    await normalizeAllStored()
+    refreshState()
+    setNormalizing(false)
+    setNormalizeMsg('הנרמול הושלם')
+    setTimeout(() => setNormalizeMsg(null), 3000)
+  }
 
   const MAX = 2 * 1024 * 1024
 
@@ -426,6 +439,18 @@ function SignaturesTab() {
           {error}
         </div>
       )}
+
+      {/* ── Normalize button ── */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={handleNormalizeAll}
+          disabled={normalizing}
+          className="px-4 py-2 bg-surface-cream border border-gold text-green-primary rounded-lg text-sm font-semibold hover:bg-gold/10 transition-colors disabled:opacity-50"
+        >
+          {normalizing ? 'מנרמל...' : 'נרמל מחדש (תיקון PNG)'}
+        </button>
+        {normalizeMsg && <span className="text-sm text-positive font-semibold">{normalizeMsg}</span>}
+      </div>
 
       {/* ── Section 1: advisor signatures ── */}
       <div>

@@ -454,22 +454,28 @@ const MeetingSummaryDoc = ({ data, styled }) => {
         {!s && <View style={{ flex: 1 }} />}
 
         {/* Signatures: client block + advisor block with sig/stamp images */}
-        <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 16 : 4 }}>
-          <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7'} styled={s} />
-          {/* Advisor block — images side-by-side above the line */}
-          <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
-            {s && (advisorSig || stamp) ? (
-              <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, width: '100%', alignItems: 'flex-end', marginBottom: 2 }}>
-                {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
-                {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+        {(() => {
+          const hasValidSig = s && advisorSig && isValidImageSrc(advisorSig)
+          const hasValidStamp = s && stamp && isValidImageSrc(stamp)
+          return (
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', marginTop: s ? 16 : 4 }}>
+              <SignBlock label={'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DC\u05E7\u05D5\u05D7'} styled={s} />
+              {/* Advisor block — images side-by-side above the line (max 108px each to fit 50% column) */}
+              <View style={{ width: '50%', alignItems: 'center', paddingHorizontal: 12 }}>
+                {(hasValidSig || hasValidStamp) ? (
+                  <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, width: '100%', alignItems: 'flex-end', marginBottom: 2 }}>
+                    {hasValidSig ? <Image src={advisorSig} style={{ width: 108, height: 50, objectFit: 'contain' }} /> : null}
+                    {hasValidStamp ? <Image src={stamp} style={{ width: 108, height: 50, objectFit: 'contain' }} /> : null}
+                  </View>
+                ) : (
+                  <View style={{ height: s ? 40 : 24 }} />
+                )}
+                <View style={{ borderBottomWidth: 1, borderBottomColor: s ? C.primary : C.black, width: '100%', marginBottom: 2 }} />
+                <Text style={{ fontSize: s ? 9 : 7.5, color: C.black, textAlign: 'center', fontWeight: 'bold' }}>{'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'}</Text>
               </View>
-            ) : (
-              <View style={{ height: s ? 40 : 24 }} />
-            )}
-            <View style={{ borderBottomWidth: 1, borderBottomColor: s ? C.primary : C.black, width: '100%', marginBottom: 2 }} />
-            <Text style={{ fontSize: s ? 9 : 7.5, color: C.black, textAlign: 'center', fontWeight: 'bold' }}>{'\u05D7\u05EA\u05D9\u05DE\u05EA \u05D4\u05DE\u05E9\u05D5\u05D5\u05E7'}</Text>
-          </View>
-        </View>
+            </View>
+          )
+        })()}
 
         <PageFooter />
       </Page>

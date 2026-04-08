@@ -211,14 +211,18 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
         {/* ── Signatures ── */}
         <View style={{ marginTop: s ? 14 : 10 }}>
           {/* Sig + stamp: both side-by-side in right half (above date line) */}
-          {s && (advisorSig || stamp) ? (
-            <View style={{ flexDirection: 'row-reverse', marginBottom: 4 }}>
-              <View style={{ width: '50%', flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, paddingHorizontal: 10 }}>
-                {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
-                {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
+          {(() => {
+            const hasValidSig = s && advisorSig && isValidImageSrc(advisorSig)
+            const hasValidStamp = s && stamp && isValidImageSrc(stamp)
+            return (hasValidSig || hasValidStamp) ? (
+              <View style={{ flexDirection: 'row-reverse', marginBottom: 4 }}>
+                <View style={{ width: '50%', flexDirection: 'row-reverse', justifyContent: 'center', gap: 4, paddingHorizontal: 10 }}>
+                  {hasValidSig ? <Image src={advisorSig} style={{ width: 108, height: 50, objectFit: 'contain' }} /> : null}
+                  {hasValidStamp ? <Image src={stamp} style={{ width: 108, height: 50, objectFit: 'contain' }} /> : null}
+                </View>
               </View>
-            </View>
-          ) : null}
+            ) : null
+          })()}
           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
             <SignLine
               label={'\u05EA\u05D0\u05E8\u05D9\u05DA'}

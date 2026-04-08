@@ -501,7 +501,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
 
         {/* Advisor sig + stamp above GREEN signature block */}
         {styled && (advisorSig || stamp) ? (
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', gap: 4, marginTop: 16, marginBottom: 2 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 4, marginTop: 16, marginBottom: 2 }}>
             {advisorSig && isValidImageSrc(advisorSig) ? <Image src={advisorSig} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
             {stamp && isValidImageSrc(stamp) ? <Image src={stamp} style={{ width: 160, height: 60, objectFit: 'contain' }} /> : null}
           </View>
