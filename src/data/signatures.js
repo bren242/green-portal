@@ -24,10 +24,25 @@ export function getSignature(userId) {
 }
 
 // Re-normalizes a base64 data URL through canvas → standard 8-bit RGBA PNG
-// Fixes corrupt/exotic PNGs that pass isValidImageSrc but crash react-pdf
+// Fixes MIME type mismatch (e.g. data:image/png but JPEG bytes) + exotic PNGs that crash react-pdf
 export function normalizeImage(base64) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (!base64 || typeof base64 !== 'string') { resolve(null); return }
+
+    // Detect actual format from magic bytes and fix MIME type before loading.
+    // Without this, browser fails to decode JPEG-data-with-PNG-header → img.onerror fires.
+    let src = base64
+    const idx = base64.indexOf('base64,')
+    if (idx !== -1) {
+      const b64 = base64.slice(idx + 7)
+      if (b64.startsWith('/9j/')) {
+        src = 'data:image/jpeg;base64,' + b64
+        console.log('[signatures] normalizeImage: detected JPEG bytes, fixing MIME type')
+      } else if (b64.startsWith('iVBOR')) {
+        src = 'data:image/png;base64,' + b64
+      }
+    }
+
     const img = new window.Image()
     img.onload = () => {
       try {
@@ -43,8 +58,11 @@ export function normalizeImage(base64) {
         resolve(null)
       }
     }
-    img.onerror = () => { resolve(null) }
-    img.src = base64
+    img.onerror = () => {
+      console.warn('[signatures] normalizeImage img.onerror — could not load image')
+      resolve(null)
+    }
+    img.src = src
   })
 }
 
