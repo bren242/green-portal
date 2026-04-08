@@ -165,13 +165,16 @@ const SignBlock = ({ label, dateValue }) => (
 )
 
 // ── Signature Row (multiple signers) ──────────────────────────
-const SignRow = ({ signers, dateValue }) => (
-  <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20, marginBottom: 8 }}>
-    {(signers || []).map((s, i) => (
-      <SignBlock key={i} label={s} dateValue={dateValue} />
-    ))}
-  </View>
-)
+const SignRow = ({ signers, dateValue }) => {
+  console.log('[SignRow] signers:', JSON.stringify(signers))
+  return (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20, marginBottom: 8 }}>
+      {(signers || []).map((s, i) => (
+        <SignBlock key={i} label={s} dateValue={dateValue} />
+      ))}
+    </View>
+  )
+}
 
 // ── Table Row for גילוי נאות ──────────────────────────────────
 const TwoColRow = ({ left, right, even }) => (
@@ -534,6 +537,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         </Para>
 
         {/* Entity table */}
+        {console.log('[DISCLOSURE styled] entities count:', DISCLOSURE_ENTITIES.length, 'sample:', JSON.stringify(DISCLOSURE_ENTITIES.slice(0, 2)))}
         <View style={{ borderWidth: 1, borderColor: styled ? C.gold : C.primary, borderRadius: 2, marginTop: 6 }}>
           {DISCLOSURE_ENTITIES.filter(Boolean).map(([right, left], i) => (
             <TwoColRow key={i} right={right || ''} left={left || ''} even={i % 2 === 0} />
@@ -1021,6 +1025,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       {/* Entity table */}
+      {console.log('[DISCLOSURE blank] entities count:', DISCLOSURE_ENTITIES.length)}
       <View style={{ borderWidth: 1, borderColor: C.primary, borderRadius: 2, marginTop: 6 }}>
         {DISCLOSURE_ENTITIES.filter(Boolean).map(([right, left], i) => (
           <TwoColRow key={i} right={right || ''} left={left || ''} even={i % 2 === 0} />
@@ -1183,7 +1188,15 @@ export async function generateMarketingAgreement(clientData) {
 
 /** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
 export async function generateMarketingAgreementStyled(clientData) {
-  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  console.log('[generateMarketingAgreementStyled] starting render...')
+  let blob
+  try {
+    blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  } catch (err) {
+    console.error('[generateMarketingAgreementStyled] PDF render FAILED:', err.message)
+    console.error('[generateMarketingAgreementStyled] stack:', err.stack)
+    throw err
+  }
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'
