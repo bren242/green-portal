@@ -5,6 +5,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
+import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 Font.register({
   family: 'Assistant',
@@ -229,7 +230,8 @@ const DeskReferralDoc = ({ data }) => {
 // ── Export ────────────────────────────────────────────────────
 export async function generateDeskReferralPDF(data) {
   Font.reset()
-  const blob = await pdf(<DeskReferralDoc data={data} />).toBlob()
+  const cleanData = sanitizeFormData(data)
+  const blob = await pdf(<DeskReferralDoc data={cleanData} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const safeName = (data.clientName || '').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]

@@ -7,6 +7,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { pdf } from '@react-pdf/renderer'
+import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 Font.register({
   family: 'Assistant',

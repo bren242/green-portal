@@ -1,6 +1,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
+import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
@@ -698,8 +699,9 @@ export async function generatePDF(formData, user) {
   if (!user) throw new Error('משתמש לא מחובר')
   Font.reset()
   const freshUser = user
+  const cleanFormData = sanitizeFormData(formData)
 
-  const blob = await pdf(<KYCDocument formData={formData} user={freshUser} />).toBlob()
+  const blob = await pdf(<KYCDocument formData={cleanFormData} user={freshUser} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = formData.clientA.fullName || 'client'
