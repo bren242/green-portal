@@ -9,7 +9,13 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onSa
   const [city, setCity] = useState('רמת גן')
 
   // Build clientData for the agreement PDF
-  const buildAgreementData = () => ({
+  const buildAgreementData = () => {
+    const today = new Date()
+    const dd = String(today.getDate()).padStart(2, '0')
+    const mm = String(today.getMonth() + 1).padStart(2, '0')
+    const yyyy = today.getFullYear()
+    const dateStr = `${dd}/${mm}/${yyyy}`
+    return {
     advisorUserId: session.advisor?.id || '',
     advisorName: session.advisor?.name || '',
     advisorId: session.advisor?.idNumber || '',
@@ -25,7 +31,9 @@ export default function AgreementModule({ user, session, onLogout, onAdmin, onSa
     clientBEmail: session.signerType === 'couple' ? (session.clientB?.email || '') : '',
     clientBAddress: session.signerType === 'couple' ? (session.clientB?.address || '') : '',
     city: city,
-  })
+    date: dateStr,
+  }
+  }
 
   const handleGenerate = async () => {
     setGenerating(true)

@@ -11,6 +11,7 @@ import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/rendere
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
 import { sanitizeFormData } from '../../utils/sanitizeInput'
+import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -313,7 +314,7 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         {/* Title */}
         <SectionTitle styled={styled}>הסכם שיווק השקעות</SectionTitle>
         <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 16, color: C.black }}>
-          {`שנערך ונחתם ב${d.city || '____________'} ביום ${d.date || '__ בחודש___ 2025'}`}
+          {`שנערך ונחתם ב${d.city || '____________'} ביום ${d.date || `__ בחודש___ ${new Date().getFullYear()}`}`}
         </Text>
 
         {/* בין */}
@@ -588,6 +589,11 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         <Para bold style={{ marginBottom: 10, textAlign: 'center' }}>
           תגמול בעל הרישיון יהיה לפי אחת האפשרויות להלן:
         </Para>
+
+        {/* Signature at top of page — client initials confirming they read this appendix */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 6, marginBottom: 16 }}>
+          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
+        </View>
 
         {/* Option i */}
         <NumPara num=".i">
@@ -1178,12 +1184,11 @@ const BlankMarketingAgreementDoc = () => (
 //  EXPORTS
 // ══════════════════════════════════════════════════════════════
 
-// Reset font DATA cache before each render — prevents bidi glyph.id crash (react-pdf #3050)
-// When two PDFs render in the same session, the glyph cache can become corrupted.
-// Font.reset() sets data=null on all registered fonts, forcing re-load without
-// removing the registrations (unlike Font.clear() which deletes built-in fonts too).
+// Full font cache reset — prevents null.unitsPerEm crash on second pdf().toBlob() in a session.
+// Font.reset() in v4.3.2 is broken: clears data but leaves loadResultPromise stale.
+// resetPdfFontCache() clears both. See src/utils/pdfFontReset.js.
 function resetFonts() {
-  Font.reset()
+  resetPdfFontCache()
 }
 
 /** גרסת הדפסה — שחור-לבן, קווים נקיים, ללא רקעים */

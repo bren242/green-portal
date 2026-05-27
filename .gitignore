@@ -3,3 +3,18 @@ dist
 .env
 .env.local
 *.log
+
+.vercel
+
+# Build artifacts and drafts
+drafts/
+unpacked_agreement/
+scripts/
+*.pdf
+_b.mjs
+test_*.mjs
+skills-lock.json
+.agents/skills/remotion-best-practices/
+
+# Local settings
+.claude/settings.local.json

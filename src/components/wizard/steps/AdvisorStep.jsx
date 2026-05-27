@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { TextArea, TextInput, RadioGroup, Checkbox } from '../ui/FormField'
 import { calculateRiskScore, RISK_LEVELS } from '../../../data/formSchema'
 import { generatePDF } from '../../pdf/generatePDF.jsx'
-import PDFPreview from '../../pdf/PDFPreview'
 
 export default function AdvisorStep({ formData, updateForm, user, onSavePDF, onComplete }) {
   const [generating, setGenerating] = useState(false)
@@ -41,11 +40,13 @@ export default function AdvisorStep({ formData, updateForm, user, onSavePDF, onC
   const handleDownloadAndContinue = () => {
     handleDownload()
     if (onSavePDF && pdfData) onSavePDF(pdfData.pdfBytes, pdfData.fileName)
+    if (pdfData?.url) URL.revokeObjectURL(pdfData.url)
     if (onComplete) onComplete()
   }
 
   const handleContinueWithout = () => {
     if (onSavePDF && pdfData) onSavePDF(pdfData.pdfBytes, pdfData.fileName)
+    if (pdfData?.url) URL.revokeObjectURL(pdfData.url)
     if (onComplete) onComplete()
   }
 
@@ -203,40 +204,25 @@ export default function AdvisorStep({ formData, updateForm, user, onSavePDF, onC
       </div>
 
       {pdfData && (
-        <>
-          <PDFPreview
-            pdfUrl={pdfData.url}
-            fileName={pdfData.fileName}
-            onClose={() => setPdfData(null)}
-            onDownload={handleDownload}
-          />
-          {onComplete && (
-            <div className="mt-4 flex gap-3">
-              <button
-                onClick={handleDownloadAndContinue}
-                className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
-              >
-                הורד עכשיו
-              </button>
-              <button
-                onClick={handleContinueWithout}
-                className="flex-1 py-2.5 border border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
-              >
-                המשך בלי להוריד
-              </button>
-            </div>
-          )}
-          {!onComplete && (
-            <div className="mt-4 text-center">
-              <button
-                onClick={handleDownload}
-                className="px-8 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
-              >
-                הורד PDF
-              </button>
-            </div>
-          )}
-        </>
+        <div className="space-y-3 mt-4">
+          <div className="border border-border rounded-card overflow-hidden" style={{ height: '400px' }}>
+            <iframe src={pdfData.url} title="תצוגה מקדימה" className="w-full h-full" />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleDownloadAndContinue}
+              className="flex-1 py-2.5 bg-green-primary text-white rounded-card text-sm font-bold hover:bg-green-secondary transition-colors shadow-card"
+            >
+              הורד עכשיו
+            </button>
+            <button
+              onClick={onComplete ? handleContinueWithout : handleDownload}
+              className="flex-1 py-2.5 border border-green-primary text-green-primary rounded-card text-sm font-bold hover:bg-green-primary/5 transition-colors"
+            >
+              {onComplete ? 'המשך בלי להוריד' : 'הורד PDF'}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )
