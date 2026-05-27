@@ -844,8 +844,7 @@ const BlankMarketingAgreementDoc = () => (
         ממגדל משה אביב, רחוב ז'בוטניסקי 7 רמת גן
       </Text>
       <Text style={{ fontSize: 10, fontWeight: 'bold', textAlign: 'center', marginBottom: 2 }}>
-        {'דוא"ל_'}
-        <Text style={{ textAlign: 'left' }}>INFO@GREENWM.CO.IL</Text>
+        {'דוא"ל INFO@GREENWM.CO.IL'}
       </Text>
       <Text style={{ fontSize: 10, textAlign: 'center', marginBottom: 2 }}>
         {'(להלן – "גרין")'}
@@ -1054,9 +1053,7 @@ const BlankMarketingAgreementDoc = () => (
       </BPara>
 
       <BPara>
-        {'בהתאם מודיעה החברה, כי יש לה זיקה לנכסים הפיננסיים המנוהלים ו/או משווקים ו/או מוצעים על ידי גופים בעלי זיקה, כפי שיתעדכן מעת לעת באתר האינטרנט של החברה '}
-        <LTR>www.greenwm.co.il</LTR>
-        {' וכי היא עשויה לקבלת טובת הנאה בקשר עם ביצוע עסקה בנכסים פיננסיים אליהם יש לה זיקה, לרבות שיווקם ו/או המשך החזקה בהם.'}
+        {'בהתאם מודיעה החברה, כי יש לה זיקה לנכסים הפיננסיים המנוהלים ו/או משווקים ו/או מוצעים על ידי גופים בעלי זיקה, כפי שיתעדכן מעת לעת באתר האינטרנט של החברה www.greenwm.co.il וכי היא עשויה לקבלת טובת הנאה בקשר עם ביצוע עסקה בנכסים פיננסיים אליהם יש לה זיקה, לרבות שיווקם ו/או המשך החזקה בהם.'}
       </BPara>
 
       {/* Signature */}

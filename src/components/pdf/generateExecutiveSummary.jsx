@@ -224,6 +224,7 @@ const ExecutiveSummaryDocument = () => (
 
 // ── Export function ──
 export async function generateExecutiveSummary() {
+  Font.reset()
   const blob = await pdf(<ExecutiveSummaryDocument />).toBlob()
   const url = URL.createObjectURL(blob)
   return { url, fileName: `GREEN_Executive_Summary_${fmtDate().replace(/\./g, '-')}.pdf` }

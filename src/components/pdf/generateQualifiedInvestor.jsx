@@ -246,6 +246,7 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
 // ══════════════════════════════════════════════════════════════
 
 export async function generateQualifiedInvestorStyled(clientData) {
+  Font.reset()
   const blob = await pdf(<QualifiedInvestorDoc data={clientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const safeName = (clientData.clientName || '').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
@@ -257,6 +258,7 @@ export async function generateQualifiedInvestorStyled(clientData) {
 }
 
 export async function generateQualifiedInvestorBlank() {
+  Font.reset()
   const blob = await pdf(<QualifiedInvestorDoc data={{}} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const fileName = '\u05D4\u05E6\u05D4\u05E8\u05EA_\u05DB\u05E9\u05D9\u05E8_\u05D9\u05D3\u05E0\u05D9.pdf'

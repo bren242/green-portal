@@ -228,6 +228,7 @@ const DeskReferralDoc = ({ data }) => {
 
 // ── Export ────────────────────────────────────────────────────
 export async function generateDeskReferralPDF(data) {
+  Font.reset()
   const blob = await pdf(<DeskReferralDoc data={data} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const safeName = (data.clientName || '').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')

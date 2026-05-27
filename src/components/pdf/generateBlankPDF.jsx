@@ -498,6 +498,7 @@ const BlankDoc = () => (
 //  EXPORT
 // ══════════════════════════════════════════════════════════════
 export async function generateBlankPDF() {
+  Font.reset()
   const blob = await pdf(<BlankDoc />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
