@@ -465,7 +465,7 @@ const KYCDocument = ({ formData, user }) => {
           />
         </View>
 
-        {formData.managedPortion && (
+        {!!formData.managedPortion && (
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -495,7 +495,7 @@ const KYCDocument = ({ formData, user }) => {
             {goals.map((g, i) => <PillTag key={i} text={g} />)}
           </View>
         )}
-        {formData.investmentGoalOther && <LabelValue label="פירוט" value={formData.investmentGoalOther} />}
+        {!!formData.investmentGoalOther && <LabelValue label="פירוט" value={formData.investmentGoalOther} />}
         <LabelValue label="אופק השקעה" value={horizonLabels[formData.investmentHorizon] || '---'} even />
 
         {/* ── Liquidity ───────────────────────────────────── */}
@@ -560,14 +560,14 @@ const KYCDocument = ({ formData, user }) => {
         <View wrap={false}>
           <SectionTitle>סיכום והמלצת בעל הרישיון</SectionTitle>
 
-          {formData.advisorSummary && (
+          {!!formData.advisorSummary && (
             <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>סיכום וניתוח</Text>
               <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.advisorSummary || '').replace(/\.$/, '')}</Text>
             </View>
           )}
 
-          {formData.clientPreferences && (
+          {!!formData.clientPreferences && (
             <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>העדפות / הגבלות לקוח</Text>
               <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.clientPreferences || '').replace(/\.$/, '')}</Text>
@@ -599,14 +599,14 @@ const KYCDocument = ({ formData, user }) => {
             </View>
           )}
 
-          {formData.finalRiskJustification && (
+          {!!formData.finalRiskJustification && (
             <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לפער בדרגה</Text>
               <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.finalRiskJustification || '').replace(/\.$/, '')}</Text>
             </View>
           )}
 
-          {formData.riskLevelReason && (
+          {!!formData.riskLevelReason && (
             <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לבחירת רמת הסיכון</Text>
               <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.riskLevelReason || '').replace(/\.$/, '')}</Text>

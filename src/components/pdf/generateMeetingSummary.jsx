@@ -329,7 +329,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
         )}
 
         {/* 2. Contact details update */}
-        {s && (d.address || d.phone || d.email || d.mobile) && (
+        {s && !!(d.address || d.phone || d.email || d.mobile) && (
           <>
             <SectionTitle styled={s}>{'\u05E2\u05D3\u05DB\u05D5\u05DF \u05E4\u05E8\u05D8\u05D9 \u05D4\u05EA\u05E7\u05E9\u05E8\u05D5\u05EA'}</SectionTitle>
             <View style={{
@@ -379,7 +379,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
             value={d.meetingInitiator}
             compact={!s}
           />
-          {d.meetingInitiator === 'other' && d.initiatorOther && (
+          {d.meetingInitiator === 'other' && !!d.initiatorOther && (
             <View style={{ flexDirection: 'row-reverse', marginBottom: 2, paddingRight: 4 }}>
               <Text style={{ fontSize: 8, color: C.muted }}>{'\u05E4\u05D9\u05E8\u05D5\u05D8: '}</Text>
               <Text style={{ fontSize: 8, color: C.black }}>{d.initiatorOther}</Text>
