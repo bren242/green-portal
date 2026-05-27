@@ -7,6 +7,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getQualifiedAmounts } from '../../data/qualifiedAmounts'
+import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -662,7 +663,8 @@ const QualifiedAdvisorDoc = ({ data = {}, styled: s }) => {
 
 export async function generateQualifiedAdvisorStyled(clientData) {
   Font.reset()
-  const blob = await pdf(<QualifiedAdvisorDoc data={clientData} styled={true} />).toBlob()
+  const cleanClientData = sanitizeFormData(clientData)
+  const blob = await pdf(<QualifiedAdvisorDoc data={cleanClientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const safeName = (clientData.clientName || '').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
   const dateStr = new Date().toISOString().split('T')[0]

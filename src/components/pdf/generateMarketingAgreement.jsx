@@ -10,6 +10,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
+import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -1188,7 +1189,8 @@ function resetFonts() {
 /** גרסת הדפסה — שחור-לבן, קווים נקיים, ללא רקעים */
 export async function generateMarketingAgreement(clientData) {
   resetFonts()
-  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={false} />).toBlob()
+  const cleanClientData = sanitizeFormData(clientData)
+  const blob = await pdf(<MarketingAgreementDoc data={cleanClientData} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'
@@ -1205,7 +1207,8 @@ export async function generateMarketingAgreement(clientData) {
 /** גרסת ממשק — צבעי GREEN, כותרות מעוצבות, תאריכים אוטומטיים */
 export async function generateMarketingAgreementStyled(clientData) {
   resetFonts()
-  const blob = await pdf(<MarketingAgreementDoc data={clientData} styled={true} />).toBlob()
+  const cleanClientData = sanitizeFormData(clientData)
+  const blob = await pdf(<MarketingAgreementDoc data={cleanClientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = clientData.clientAName || 'client'

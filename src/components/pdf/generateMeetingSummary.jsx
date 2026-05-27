@@ -6,6 +6,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
+import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -490,7 +491,8 @@ const MeetingSummaryDoc = ({ data, styled }) => {
 /** גרסת ממשק — צבעי GREEN, תאריכים אוטומטיים, פרטים מסשן */
 export async function generateMeetingSummaryStyled(meetingData) {
   Font.reset()
-  const blob = await pdf(<MeetingSummaryDoc data={meetingData} styled={true} />).toBlob()
+  const cleanMeetingData = sanitizeFormData(meetingData)
+  const blob = await pdf(<MeetingSummaryDoc data={cleanMeetingData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 
   const clientName = meetingData.clientName || 'client'
