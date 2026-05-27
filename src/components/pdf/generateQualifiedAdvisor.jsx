@@ -7,7 +7,6 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getQualifiedAmounts } from '../../data/qualifiedAmounts'
-import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -662,7 +661,7 @@ const QualifiedAdvisorDoc = ({ data = {}, styled: s }) => {
 // ══════════════════════════════════════════════════════════════
 
 export async function generateQualifiedAdvisorStyled(clientData) {
-  resetPdfFontCache()
+  Font.reset()
   const blob = await pdf(<QualifiedAdvisorDoc data={clientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const safeName = (clientData.clientName || '').replace(/[^a-zA-Z0-9\u0590-\u05FF]/g, '_')
@@ -675,7 +674,7 @@ export async function generateQualifiedAdvisorStyled(clientData) {
 
 export async function generateQualifiedAdvisorBlank() {
   // Blank version: showExtended flag triggers pages 3-4 WITHOUT filling any radio
-  resetPdfFontCache()
+  Font.reset()
   const blankData = { showExtended: true }
   const blob = await pdf(<QualifiedAdvisorDoc data={blankData} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()

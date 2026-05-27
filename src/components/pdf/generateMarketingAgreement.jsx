@@ -10,7 +10,6 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
-import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -1178,12 +1177,12 @@ const BlankMarketingAgreementDoc = () => (
 //  EXPORTS
 // ══════════════════════════════════════════════════════════════
 
-// Reset font DATA+PROMISE cache before each render — prevents bidi glyph.id crash (react-pdf #3050)
-// Font.reset() in v4.3.2 is broken: clears data but not loadResultPromise,
-// so the second export never re-fetches the font and crashes on null.unitsPerEm.
-// Use resetPdfFontCache() which clears both fields. See src/utils/pdfFontReset.js.
+// Reset font DATA cache before each render — prevents bidi glyph.id crash (react-pdf #3050)
+// When two PDFs render in the same session, the glyph cache can become corrupted.
+// Font.reset() sets data=null on all registered fonts, forcing re-load without
+// removing the registrations (unlike Font.clear() which deletes built-in fonts too).
 function resetFonts() {
-  resetPdfFontCache()
+  Font.reset()
 }
 
 /** גרסת הדפסה — שחור-לבן, קווים נקיים, ללא רקעים */

@@ -7,7 +7,6 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
 import { pdf } from '@react-pdf/renderer'
-import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 Font.register({
   family: 'Assistant',
@@ -225,7 +224,7 @@ const ExecutiveSummaryDocument = () => (
 
 // ── Export function ──
 export async function generateExecutiveSummary() {
-  resetPdfFontCache()
+  Font.reset()
   const blob = await pdf(<ExecutiveSummaryDocument />).toBlob()
   const url = URL.createObjectURL(blob)
   return { url, fileName: `GREEN_Executive_Summary_${fmtDate().replace(/\./g, '-')}.pdf` }

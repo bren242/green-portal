@@ -1,5 +1,5 @@
 import React from 'react'
-import { Document, Page, Text, View, Image, pdf } from '@react-pdf/renderer'
+import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
 
 import { logoPng } from '../../assets/logoBase64'
@@ -12,7 +12,6 @@ import {
   ClientCard, BalanceBox, KpiRow, KpiHeader, SectorCard, SignatureLine, DateLine,
   fmtMoney, parseAmount, translateMarital, fmtDate,
 } from './PDFTemplate'
-import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 // ── Label Maps ─────────────────────────────────────────────────
 const goalLabels = {
@@ -697,7 +696,7 @@ const KYCDocument = ({ formData, user }) => {
 // ── Export ──────────────────────────────────────────────────────
 export async function generatePDF(formData, user) {
   if (!user) throw new Error('משתמש לא מחובר')
-  resetPdfFontCache()
+  Font.reset()
   const freshUser = user
 
   const blob = await pdf(<KYCDocument formData={formData} user={freshUser} />).toBlob()
