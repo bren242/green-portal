@@ -2,6 +2,7 @@ import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { RISK_LEVELS } from '../../data/formSchema'
 import { sanitizeFormData } from '../../utils/sanitizeInput'
+import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
@@ -697,7 +698,7 @@ const KYCDocument = ({ formData, user }) => {
 // ── Export ──────────────────────────────────────────────────────
 export async function generatePDF(formData, user) {
   if (!user) throw new Error('משתמש לא מחובר')
-  Font.reset()
+  resetPdfFontCache()
   const freshUser = user
   const cleanFormData = sanitizeFormData(formData)
 

@@ -7,6 +7,7 @@ import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-
 import { logoPng } from '../../assets/logoBase64'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
 import { sanitizeFormData } from '../../utils/sanitizeInput'
+import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -490,7 +491,7 @@ const MeetingSummaryDoc = ({ data, styled }) => {
 
 /** גרסת ממשק — צבעי GREEN, תאריכים אוטומטיים, פרטים מסשן */
 export async function generateMeetingSummaryStyled(meetingData) {
-  Font.reset()
+  resetPdfFontCache()
   const cleanMeetingData = sanitizeFormData(meetingData)
   const blob = await pdf(<MeetingSummaryDoc data={cleanMeetingData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
@@ -508,7 +509,7 @@ export async function generateMeetingSummaryStyled(meetingData) {
 
 /** גרסת הדפסה — שחור-לבן, שדות ריקים */
 export async function generateMeetingSummaryBlank() {
-  Font.reset()
+  resetPdfFontCache()
   const blob = await pdf(<MeetingSummaryDoc data={{}} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
 

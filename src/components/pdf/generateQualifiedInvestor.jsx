@@ -8,6 +8,7 @@ import { Document, Page, Text, View, Image, Font, pdf, Svg, Path } from '@react-
 import { logoPng } from '../../assets/logoBase64'
 import { getQualifiedAmounts } from '../../data/qualifiedAmounts'
 import { getSignature, getCompanyStamp, isValidImageSrc } from '../../data/signatures'
+import { resetPdfFontCache } from '../../utils/pdfFontReset'
 import { sanitizeFormData } from '../../utils/sanitizeInput'
 
 // ── Font ──────────────────────────────────────────────────────
@@ -247,7 +248,7 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
 // ══════════════════════════════════════════════════════════════
 
 export async function generateQualifiedInvestorStyled(clientData) {
-  Font.reset()
+  resetPdfFontCache()
   const cleanClientData = sanitizeFormData(clientData)
   const blob = await pdf(<QualifiedInvestorDoc data={cleanClientData} styled={true} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
@@ -260,7 +261,7 @@ export async function generateQualifiedInvestorStyled(clientData) {
 }
 
 export async function generateQualifiedInvestorBlank() {
-  Font.reset()
+  resetPdfFontCache()
   const blob = await pdf(<QualifiedInvestorDoc data={{}} styled={false} />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const fileName = '\u05D4\u05E6\u05D4\u05E8\u05EA_\u05DB\u05E9\u05D9\u05E8_\u05D9\u05D3\u05E0\u05D9.pdf'
