@@ -590,11 +590,6 @@ const MarketingAgreementDoc = ({ data, styled }) => {
           תגמול בעל הרישיון יהיה לפי אחת האפשרויות להלן:
         </Para>
 
-        {/* Signature at top of page — client initials confirming they read this appendix */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 6, marginBottom: 16 }}>
-          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
-        </View>
-
         {/* Option i */}
         <NumPara num=".i">
           {'כנגד קבלת השירותים, יהא זכאי בעל הרישיון לגבות עמלה מגופים פיננסיים שונים להם יש לו זיקה, בגין הפניית הלקוח לגופים הפיננסיים בשיעורים שייקבעו בין בעל הרישיון לבין הגופים הפיננסיים השונים מעת לעת.'}
@@ -623,9 +618,11 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         </NumPara>
 
         {/* Signature after option ii */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
-          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
-        </View>
+        {!!(d.compensationModel === 'ii') && (
+          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+            <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
+          </View>
+        )}
 
         <PageFooter />
       </Page>
