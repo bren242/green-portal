@@ -210,7 +210,7 @@ const KYCDocument = ({ formData, user }) => {
     processedAssets.splice(1, 0, {
       title: 'ני״ע בארץ ובחו״ל',
       rows: [['סך הכל', 'אין']],
-      notes: '',
+      notes: null,
     })
   }
 
@@ -563,14 +563,14 @@ const KYCDocument = ({ formData, user }) => {
           {formData.advisorSummary && (
             <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>סיכום וניתוח</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.advisorSummary).replace(/\.$/, '')}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.advisorSummary || '').replace(/\.$/, '')}</Text>
             </View>
           )}
 
           {formData.clientPreferences && (
             <View style={{ borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, marginBottom: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>העדפות / הגבלות לקוח</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.clientPreferences).replace(/\.$/, '')}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.clientPreferences || '').replace(/\.$/, '')}</Text>
             </View>
           )}
         </View>
@@ -602,14 +602,14 @@ const KYCDocument = ({ formData, user }) => {
           {formData.finalRiskJustification && (
             <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לפער בדרגה</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.finalRiskJustification).replace(/\.$/, '')}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.finalRiskJustification || '').replace(/\.$/, '')}</Text>
             </View>
           )}
 
           {formData.riskLevelReason && (
             <View style={{ marginTop: 8, borderWidth: 0.5, borderColor: C.gold, borderRadius: 4, padding: 10, backgroundColor: C.cream }}>
               <Text style={{ fontSize: 9, fontWeight: 'bold', color: C.primary, textAlign: 'right', marginBottom: 3 }}>נימוק לבחירת רמת הסיכון</Text>
-              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.riskLevelReason).replace(/\.$/, '')}</Text>
+              <Text style={{ fontSize: 9, textAlign: 'right', lineHeight: 1.5, color: C.black }}>{String(formData.riskLevelReason || '').replace(/\.$/, '')}</Text>
             </View>
           )}
         </View>
