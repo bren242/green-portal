@@ -243,7 +243,7 @@ export const SectorCard = ({ title, total, items, notes }) => (
           <Text style={{ fontSize: 8, fontWeight: 'bold', color: C.black, textAlign: 'left', minWidth: 70 }}>{value}</Text>
         </View>
       ))}
-      {notes && (
+      {!!notes && (
         <Text style={{ fontSize: 7, color: C.muted, textAlign: 'right', marginTop: 4 }}>
           {notes}
         </Text>
