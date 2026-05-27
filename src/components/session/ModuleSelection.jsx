@@ -113,10 +113,13 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
 
   const allCompleted = modules.length > 0 && modules.every((m) => completedModules.includes(m.id))
 
-  // Kit availability: path supports it + all kit modules are completed with PDFs
+  // Kit availability: path supports it + at least 2 kit modules completed with PDFs
   const supportsKit = pathSupportsKit(session.path)
   const kitModules = getKitModuleOrder(session.path)
-  const kitReady = supportsKit && kitModules.every((id) => completedPDFs.some((p) => p.moduleId === id))
+  const completedKitCount = kitModules.filter((id) =>
+    completedPDFs.some((p) => p.moduleId === id)
+  ).length
+  const kitReady = supportsKit && completedKitCount >= 2
 
   return (
     <div className="max-w-2xl mx-auto">
