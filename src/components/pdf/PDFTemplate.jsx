@@ -329,7 +329,7 @@ export const ClientCard = ({ client, title, full }) => (
       <LabelValue label="שם מלא" value={client.fullName} even />
       <LabelValue label="תעודת זהות" value={client.idNumber} />
       {full && <>
-        <LabelValue label="תאריך לידה" value={client.birthDate} even />
+        <LabelValue label="תאריך לידה" value={fmtBirthDate(client.birthDate)} even />
         <LabelValue label="מצב משפחתי" value={translateMarital(client.maritalStatus)} />
         <LabelValue label="נפשות תלויות" value={client.dependents} even />
       </>}
@@ -398,4 +398,12 @@ export function translateMarital(status) {
 export function fmtDate() {
   const d = new Date()
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`
+}
+
+export function fmtBirthDate(val) {
+  if (!val) return '---'
+  // HTML date input stores YYYY-MM-DD — convert to DD/MM/YYYY
+  const [y, m, d] = val.split('-')
+  if (y && m && d) return `${d}/${m}/${y}`
+  return val
 }
