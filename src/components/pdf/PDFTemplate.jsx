@@ -101,7 +101,7 @@ export const SectionTitle = ({ children }) => (
 export const SectionGap = () => <View style={{ height: 20 }} />
 
 // ── Label → Value Row ──────────────────────────────────────────
-export const LabelValue = ({ label, value, even }) => (
+export const LabelValue = ({ label = '', value, even }) => (
   <View style={[
     { flexDirection: 'row-reverse', paddingVertical: 4, paddingHorizontal: 6 },
     even && { backgroundColor: C.surface },
@@ -139,7 +139,7 @@ export const DataTable = ({ headers, rows }) => (
 )
 
 // ── Summary Row (used inside summary boxes) ────────────────────
-export const SummaryRow = ({ label, value, highlight }) => {
+export const SummaryRow = ({ label = '', value = '', highlight }) => {
   if (highlight) {
     return (
       <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 5, paddingHorizontal: 8, borderRadius: 2, marginTop: 3 }}>
@@ -213,7 +213,7 @@ export const KpiHeader = () => (
 )
 
 // ── Sector Card (financial section — 2 per row) ───────────────
-export const SectorCard = ({ title, total, items, notes }) => (
+export const SectorCard = ({ title = '', total = '', items = [], notes }) => (
   <View style={{
     width: '48%',
     borderWidth: 1,
@@ -253,7 +253,7 @@ export const SectorCard = ({ title, total, items, notes }) => (
 )
 
 // ── Pill Tag ───────────────────────────────────────────────────
-export const PillTag = ({ text }) => (
+export const PillTag = ({ text = '' }) => (
   <View style={{
     backgroundColor: C.cream, borderWidth: 1, borderColor: C.secondary,
     borderRadius: 12, paddingVertical: 3, paddingHorizontal: 10,
@@ -285,7 +285,7 @@ export const RiskGauge = ({ level, size = 'normal' }) => {
                 borderColor: active ? colors[n - 1] : C.border,
                 justifyContent: 'center', alignItems: 'center',
               }}>
-                <Text style={{ fontSize: sm ? 7 : 9, fontWeight: 'bold', color: active ? C.white : C.muted }}>{n}</Text>
+                <Text style={{ fontSize: sm ? 7 : 9, fontWeight: 'bold', color: active ? C.white : C.muted }}>{String(n)}</Text>
               </View>
               <Text style={{
                 fontSize: sm ? 6 : 7,
@@ -302,7 +302,7 @@ export const RiskGauge = ({ level, size = 'normal' }) => {
 }
 
 // ── Policy Cube ────────────────────────────────────────────────
-export const PolicyCube = ({ label, value }) => (
+export const PolicyCube = ({ label = '', value }) => (
   <View style={{
     width: '23%', backgroundColor: C.cream, borderWidth: 1, borderColor: C.gold,
     borderRadius: 4, padding: 6, alignItems: 'center', marginHorizontal: '1%',
@@ -354,7 +354,7 @@ export const BalanceBox = ({ title, rows, highlightLabel, highlightValue }) => (
 )
 
 // ── Signature Line (RTL: label right, writing line left) ───────
-export const SignatureLine = ({ label }) => (
+export const SignatureLine = ({ label = '' }) => (
   <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-end', marginTop: 14, marginBottom: 2 }}>
     <Text style={{ fontSize: 9, color: C.black, textAlign: 'right' }}>X {label}</Text>
     <View style={{

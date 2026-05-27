@@ -137,7 +137,7 @@ const QualifiedInvestorDoc = ({ data = {}, styled: s }) => {
           )}
           <Text style={{ fontSize: 10, color: C.black }}>{'\u05EA.\u05D6'}</Text>
           {d.clientId ? (
-            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.black, marginHorizontal: 4 }}>{d.clientId}</Text>
+            <Text style={{ fontSize: 10, fontWeight: 'bold', color: C.black, marginHorizontal: 4 }}>{String(d.clientId || '')}</Text>
           ) : (
             <View style={{ borderBottomWidth: 1, borderBottomColor: C.black, width: 100, height: 14, marginHorizontal: 4 }} />
           )}
