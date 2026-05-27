@@ -596,11 +596,9 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         </NumPara>
 
         {/* Signature after option i */}
-        {!!(d.compensationModel === 'i') && (
-          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 6, marginBottom: 12 }}>
-            <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
-          </View>
-        )}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 6, marginBottom: 12 }}>
+          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
+        </View>
 
         <Text style={{ fontSize: 11, textAlign: 'center', marginVertical: 10 }}>או</Text>
 
@@ -618,11 +616,9 @@ const MarketingAgreementDoc = ({ data, styled }) => {
         </NumPara>
 
         {/* Signature after option ii */}
-        {!!(d.compensationModel === 'ii') && (
-          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
-            <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
-          </View>
-        )}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 16 }}>
+          <SignBlock label="חתימת הלקוח" dateValue={dateVal} />
+        </View>
 
         <PageFooter />
       </Page>
