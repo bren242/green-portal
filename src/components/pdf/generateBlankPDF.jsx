@@ -1,6 +1,7 @@
 import React from 'react'
 import { Document, Page, Text, View, Image, Font, pdf } from '@react-pdf/renderer'
 import { logoPng } from '../../assets/logoBase64'
+import { resetPdfFontCache } from '../../utils/pdfFontReset'
 
 // ── Font ──────────────────────────────────────────────────────
 Font.register({
@@ -498,7 +499,7 @@ const BlankDoc = () => (
 //  EXPORT
 // ══════════════════════════════════════════════════════════════
 export async function generateBlankPDF() {
-  Font.reset()
+  resetPdfFontCache()
   const blob = await pdf(<BlankDoc />).toBlob()
   const pdfBytes = await blob.arrayBuffer()
   const previewBlob = new Blob([pdfBytes], { type: 'application/pdf' })
