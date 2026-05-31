@@ -129,7 +129,7 @@ const REG_TEXTS = [
 
 // ── Risk levels table data (approved values) ──────────────────
 const RISK_TABLE = [
-  { level: 1, name: 'שמרן',       maxLoss: 'עד 5%',    maxStocks: '0%'       },
+  { level: 1, name: 'שמרן',       maxLoss: 'עד 5%',    maxStocks: 'עד 10%'   },
   { level: 2, name: 'שמרן-מתון',  maxLoss: 'עד 10%',   maxStocks: 'עד 20%'   },
   { level: 3, name: 'מאוזן',      maxLoss: 'עד 15%',   maxStocks: 'עד 30%'   },
   { level: 4, name: 'צמיחה',      maxLoss: 'מעל 15%',  maxStocks: 'עד 50%'   },
