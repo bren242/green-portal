@@ -356,6 +356,52 @@ function SignaturesTab() {
   const [error, setError] = useState(null)
   const [normalizing, setNormalizing] = useState(false)
   const [normalizeMsg, setNormalizeMsg] = useState(null)
+  const [importMsg, setImportMsg] = useState(null)
+
+  const handleExport = () => {
+    const data = {
+      version: 1,
+      signatures: {},
+      companyStamp: getCompanyStamp(),
+      qualifiedAmounts: localStorage.getItem('green_qualified_amounts'),
+      adminSettings: localStorage.getItem('green_admin_settings'),
+    }
+    users.forEach(u => {
+      const sig = getSignature(u.id)
+      if (sig) data.signatures[u.id] = sig
+    })
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'green-settings.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImport = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result)
+        if (data.signatures) {
+          Object.entries(data.signatures).forEach(([userId, sig]) => saveSignature(userId, sig))
+        }
+        if (data.companyStamp) saveCompanyStamp(data.companyStamp)
+        if (data.qualifiedAmounts) localStorage.setItem('green_qualified_amounts', data.qualifiedAmounts)
+        if (data.adminSettings) localStorage.setItem('green_admin_settings', data.adminSettings)
+        refreshState()
+        setImportMsg('ייבוא הושלם ✓')
+        setTimeout(() => setImportMsg(null), 3000)
+      } catch {
+        setError('קובץ לא תקין')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
 
   const refreshState = () => {
     const m = {}
@@ -439,6 +485,25 @@ function SignaturesTab() {
           {error}
         </div>
       )}
+
+      {/* ── Export / Import ── */}
+      <div className="bg-surface-cream border border-gold/40 rounded-card p-4">
+        <h3 className="text-sm font-bold text-green-primary mb-1">סנכרון בין מחשבים</h3>
+        <p className="text-xs text-text-muted mb-3">ייצא מהמחשב הראשי ← שלח ליובל ← ייבא אצלו. פעולה חד-פעמית לכל מחשב.</p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 bg-green-primary text-white rounded-lg text-sm font-semibold hover:bg-green-secondary transition-colors"
+          >
+            ↓ ייצא הגדרות
+          </button>
+          <label className="cursor-pointer px-4 py-2 bg-white border border-green-primary text-green-primary rounded-lg text-sm font-semibold hover:bg-green-primary/5 transition-colors">
+            ↑ ייבא הגדרות
+            <input type="file" accept=".json" className="hidden" onChange={handleImport} />
+          </label>
+          {importMsg && <span className="text-sm text-positive font-semibold">{importMsg}</span>}
+        </div>
+      </div>
 
       {/* ── Normalize button ── */}
       <div className="flex items-center gap-3">
