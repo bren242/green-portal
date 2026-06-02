@@ -169,7 +169,7 @@ const KYCDocument = ({ formData, user }) => {
     if (item.has) {
       totalMonthlyIncome += parseAmount(item.amount)
       const incomeDisplay = (label === 'שכר נטו חודשי' && formData.incomeRange === '50_plus')
-        ? 'מעל 50,000 ₪'
+        ? 'מעל ₪50,000'
         : fmtMoney(item.amount)
       incomeRows.push([label, incomeDisplay])
     }
@@ -391,7 +391,7 @@ const KYCDocument = ({ formData, user }) => {
               title="הכנסות (חודשי)"
               total={
                 formData.incomeRange === '50_plus' && totalMonthlyIncome === 60000
-                  ? 'מעל 50,000 ₪'
+                  ? 'מעל ₪50,000'
                   : fmtMoney(totalMonthlyIncome)
               }
               items={incomeRows}
@@ -403,7 +403,7 @@ const KYCDocument = ({ formData, user }) => {
               title="הוצאות חודשיות"
               total={
                 formData.expenseRange === '50_plus' && totalMonthlyExpenses === 60000
-                  ? 'מעל 50,000 ₪'
+                  ? 'מעל ₪50,000'
                   : fmtMoney(totalMonthlyExpenses)
               }
               items={expenseRows}

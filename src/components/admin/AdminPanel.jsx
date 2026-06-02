@@ -301,10 +301,10 @@ function ScoringTab() {
           </thead>
           <tbody>
             {[
-              { level: 1, name: 'שמרן', range: '1.0-1.9', loss: 'עד 5%', stocks: '0%', bonds: 'עד 25%' },
-              { level: 2, name: 'שמרן-מתון', range: '2.0-2.9', loss: 'עד 10%', stocks: 'עד 15%', bonds: 'עד 50%' },
-              { level: 3, name: 'מאוזן', range: '3.0-3.7', loss: 'עד 15%', stocks: 'עד 25%', bonds: 'עד 100%' },
-              { level: 4, name: 'צמיחה', range: '3.8-4.4', loss: 'מעל 15%', stocks: 'עד 35%', bonds: 'עד 100%' },
+              { level: 1, name: 'שמרן', range: '1.0-1.9', loss: 'עד 5%', stocks: 'עד 10%', bonds: 'עד 25%' },
+              { level: 2, name: 'שמרן-מתון', range: '2.0-2.9', loss: 'עד 10%', stocks: 'עד 20%', bonds: 'עד 50%' },
+              { level: 3, name: 'מאוזן', range: '3.0-3.7', loss: 'עד 15%', stocks: 'עד 30%', bonds: 'עד 100%' },
+              { level: 4, name: 'צמיחה', range: '3.8-4.4', loss: 'מעל 15%', stocks: 'עד 50%', bonds: 'עד 100%' },
               { level: 5, name: 'אגרסיבי', range: '4.5-5.0', loss: 'משמעותי', stocks: 'עד 100%', bonds: '100%' },
             ].map((row, i) => (
               <tr key={row.level} className={i % 2 === 0 ? 'bg-white' : 'bg-surface-light'}>

@@ -150,10 +150,10 @@ export function calculateRiskScore(form) {
 }
 
 export const RISK_LEVELS = [
-  { level: 1, name: 'שמרן', maxLoss: 'עד 5%', maxStocks: '0%', corpBonds: 'עד 25%', description: 'שמירת ערך מקסימלית, תנודות מינימליות, תשואה צנועה מעל פקדון' },
-  { level: 2, name: 'שמרן-מתון', maxLoss: 'עד 10%', maxStocks: 'עד 15%', corpBonds: 'עד 50%', description: 'חשיפה מוגבלת לסיכון, תשואה מעל אינפלציה לאורך זמן' },
-  { level: 3, name: 'מאוזן', maxLoss: 'עד 15%', maxStocks: 'עד 25%', corpBonds: 'עד 100%', description: 'איזון בין סיכון לתשואה, תנודות מובנות ומקובלות' },
-  { level: 4, name: 'צמיחה', maxLoss: 'מעל 15%', maxStocks: 'עד 35%', corpBonds: 'עד 100%', description: 'נכונות לסיכון גבוה לטובת תשואה עודפת לטווח ארוך' },
+  { level: 1, name: 'שמרן', maxLoss: 'עד 5%', maxStocks: 'עד 10%', corpBonds: 'עד 25%', description: 'שמירת ערך מקסימלית, תנודות מינימליות, תשואה צנועה מעל פקדון' },
+  { level: 2, name: 'שמרן-מתון', maxLoss: 'עד 10%', maxStocks: 'עד 20%', corpBonds: 'עד 50%', description: 'חשיפה מוגבלת לסיכון, תשואה מעל אינפלציה לאורך זמן' },
+  { level: 3, name: 'מאוזן', maxLoss: 'עד 15%', maxStocks: 'עד 30%', corpBonds: 'עד 100%', description: 'איזון בין סיכון לתשואה, תנודות מובנות ומקובלות' },
+  { level: 4, name: 'צמיחה', maxLoss: 'מעל 15%', maxStocks: 'עד 50%', corpBonds: 'עד 100%', description: 'נכונות לסיכון גבוה לטובת תשואה עודפת לטווח ארוך' },
   { level: 5, name: 'אגרסיבי', maxLoss: 'משמעותי', maxStocks: 'עד 100%', corpBonds: '100%', description: 'חשיפה מקסימלית, מתאים למשקיע מנוסה עם אופק ארוך' },
 ]
 
