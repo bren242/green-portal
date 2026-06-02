@@ -168,7 +168,10 @@ const KYCDocument = ({ formData, user }) => {
   for (const [label, item] of incomeItems) {
     if (item.has) {
       totalMonthlyIncome += parseAmount(item.amount)
-      incomeRows.push([label, fmtMoney(item.amount)])
+      const incomeDisplay = (label === 'שכר נטו חודשי' && formData.incomeRange === '50_plus')
+        ? 'מעל 50,000 ₪'
+        : fmtMoney(item.amount)
+      incomeRows.push([label, incomeDisplay])
     }
   }
 
@@ -228,7 +231,10 @@ const KYCDocument = ({ formData, user }) => {
   }
   if (formData.liabilities.monthlyExpenses) {
     totalMonthlyExpenses += parseAmount(formData.liabilities.monthlyExpenses)
-    expenseRows.push(['הוצאות שוטפות', fmtMoney(formData.liabilities.monthlyExpenses)])
+    const expenseDisplay = formData.expenseRange === '50_plus'
+      ? 'מעל 50,000 ₪'
+      : fmtMoney(formData.liabilities.monthlyExpenses)
+    expenseRows.push(['הוצאות שוטפות', expenseDisplay])
   }
 
   // Liabilities (totals only — for net worth block)
