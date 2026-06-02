@@ -389,7 +389,11 @@ const KYCDocument = ({ formData, user }) => {
           {incomeRows.length > 0 && (
             <SectorCard
               title="הכנסות (חודשי)"
-              total={fmtMoney(totalMonthlyIncome)}
+              total={
+                formData.incomeRange === '50_plus' && totalMonthlyIncome === 60000
+                  ? 'מעל 50,000 ₪'
+                  : fmtMoney(totalMonthlyIncome)
+              }
               items={incomeRows}
               notes={formData.incomeNotes}
             />
@@ -397,7 +401,11 @@ const KYCDocument = ({ formData, user }) => {
           {expenseRows.length > 0 && (
             <SectorCard
               title="הוצאות חודשיות"
-              total={fmtMoney(totalMonthlyExpenses)}
+              total={
+                formData.expenseRange === '50_plus' && totalMonthlyExpenses === 60000
+                  ? 'מעל 50,000 ₪'
+                  : fmtMoney(totalMonthlyExpenses)
+              }
               items={expenseRows}
             />
           )}
