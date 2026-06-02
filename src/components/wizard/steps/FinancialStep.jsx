@@ -1,5 +1,10 @@
 import { TextArea, SelectInput, RadioGroup, RefuseButton } from '../ui/FormField'
 
+const formatCommas = (str) => {
+  const n = String(str || '').replace(/[^\d]/g, '')
+  return n ? Number(n).toLocaleString('he-IL') : ''
+}
+
 // ── Range options (identical for income & expenses) ──────────────
 const RANGE_OPTIONS = [
   { value: 'up_to_10', label: 'עד 10,000 ₪' },
@@ -167,14 +172,18 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
                 <span className="text-sm font-semibold text-green-primary min-w-[160px]">
                   {group.label}
                 </span>
-                <input
-                  type="text"
-                  value={data.amount}
-                  onChange={(e) => handleAssetGroup(group.key, 'amount', e.target.value)}
-                  placeholder="סכום ₪"
-                  autoComplete="off"
-                  className="flex-1 px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary"
-                />
+                <div className="flex-1 flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    value={data.amount}
+                    onChange={(e) => handleAssetGroup(group.key, 'amount', formatCommas(e.target.value))}
+                    placeholder="0"
+                    autoComplete="off"
+                    dir="ltr"
+                    className="flex-1 px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary focus:ring-1 focus:ring-green-secondary text-left"
+                  />
+                  <span className="text-sm text-text-muted shrink-0">ש"ח</span>
+                </div>
               </div>
               {data.amount && (
                 <textarea
@@ -205,9 +214,15 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
             <span className="text-sm font-medium">משכנתא</span>
           </label>
           {formData.liabilities.mortgage.has && (
-            <div className="flex gap-2">
-              <input type="text" value={formData.liabilities.mortgage.monthly} onChange={(e) => updateLiability('mortgage', { ...formData.liabilities.mortgage, monthly: e.target.value })} placeholder="חודשי ₪" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary" />
-              <input type="text" value={formData.liabilities.mortgage.total} onChange={(e) => updateLiability('mortgage', { ...formData.liabilities.mortgage, total: e.target.value })} placeholder="יתרה ₪" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary" />
+            <div className="flex gap-2 flex-wrap">
+              <div className="flex items-center gap-1">
+                <input type="text" dir="ltr" value={formData.liabilities.mortgage.monthly} onChange={(e) => updateLiability('mortgage', { ...formData.liabilities.mortgage, monthly: formatCommas(e.target.value) })} placeholder="0" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary text-left" />
+                <span className="text-xs text-text-muted">ש"ח/חודש</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <input type="text" dir="ltr" value={formData.liabilities.mortgage.total} onChange={(e) => updateLiability('mortgage', { ...formData.liabilities.mortgage, total: formatCommas(e.target.value) })} placeholder="0" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary text-left" />
+                <span className="text-xs text-text-muted">ש"ח יתרה</span>
+              </div>
             </div>
           )}
         </div>
@@ -222,9 +237,15 @@ export default function FinancialStep({ formData, updateForm, isRefused, toggleR
             <span className="text-sm font-medium">הלוואות</span>
           </label>
           {formData.liabilities.loans.has && (
-            <div className="flex gap-2">
-              <input type="text" value={formData.liabilities.loans.monthly} onChange={(e) => updateLiability('loans', { ...formData.liabilities.loans, monthly: e.target.value })} placeholder="חודשי ₪" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary" />
-              <input type="text" value={formData.liabilities.loans.total} onChange={(e) => updateLiability('loans', { ...formData.liabilities.loans, total: e.target.value })} placeholder="יתרה ₪" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary" />
+            <div className="flex gap-2 flex-wrap">
+              <div className="flex items-center gap-1">
+                <input type="text" dir="ltr" value={formData.liabilities.loans.monthly} onChange={(e) => updateLiability('loans', { ...formData.liabilities.loans, monthly: formatCommas(e.target.value) })} placeholder="0" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary text-left" />
+                <span className="text-xs text-text-muted">ש"ח/חודש</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <input type="text" dir="ltr" value={formData.liabilities.loans.total} onChange={(e) => updateLiability('loans', { ...formData.liabilities.loans, total: formatCommas(e.target.value) })} placeholder="0" autoComplete="off" className="w-28 px-2 py-1.5 border border-border rounded-lg text-sm focus:outline-none focus:border-green-secondary text-left" />
+                <span className="text-xs text-text-muted">ש"ח יתרה</span>
+              </div>
             </div>
           )}
         </div>

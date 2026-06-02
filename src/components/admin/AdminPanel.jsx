@@ -365,6 +365,7 @@ function SignaturesTab() {
       companyStamp: getCompanyStamp(),
       qualifiedAmounts: localStorage.getItem('green_qualified_amounts'),
       adminSettings: localStorage.getItem('green_admin_settings'),
+      userProfiles: users.map(u => ({ id: u.id, idNumber: u.idNumber || '', license: u.license || '' })),
     }
     users.forEach(u => {
       const sig = getSignature(u.id)

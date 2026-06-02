@@ -36,6 +36,19 @@ export default function AdvisorSelect({ onSelect }) {
         if (data.companyStamp) saveCompanyStamp(data.companyStamp)
         if (data.qualifiedAmounts) localStorage.setItem('green_qualified_amounts', data.qualifiedAmounts)
         if (data.adminSettings) localStorage.setItem('green_admin_settings', data.adminSettings)
+        if (data.userProfiles && Array.isArray(data.userProfiles)) {
+          try {
+            const raw = localStorage.getItem('green_users')
+            const stored = raw ? JSON.parse(raw) : null
+            if (stored && Array.isArray(stored)) {
+              const merged = stored.map(u => {
+                const p = data.userProfiles.find(x => x.id === u.id)
+                return p ? { ...u, idNumber: p.idNumber || u.idNumber, license: p.license || u.license } : u
+              })
+              localStorage.setItem('green_users', JSON.stringify(merged))
+            }
+          } catch { /* ignore */ }
+        }
         setImportMsg('ההגדרות נטענו בהצלחה ✓')
         setImportError(null)
         setTimeout(() => setImportMsg(null), 4000)
