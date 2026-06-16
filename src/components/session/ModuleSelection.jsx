@@ -5,6 +5,7 @@ import { generateMarketingAgreementBlank } from '../pdf/generateMarketingAgreeme
 import { generateMeetingSummaryBlank } from '../pdf/generateMeetingSummary'
 import { generateQualifiedInvestorBlank } from '../pdf/generateQualifiedInvestor'
 import { generateQualifiedAdvisorBlank } from '../pdf/generateQualifiedAdvisor'
+import { generateSpecialRiskBlank } from '../pdf/generateSpecialRisk'
 import { mergeSessionPDFs, pathSupportsKit, getKitModuleOrder } from '../../utils/mergePDFs'
 
 const MODULE_ICONS = {
@@ -41,6 +42,7 @@ const BLANK_GENERATORS = {
   generateMeetingSummaryBlank,
   generateQualifiedInvestorBlank,
   generateQualifiedAdvisorBlank,
+  generateSpecialRiskBlank,
 }
 
 export default function ModuleSelection({ session, onModuleStart, onUpdateModules, onEndSession }) {
@@ -153,7 +155,7 @@ export default function ModuleSelection({ session, onModuleStart, onUpdateModule
       <div className="space-y-3 mb-6">
         {modules.map((mod) => {
           const isCompleted = completedModules.includes(mod.id)
-          const isAvailable = mod.id === 'kyc' || mod.id === 'agreement' || mod.id === 'meeting' || mod.id === 'qualified' || mod.id === 'qualifiedAdvisor' || mod.id === 'deskReferral'
+          const isAvailable = mod.id === 'kyc' || mod.id === 'agreement' || mod.id === 'meeting' || mod.id === 'qualified' || mod.id === 'qualifiedAdvisor' || mod.id === 'deskReferral' || mod.id === 'specialRisk'
           const isFuture = !isAvailable
 
           return (
