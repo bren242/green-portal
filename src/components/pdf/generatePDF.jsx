@@ -535,7 +535,6 @@ const KYCDocument = ({ formData, user }) => {
           <View style={{ flexDirection: 'row-reverse', backgroundColor: C.primary, paddingVertical: 4, paddingHorizontal: 6 }}>
             <Text style={{ width: 36, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>דרגה</Text>
             <Text style={{ flex: 2, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>שם</Text>
-            <Text style={{ flex: 2, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>הפסד מקס׳</Text>
             <Text style={{ flex: 2, fontSize: 8, fontWeight: 'bold', color: C.goldLight, textAlign: 'right' }}>מניות מקס׳</Text>
           </View>
           {RISK_TABLE.map((rl) => {
@@ -549,7 +548,6 @@ const KYCDocument = ({ formData, user }) => {
               }}>
                 <Text style={{ width: 36, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.level}</Text>
                 <Text style={{ flex: 2, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.name}</Text>
-                <Text style={{ flex: 2, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.maxLoss}</Text>
                 <Text style={{ flex: 2, fontSize: 8, fontWeight: isSelected ? 'bold' : 'normal', color: isSelected ? C.primary : C.black, textAlign: 'right' }}>{rl.maxStocks}</Text>
               </View>
             )
@@ -609,7 +607,7 @@ const KYCDocument = ({ formData, user }) => {
               </Text>
               <Text style={{ fontSize: 9, color: C.secondary, textAlign: 'right', marginTop: 3 }}>{rlFinal.description}</Text>
               <Text style={{ fontSize: 9, color: C.black, textAlign: 'right', marginTop: 3 }}>
-                הפסד מקסימלי: {rlFinal.maxLoss} | מניות: {rlFinal.maxStocks} | אג״ח קונצרני: {rlFinal.corpBonds}
+                מניות: {rlFinal.maxStocks} | אג״ח קונצרני: {rlFinal.corpBonds}
               </Text>
               <RiskGauge level={formData.finalRiskLevel} size="small" />
             </View>

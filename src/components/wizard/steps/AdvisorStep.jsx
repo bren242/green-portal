@@ -124,7 +124,6 @@ export default function AdvisorStep({ formData, updateForm, user, onSavePDF, onC
               {RISK_LEVELS[formData.finalRiskLevel - 1].description}
             </div>
             <div className="text-text-muted text-xs mt-1">
-              הפסד מקסימלי: {RISK_LEVELS[formData.finalRiskLevel - 1].maxLoss} |
               מניות מקס׳: {RISK_LEVELS[formData.finalRiskLevel - 1].maxStocks} |
               אג״ח קונצרני: {RISK_LEVELS[formData.finalRiskLevel - 1].corpBonds}
             </div>

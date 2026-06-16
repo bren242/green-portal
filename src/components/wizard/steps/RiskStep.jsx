@@ -93,7 +93,7 @@ export default function RiskStep({ formData, updateForm, isRefused, toggleRefusa
             </span>
           </div>
           <div className="text-xs text-text-muted">
-            ממוצע: {riskResult.average} | הפסד מקסימלי: {RISK_LEVELS[riskResult.level - 1].maxLoss} | מניות מקס׳: {RISK_LEVELS[riskResult.level - 1].maxStocks}
+            ממוצע: {riskResult.average} | מניות מקס׳: {RISK_LEVELS[riskResult.level - 1].maxStocks}
           </div>
           {riskResult.hasGap && (
             <div className="bg-warning-bg border border-warning-border text-warning-red text-sm p-3 rounded-lg">
