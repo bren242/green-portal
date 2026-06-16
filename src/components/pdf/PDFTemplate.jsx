@@ -402,7 +402,7 @@ export function fmtDate() {
 
 export function fmtBirthDate(val) {
   if (!val) return '---'
-  // HTML date input stores YYYY-MM-DD — convert to DD/MM/YYYY
+  if (val.includes('/')) return val
   const [y, m, d] = val.split('-')
   if (y && m && d) return `${d}/${m}/${y}`
   return val

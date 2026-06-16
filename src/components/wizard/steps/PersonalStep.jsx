@@ -20,7 +20,7 @@ function ClientFields({ title, client, onChange }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <TextInput label="שם מלא *" value={client.fullName} onChange={(v) => update('fullName', v)} placeholder="שם פרטי ומשפחה" />
         <TextInput label="תעודת זהות *" value={client.idNumber} onChange={(v) => update('idNumber', v)} placeholder="מספר ת.ז" inputMode="numeric" onlyDigits />
-        <TextInput label="תאריך לידה" value={client.birthDate} onChange={(v) => update('birthDate', v)} type="date" />
+        <TextInput label="תאריך לידה" value={client.birthDate} onChange={(v) => update('birthDate', v)} placeholder="DD/MM/YYYY" />
         <SelectInput label="מצב משפחתי" value={client.maritalStatus} onChange={(v) => update('maritalStatus', v)} options={MARITAL_OPTIONS} />
         <TextInput label="נפשות תלויות" value={client.dependents} onChange={(v) => update('dependents', v)} placeholder="מספר" />
         <TextInput label="טלפון נייד *" value={client.phone} onChange={(v) => update('phone', v)} placeholder="050-0000000" type="tel" />

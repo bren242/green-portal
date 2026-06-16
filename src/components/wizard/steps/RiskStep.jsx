@@ -15,10 +15,10 @@ export default function RiskStep({ formData, updateForm, isRefused, toggleRefusa
             value={formData.riskQ1}
             onChange={(v) => updateForm({ riskQ1: v })}
             options={[
-              { value: 'a', label: 'סיכוי להרוויח עד 6%, סיכון להפסיד עד 5%' },
-              { value: 'b', label: 'סיכוי להרוויח עד 14%, סיכון להפסיד עד 10%' },
-              { value: 'c', label: 'סיכוי להרוויח עד 20%, סיכון להפסיד עד 15%' },
-              { value: 'd', label: 'סיכוי להרוויח מעל 20%, סיכון להפסיד מעל 15%' },
+              { value: 'a', label: <>סיכוי להרוויח <strong>עד</strong> 6%, סיכון להפסיד <strong>עד</strong> 5%</> },
+              { value: 'b', label: <>סיכוי להרוויח <strong>עד</strong> 14%, סיכון להפסיד <strong>עד</strong> 10%</> },
+              { value: 'c', label: <>סיכוי להרוויח <strong>עד</strong> 20%, סיכון להפסיד <strong>עד</strong> 15%</> },
+              { value: 'd', label: <>סיכוי להרוויח <strong>מעל</strong> 20%, סיכון להפסיד <strong>מעל</strong> 15%</> },
             ]}
           />
         </div>
