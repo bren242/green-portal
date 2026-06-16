@@ -6,6 +6,7 @@ import { generateMarketingAgreementBlank } from '../pdf/generateMarketingAgreeme
 import { generateMeetingSummaryBlank } from '../pdf/generateMeetingSummary'
 import { generateQualifiedInvestorBlank } from '../pdf/generateQualifiedInvestor'
 import { generateQualifiedAdvisorBlank } from '../pdf/generateQualifiedAdvisor'
+import { generateSpecialRiskBlank } from '../pdf/generateSpecialRisk'
 import { saveSignature, saveCompanyStamp } from '../pdf/../../data/signatures'
 
 const BLANK_GENERATORS = {
@@ -14,6 +15,7 @@ const BLANK_GENERATORS = {
   generateMeetingSummaryBlank,
   generateQualifiedInvestorBlank,
   generateQualifiedAdvisorBlank,
+  generateSpecialRiskBlank,
 }
 
 export default function AdvisorSelect({ onSelect }) {

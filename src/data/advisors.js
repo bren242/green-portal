@@ -29,6 +29,7 @@ export const ALL_MODULES = [
   { id: 'kyc', name: 'איפיון צרכים' },
   { id: 'qualified', name: 'הצהרת לקוח כשיר' },
   { id: 'qualifiedAdvisor', name: 'לקוח כשיר — חוק הייעוץ' },
+  { id: 'specialRisk', name: 'נספח השקעות בסיכון מיוחד' },
   { id: 'meeting', name: 'סיכום פגישה' },
   { id: 'deskReferral', name: 'הפניה לדסק תפעול' },
 ]
@@ -40,6 +41,7 @@ export const BLANK_FORMS = [
   { id: 'meeting_blank', name: 'סיכום פגישה (ידני)', generator: 'generateMeetingSummaryBlank' },
   { id: 'qualified_blank', name: 'הצהרת כשיר (ידני)', generator: 'generateQualifiedInvestorBlank' },
   { id: 'qualifiedAdvisor_blank', name: 'כשיר חוק הייעוץ (ידני)', generator: 'generateQualifiedAdvisorBlank' },
+  { id: 'specialRisk_blank', name: 'נספח סיכון מיוחד (ידני)', generator: 'generateSpecialRiskBlank' },
 ]
 
 // Session data factory

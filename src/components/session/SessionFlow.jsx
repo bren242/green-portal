@@ -11,6 +11,7 @@ import MeetingSummaryModule from './MeetingSummaryModule'
 import QualifiedInvestorModule from './QualifiedInvestorModule'
 import QualifiedAdvisorModule from './QualifiedAdvisorModule'
 import DeskReferralModule from './DeskReferralModule'
+import SpecialRiskModule from './SpecialRiskModule'
 
 // Session steps: advisor → clientType → clientDetails → modules → (module work)
 const STEPS = ['advisor', 'clientType', 'clientDetails', 'modules']
@@ -177,6 +178,20 @@ export default function SessionFlow({ user, onLogout, onAdmin }) {
           onAdmin={onAdmin}
           onSavePDF={(pdfBytes, fileName) => handleSavePDF('deskReferral', pdfBytes, fileName)}
           onComplete={() => handleModuleComplete('deskReferral')}
+          onBack={handleModuleBack}
+        />
+      )
+    }
+
+    if (activeModule === 'specialRisk') {
+      return (
+        <SpecialRiskModule
+          user={user}
+          session={session}
+          onLogout={onLogout}
+          onAdmin={onAdmin}
+          onSavePDF={(pdfBytes, fileName) => handleSavePDF('specialRisk', pdfBytes, fileName)}
+          onComplete={() => handleModuleComplete('specialRisk')}
           onBack={handleModuleBack}
         />
       )
